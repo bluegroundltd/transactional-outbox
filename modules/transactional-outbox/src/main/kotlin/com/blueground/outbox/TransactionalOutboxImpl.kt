@@ -1,4 +1,4 @@
-package com.blueground.transactional.outbox
+package com.blueground.outbox
 
 class TransactionalOutboxImpl : TransactionalOutbox {
 
