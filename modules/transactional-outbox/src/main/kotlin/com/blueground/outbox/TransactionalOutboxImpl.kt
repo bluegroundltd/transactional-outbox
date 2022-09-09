@@ -4,19 +4,39 @@ import com.blueground.outbox.item.OutboxItem
 import com.blueground.outbox.item.OutboxPayload
 import com.blueground.outbox.item.OutboxStatus
 import com.blueground.outbox.item.OutboxType
+import com.blueground.outbox.store.OutboxFilter
+import com.blueground.outbox.store.OutboxStore
+import com.google.common.util.concurrent.ThreadFactoryBuilder
+import java.time.Clock
+import java.time.Duration
+import java.time.Instant
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
 
 class TransactionalOutboxImpl(
-  private val outboxHandlers: List<OutboxHandler>,
-  private val outboxPersistor: OutboxPersistor
+  private val clock: Clock,
+  private val outboxHandlers: Map<OutboxType, OutboxHandler>,
+  private val lockIdentifier: Long,
+  private val locksProvider: OutboxLocksProvider,
+  private val outboxStore: OutboxStore,
+  private val executor: ExecutorService = Executors.newFixedThreadPool(
+    DEFAULT_THREAD_POOL_SIZE,
+    ThreadFactoryBuilder().setNameFormat(THEAD_POOL_NAME_FORMAT).build()
+  )
 ) : TransactionalOutbox {
-  // TODO change handlers storage to MutableMap<OutboxType, OutboxHandler>
+
+  companion object {
+    private val RERUN_AFTER_DEFAULT_DURATION = Duration.ofHours(1)
+    private const val DEFAULT_THREAD_POOL_SIZE = 10
+    private const val THEAD_POOL_NAME_FORMAT = "outbox-item-processor-%d"
+  }
 
   override fun add(type: OutboxType, payload: OutboxPayload) {
-    val handler = getHandler(type)
+    val handler = outboxHandlers[type]
       ?: throw UnsupportedOperationException("Outbox item type \"{${type.getType()}\" isn't supported")
 
     val outboxItem = makePendingItem(type, payload, handler)
-    outboxPersistor.insert(outboxItem)
+    outboxStore.insert(outboxItem)
   }
 
   // TODO extract to factory
@@ -33,7 +53,35 @@ class TransactionalOutboxImpl(
     )
   }
 
-  private fun getHandler(type: OutboxType) = outboxHandlers.find { it.supports(type) }
+  override fun monitor() {
+    locksProvider.acquire(lockIdentifier)
+    val items = fetchEligibleItems()
+    markForProcessing(items)
+    items.map { outboxStore.update(it) }
+    locksProvider.release(lockIdentifier)
 
-  override fun monitor() = TODO("Not yet implemented")
+    items.forEach { item ->
+      executor.execute(
+        OutboxItemProcessor(item, outboxHandlers[item.type]!!, outboxStore)
+      )
+    }
+  }
+
+  private fun fetchEligibleItems() = outboxStore.fetch(OutboxFilter(Instant.now(clock)))
+
+  private fun markForProcessing(items: List<OutboxItem>) =
+    items.map {
+      when (it.status) {
+        OutboxStatus.PENDING, OutboxStatus.RUNNING -> it.status = OutboxStatus.RUNNING
+        else -> {
+          // Once we add logging, we can simply log it, and not crash.
+          throw IllegalArgumentException(
+            "Expected outbox item of status ${OutboxStatus.PENDING} or ${OutboxStatus.RUNNING}, but got ${it.status}"
+          )
+        }
+      }
+
+      it.lastExecution = Instant.now(clock)
+      it.rerunAfter = it.lastExecution?.plus(RERUN_AFTER_DEFAULT_DURATION)
+    }
 }

@@ -6,10 +6,10 @@ import java.time.Instant
 class OutboxItem(
   val id: Long?,
   val type: OutboxType,
-  val status: OutboxStatus,
+  var status: OutboxStatus,
   val payload: String,
-  val retries: Int,
-  val nextRun: Instant,
-  val lastExecution: Instant?,
-  val rerunAfter: Instant?, // TODO maybe duration? to be added to lastExecution?
+  var retries: Long,
+  var nextRun: Instant,
+  var lastExecution: Instant?,
+  var rerunAfter: Instant?, // TODO maybe duration? to be added to lastExecution?
 )

@@ -10,4 +10,10 @@ interface OutboxHandler {
   fun serialize(payload: OutboxPayload): String
 
   fun getNextExecutionTime(currentRetries: Long): Instant
+
+  fun hasReachedMaxRetries(retries: Long): Boolean
+
+  fun handle(payload: String)
+
+  fun handleFailure(payload: String)
 }
