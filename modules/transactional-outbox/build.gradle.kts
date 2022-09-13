@@ -13,7 +13,6 @@ dependencies {
   implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion")
   implementation("org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion")
 
-  testImplementation(project(":commons-test"))
   testImplementation("org.spockframework:spock-core:$spockVersion")
 
   detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:$detektVersion")

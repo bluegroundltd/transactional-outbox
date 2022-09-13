@@ -1,12 +1,12 @@
 package com.blueground.outbox
 
-import com.blueground.commons.test.UnitTestSpecification
 import com.blueground.outbox.item.OutboxItem
 import com.blueground.outbox.item.OutboxPayload
 import com.blueground.outbox.item.OutboxStatus
 import com.blueground.outbox.item.OutboxType
 import com.blueground.outbox.store.OutboxFilter
 import com.blueground.outbox.store.OutboxStore
+import spock.lang.Specification
 import spock.lang.Unroll
 
 import java.time.Clock
@@ -14,7 +14,7 @@ import java.time.Instant
 import java.time.ZoneId
 import java.util.concurrent.ExecutorService
 
-class TransactionalOutboxImplSpec extends UnitTestSpecification {
+class TransactionalOutboxImplSpec extends Specification {
   private static final long LOCK_IDENTIFIER = 1L
   Clock clock = Clock.fixed(Instant.now(), ZoneId.systemDefault())
   Map<OutboxType, OutboxHandler> handlers = Mock()
@@ -129,26 +129,24 @@ class TransactionalOutboxImplSpec extends UnitTestSpecification {
       thrown(IllegalArgumentException)
 
     where:
-      status                 | _
-      OutboxStatus.FAILED    | _
-      OutboxStatus.COMPLETED | _
+      status << [OutboxStatus.COMPLETED, OutboxStatus.FAILED]
   }
 
   private def makeOutboxItem(OutboxStatus status) {
     return new OutboxItem(
-      generateLong(),
+      1L,
       new OutboxType() {
         @Override
         String getType() {
-          return generateString()
+          return "type"
         }
       },
-      status ?: randomEnum(OutboxStatus),
-      generateString(),
-      generateLong(),
-      generateInstant(),
-      generateInstant(),
-      generateInstant()
+      status,
+      "payload",
+      1L,
+      Instant.now(clock),
+      Instant.now(clock),
+      Instant.now(clock)
     )
   }
 

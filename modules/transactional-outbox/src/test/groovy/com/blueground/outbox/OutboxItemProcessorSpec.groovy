@@ -1,12 +1,12 @@
 package com.blueground.outbox
 
-import com.blueground.commons.test.UnitTestSpecification
 import com.blueground.outbox.item.OutboxItem
 import com.blueground.outbox.store.OutboxStore
+import spock.lang.Specification
 
 import java.time.Instant
 
-class OutboxItemProcessorSpec extends UnitTestSpecification {
+class OutboxItemProcessorSpec extends Specification {
   OutboxItem item = GroovyMock()
   OutboxHandler handler = GroovyMock()
   OutboxStore store = GroovyMock()
