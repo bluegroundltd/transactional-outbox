@@ -7,6 +7,8 @@ import com.blueground.outbox.item.OutboxType
 import com.blueground.outbox.store.OutboxFilter
 import com.blueground.outbox.store.OutboxStore
 import com.google.common.util.concurrent.ThreadFactoryBuilder
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import java.time.Clock
 import java.time.Duration
 import java.time.Instant
@@ -29,9 +31,11 @@ class TransactionalOutboxImpl(
     private val RERUN_AFTER_DEFAULT_DURATION = Duration.ofHours(1)
     private const val DEFAULT_THREAD_POOL_SIZE = 10
     private const val THEAD_POOL_NAME_FORMAT = "outbox-item-processor-%d"
+    private val logger: Logger = LoggerFactory.getLogger(TransactionalOutboxImpl::class.java)
   }
 
   override fun add(type: OutboxType, payload: OutboxPayload) {
+    logger.info("Adding item of type: ${type.getType()} and payload: $payload")
     val handler = outboxHandlers[type]
       ?: throw UnsupportedOperationException("Outbox item type \"{${type.getType()}\" isn't supported")
 

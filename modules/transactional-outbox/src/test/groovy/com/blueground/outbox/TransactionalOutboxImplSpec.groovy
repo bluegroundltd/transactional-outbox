@@ -38,7 +38,7 @@ class TransactionalOutboxImplSpec extends Specification {
 
     then:
       1 * handlers.get(type) >> null
-      1 * type.getType()
+      2 * type.getType() >> "type"
       0 * _
 
     and:
@@ -63,6 +63,7 @@ class TransactionalOutboxImplSpec extends Specification {
       transactionalOutbox.add(type, payload)
 
     then:
+      1 * type.getType() >> "type"
       1 * handlers.get(type) >> handler
       1 * handler.serialize(payload) >> serializedPayload
       1 * handler.getNextExecutionTime(0) >> nextRun
