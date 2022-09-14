@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory
 import java.time.Clock
 import java.time.Duration
 import java.time.Instant
+import java.util.EnumSet
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
@@ -32,6 +33,7 @@ class TransactionalOutboxImpl(
     private const val DEFAULT_THREAD_POOL_SIZE = 10
     private const val THEAD_POOL_NAME_FORMAT = "outbox-item-processor-%d"
     private val logger: Logger = LoggerFactory.getLogger(TransactionalOutboxImpl::class.java)
+    private val STATUSES_ELIGIBLE_FOR_PROCESSING = EnumSet.of(OutboxStatus.PENDING, OutboxStatus.RUNNING)
   }
 
   override fun add(type: OutboxType, payload: OutboxPayload) {
@@ -71,20 +73,24 @@ class TransactionalOutboxImpl(
     }
   }
 
-  private fun fetchEligibleItems() = outboxStore.fetch(OutboxFilter(Instant.now(clock)))
+  private fun fetchEligibleItems(): List<OutboxItem> {
+    val (eligibleItems, erroneouslyFetchedItems) = outboxStore
+      .fetch(OutboxFilter(Instant.now(clock)))
+      .partition { it.status in STATUSES_ELIGIBLE_FOR_PROCESSING }
+
+    erroneouslyFetchedItems.map {
+      logger.warn(
+        "Outbox item with id ${it.id} erroneously fetched, as its status is ${it.status}. " +
+          "Expected status to be one of $STATUSES_ELIGIBLE_FOR_PROCESSING"
+      )
+    }
+
+    return eligibleItems
+  }
 
   private fun markForProcessing(items: List<OutboxItem>) =
     items.map {
-      when (it.status) {
-        OutboxStatus.PENDING, OutboxStatus.RUNNING -> it.status = OutboxStatus.RUNNING
-        else -> {
-          // Once we add logging, we can simply log it, and not crash.
-          throw IllegalArgumentException(
-            "Expected outbox item of status ${OutboxStatus.PENDING} or ${OutboxStatus.RUNNING}, but got ${it.status}"
-          )
-        }
-      }
-
+      it.status = OutboxStatus.RUNNING
       it.lastExecution = Instant.now(clock)
       it.rerunAfter = it.lastExecution?.plus(RERUN_AFTER_DEFAULT_DURATION)
     }

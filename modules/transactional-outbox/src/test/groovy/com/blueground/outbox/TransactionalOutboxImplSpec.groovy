@@ -8,7 +8,6 @@ import com.blueground.outbox.store.OutboxFilter
 import com.blueground.outbox.store.OutboxStore
 import com.blueground.outbox.utils.OutboxItemBuilder
 import spock.lang.Specification
-import spock.lang.Unroll
 
 import java.time.Clock
 import java.time.Instant
@@ -115,31 +114,5 @@ class TransactionalOutboxImplSpec extends Specification {
       items.size() * handlers.get(_) >> expectedHandler
       items.size() * executor.execute(_)
       0 * _
-  }
-
-  @Unroll
-  def "Should throw an exception when an item of status #status is fetched into monitor"() {
-    given:
-      def outboxItem = OutboxItemBuilder.make().withStatus(status).build()
-      def now = Instant.now(clock)
-
-    when:
-      transactionalOutbox.monitor()
-
-    then:
-      1 * locksProvider.acquire(LOCK_IDENTIFIER)
-      1 * store.fetch(_) >> { OutboxFilter filter ->
-        with (filter) {
-          outboxPendingFilter.nextRunLessThan == now
-          outboxRunningFilter.rerunAfterGreaterThan == now
-        }
-
-        [outboxItem]
-      }
-    and:
-      thrown(IllegalArgumentException)
-
-    where:
-      status << [OutboxStatus.COMPLETED, OutboxStatus.FAILED]
   }
 }
