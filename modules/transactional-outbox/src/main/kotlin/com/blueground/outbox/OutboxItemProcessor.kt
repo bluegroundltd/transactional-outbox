@@ -3,12 +3,18 @@ package com.blueground.outbox
 import com.blueground.outbox.item.OutboxItem
 import com.blueground.outbox.item.OutboxStatus
 import com.blueground.outbox.store.OutboxStore
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 class OutboxItemProcessor(
   private val item: OutboxItem,
   private val handler: OutboxHandler,
   private val store: OutboxStore
 ) : Runnable {
+
+  companion object {
+    private val logger: Logger = LoggerFactory.getLogger(OutboxItemProcessor::class.java)
+  }
 
   override fun run() {
     if (!handler.supports(item.type)) {
@@ -18,21 +24,34 @@ class OutboxItemProcessor(
     try {
       handler.handle(item.payload)
       item.status = OutboxStatus.COMPLETED
-    } catch (_: Exception) {
-      // TODO log exception or pass it to handler (for FAILED items)
-      handleGracefulFailure()
+    } catch (exception: Exception) {
+      if (handler.hasReachedMaxRetries(item.retries)) {
+        handleTerminalFailure(exception)
+      } else {
+        handleRetryableFailure(exception)
+      }
     } finally {
       store.update(item)
     }
   }
 
-  private fun handleGracefulFailure() {
-    if (handler.hasReachedMaxRetries(item.retries)) {
-      item.status = OutboxStatus.FAILED
-      handler.handleFailure(item.payload)
-    } else {
-      item.retries += 1
-      item.nextRun = handler.getNextExecutionTime(item.retries)
-    }
+  private fun handleTerminalFailure(exception: Exception) {
+    logger.info(
+      "Failure handling outbox item with id: ${item.id} and type: ${item.type}. " +
+        "Item reached max-retries (${item.retries}), delegating failure to handler.",
+      exception
+    )
+    item.status = OutboxStatus.FAILED
+    handler.handleFailure(item.payload)
+  }
+
+  private fun handleRetryableFailure(exception: Exception) {
+    item.retries += 1
+    item.nextRun = handler.getNextExecutionTime(item.retries)
+    logger.info(
+      "Failure handling outbox item with id: ${item.id} and type: ${item.type}. " +
+        "Updated retries (${item.retries}) and next run is on ${item.nextRun}.",
+      exception
+    )
   }
 }
