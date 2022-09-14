@@ -6,6 +6,7 @@ import com.blueground.outbox.item.OutboxStatus
 import com.blueground.outbox.item.OutboxType
 import com.blueground.outbox.store.OutboxFilter
 import com.blueground.outbox.store.OutboxStore
+import com.blueground.outbox.utils.OutboxItemBuilder
 import spock.lang.Specification
 import spock.lang.Unroll
 
@@ -55,16 +56,8 @@ class TransactionalOutboxImplSpec extends Specification {
       def nextRun = GroovyMock(Instant)
 
     and:
-      def expectedOutboxItem = new OutboxItem(
-        null,
-        type,
-        OutboxStatus.PENDING,
-        serializedPayload,
-        0,
-        nextRun,
-        null,
-        null
-      )
+      def expectedOutboxItem =
+        OutboxItemBuilder.make().withType(type).withPayload(serializedPayload).withNextRun(nextRun).build()
 
     when:
       transactionalOutbox.add(type, payload)
@@ -75,7 +68,7 @@ class TransactionalOutboxImplSpec extends Specification {
       1 * handler.getNextExecutionTime(0) >> nextRun
       1 * store.insert(_) >> { OutboxItem item ->
         with(item) {
-          id == expectedOutboxItem.id
+          id == null
           type == expectedOutboxItem.type
           status == expectedOutboxItem.status
           item.payload == expectedOutboxItem.payload
@@ -88,13 +81,14 @@ class TransactionalOutboxImplSpec extends Specification {
       0 * _
   }
 
-  @Unroll
-  def "Should delegate to the executor thread pool when monitor is called with batchSize #batchSize"() {
+  def "Should delegate to the executor thread pool when monitor is called"() {
     given:
-      def outboxItems = makeOutboxItemList(batchSize, OutboxStatus.PENDING)
+      def pendingItem = OutboxItemBuilder.makePending()
+      def runningItem = OutboxItemBuilder.make().withStatus(OutboxStatus.RUNNING).build()
+      def items = [pendingItem, runningItem]
 
     and:
-      def handler = GroovyMock(OutboxHandler)
+      def expectedHandler = GroovyMock(OutboxHandler)
       def now = Instant.now(clock)
 
     when:
@@ -102,59 +96,49 @@ class TransactionalOutboxImplSpec extends Specification {
 
     then:
       1 * locksProvider.acquire(LOCK_IDENTIFIER)
-      1 * store.fetch(new OutboxFilter(now, now)) >> outboxItems
-      batchSize * store.update(_)
+      1 * store.fetch(_) >> { OutboxFilter filter ->
+        with (filter) {
+          outboxPendingFilter.nextRunLessThan == now
+          outboxRunningFilter.rerunAfterGreaterThan == now
+        }
+        items
+      }
+      items.size() * store.update(_) >> { OutboxItem item ->
+        with(item) {
+          item.status == OutboxStatus.RUNNING
+          item.lastExecution == now
+          // TODO verify nextRun (maybe pass it via constructor)
+        }
+      }
       1 * locksProvider.release(LOCK_IDENTIFIER)
-      batchSize * handlers.get(_) >> handler
-      batchSize * executor.execute(_)
+      items.size() * handlers.get(_) >> expectedHandler
+      items.size() * executor.execute(_)
       0 * _
-
-    where:
-      batchSize << ([0, 1, 10] as Integer)
   }
 
   @Unroll
   def "Should throw an exception when an item of status #status is fetched into monitor"() {
     given:
-      def outboxItems = makeOutboxItemList(1, status)
+      def outboxItem = OutboxItemBuilder.make().withStatus(status).build()
+      def now = Instant.now(clock)
 
     when:
       transactionalOutbox.monitor()
 
     then:
-      1 * locksProvider.acquire(_)
-      1 * store.fetch(_) >> outboxItems
+      1 * locksProvider.acquire(LOCK_IDENTIFIER)
+      1 * store.fetch(_) >> { OutboxFilter filter ->
+        with (filter) {
+          outboxPendingFilter.nextRunLessThan == now
+          outboxRunningFilter.rerunAfterGreaterThan == now
+        }
 
+        [outboxItem]
+      }
     and:
       thrown(IllegalArgumentException)
 
     where:
       status << [OutboxStatus.COMPLETED, OutboxStatus.FAILED]
-  }
-
-  private def makeOutboxItem(OutboxStatus status) {
-    return new OutboxItem(
-      1L,
-      new OutboxType() {
-        @Override
-        String getType() {
-          return "type"
-        }
-      },
-      status,
-      "payload",
-      1L,
-      Instant.now(clock),
-      Instant.now(clock),
-      Instant.now(clock)
-    )
-  }
-
-  private def makeOutboxItemList(Integer length, OutboxStatus status) {
-    def list = []
-    for (_ in (0..<length)) {
-      list.add(makeOutboxItem(status))
-    }
-    return list
   }
 }
