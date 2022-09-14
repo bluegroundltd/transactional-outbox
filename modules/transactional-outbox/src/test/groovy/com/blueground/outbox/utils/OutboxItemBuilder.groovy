@@ -55,6 +55,10 @@ class OutboxItemBuilder implements SpecHelper {
     make().build()
   }
 
+  static OutboxItem makeRunning() {
+    make().withStatus(OutboxStatus.RUNNING).build()
+  }
+
   OutboxItem build() {
     new OutboxItem(
       id,
