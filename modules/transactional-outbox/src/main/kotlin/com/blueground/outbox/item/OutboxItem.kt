@@ -11,5 +11,5 @@ class OutboxItem(
   var retries: Long,
   var nextRun: Instant,
   var lastExecution: Instant?,
-  var rerunAfter: Instant?, // TODO maybe duration? to be added to lastExecution?
+  var rerunAfter: Instant?
 )

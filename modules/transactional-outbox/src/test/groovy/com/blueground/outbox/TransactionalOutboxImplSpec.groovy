@@ -10,12 +10,14 @@ import com.blueground.outbox.utils.OutboxItemBuilder
 import spock.lang.Specification
 
 import java.time.Clock
+import java.time.Duration
 import java.time.Instant
 import java.time.ZoneId
 import java.util.concurrent.ExecutorService
 
 class TransactionalOutboxImplSpec extends Specification {
   private static final long LOCK_IDENTIFIER = 1L
+  private static final Duration DURATION_ONE_HOUR = Duration.ofHours(1)
   Clock clock = Clock.fixed(Instant.now(), ZoneId.systemDefault())
   Map<OutboxType, OutboxHandler> handlers = Mock()
   OutboxLocksProvider locksProvider = Mock()
@@ -24,7 +26,15 @@ class TransactionalOutboxImplSpec extends Specification {
   TransactionalOutbox transactionalOutbox
 
   def setup() {
-    transactionalOutbox = new TransactionalOutboxImpl(clock, handlers, LOCK_IDENTIFIER, locksProvider, store, executor)
+    transactionalOutbox = new TransactionalOutboxImpl(
+      clock,
+      handlers,
+      LOCK_IDENTIFIER,
+      locksProvider,
+      store,
+      DURATION_ONE_HOUR,
+      executor
+    )
   }
 
   def "Should throw UnsupportedOperationException when item isn't supported"() {
@@ -107,7 +117,7 @@ class TransactionalOutboxImplSpec extends Specification {
         with(item) {
           item.status == OutboxStatus.RUNNING
           item.lastExecution == now
-          // TODO verify nextRun (maybe pass it via constructor)
+          item.rerunAfter == item.lastExecution + DURATION_ONE_HOUR
         }
       }
       1 * locksProvider.release(LOCK_IDENTIFIER)

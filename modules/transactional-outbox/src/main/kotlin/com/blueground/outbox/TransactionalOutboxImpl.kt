@@ -22,6 +22,7 @@ class TransactionalOutboxImpl(
   private val lockIdentifier: Long,
   private val locksProvider: OutboxLocksProvider,
   private val outboxStore: OutboxStore,
+  private val defaultRerunAfterDuration: Duration,
   private val executor: ExecutorService = Executors.newFixedThreadPool(
     DEFAULT_THREAD_POOL_SIZE,
     ThreadFactoryBuilder().setNameFormat(THEAD_POOL_NAME_FORMAT).build()
@@ -29,7 +30,6 @@ class TransactionalOutboxImpl(
 ) : TransactionalOutbox {
 
   companion object {
-    private val RERUN_AFTER_DEFAULT_DURATION = Duration.ofHours(1)
     private const val DEFAULT_THREAD_POOL_SIZE = 10
     private const val THEAD_POOL_NAME_FORMAT = "outbox-item-processor-%d"
     private val logger: Logger = LoggerFactory.getLogger(TransactionalOutboxImpl::class.java)
@@ -92,6 +92,6 @@ class TransactionalOutboxImpl(
     items.map {
       it.status = OutboxStatus.RUNNING
       it.lastExecution = Instant.now(clock)
-      it.rerunAfter = it.lastExecution?.plus(RERUN_AFTER_DEFAULT_DURATION)
+      it.rerunAfter = it.lastExecution?.plus(defaultRerunAfterDuration)
     }
 }
