@@ -25,15 +25,13 @@ class OutboxItemProcessorSpec extends Specification {
     )
   }
 
-  def "Should throw when an erroneous item type is provided"() {
+  def "Should don nothing when an erroneous item type is provided"() {
     when:
       processor.run()
 
     then:
       1 * handler.supports(item.type) >> false
-
-    and:
-      thrown(IllegalArgumentException)
+      0 * _
   }
 
   def "Should handle an item and update its status to completion when run is called"() {
