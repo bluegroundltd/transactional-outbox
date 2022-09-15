@@ -78,7 +78,7 @@ class TransactionalOutboxImpl(
       .fetch(OutboxFilter(Instant.now(clock)))
       .partition { it.status in STATUSES_ELIGIBLE_FOR_PROCESSING }
 
-    erroneouslyFetchedItems.map {
+    erroneouslyFetchedItems.forEach {
       logger.warn(
         "Outbox item with id ${it.id} erroneously fetched, as its status is ${it.status}. " +
           "Expected status to be one of $STATUSES_ELIGIBLE_FOR_PROCESSING"

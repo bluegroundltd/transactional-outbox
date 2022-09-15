@@ -125,4 +125,21 @@ class TransactionalOutboxImplSpec extends Specification {
       items.size() * executor.execute(_)
       0 * _
   }
+
+  def "Should do nothing with an item that is erronously fetched"() {
+    given:
+      def completedItem = OutboxItemBuilder.make().withStatus(OutboxStatus.COMPLETED).build()
+
+    and:
+      def items = [completedItem]
+
+    when:
+      transactionalOutbox.monitor()
+
+    then:
+      1 * locksProvider.acquire(LOCK_IDENTIFIER)
+      1 * store.fetch(_) >> items
+      1 * locksProvider.release(LOCK_IDENTIFIER)
+      0 * _
+  }
 }
