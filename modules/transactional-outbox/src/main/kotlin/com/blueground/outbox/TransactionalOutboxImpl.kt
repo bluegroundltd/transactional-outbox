@@ -14,13 +14,14 @@ import java.time.Instant
 import java.util.EnumSet
 import java.util.concurrent.ExecutorService
 
+@SuppressWarnings("LongParameterList")
 internal class TransactionalOutboxImpl(
   private val clock: Clock,
   private val outboxHandlers: Map<OutboxType, OutboxHandler>,
   private val lockIdentifier: Long,
   private val locksProvider: OutboxLocksProvider,
   private val outboxStore: OutboxStore,
-  private val defaultRerunAfterDuration: Duration,
+  private val rerunAfterDuration: Duration,
   private val executor: ExecutorService
 ) : TransactionalOutbox {
 
@@ -85,6 +86,6 @@ internal class TransactionalOutboxImpl(
     items.map {
       it.status = OutboxStatus.RUNNING
       it.lastExecution = Instant.now(clock)
-      it.rerunAfter = it.lastExecution?.plus(defaultRerunAfterDuration)
+      it.rerunAfter = it.lastExecution?.plus(rerunAfterDuration)
     }
 }
