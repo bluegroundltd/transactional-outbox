@@ -14,7 +14,7 @@ import java.time.Instant
 import java.util.EnumSet
 import java.util.concurrent.ExecutorService
 
-class TransactionalOutboxImpl(
+internal class TransactionalOutboxImpl(
   private val clock: Clock,
   private val outboxHandlers: Map<OutboxType, OutboxHandler>,
   private val lockIdentifier: Long,
