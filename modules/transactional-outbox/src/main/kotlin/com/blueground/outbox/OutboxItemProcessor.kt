@@ -2,6 +2,7 @@ package com.blueground.outbox
 
 import com.blueground.outbox.item.OutboxItem
 import com.blueground.outbox.item.OutboxStatus
+import com.blueground.outbox.item.OutboxType
 import com.blueground.outbox.store.OutboxStore
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -55,4 +56,6 @@ class OutboxItemProcessor(
       exception
     )
   }
+
+  private fun OutboxHandler.supports(type: OutboxType) = this.getSupportedType() == type
 }

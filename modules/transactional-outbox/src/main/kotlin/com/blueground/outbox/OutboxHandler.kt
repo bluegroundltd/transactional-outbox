@@ -5,7 +5,7 @@ import com.blueground.outbox.item.OutboxType
 import java.time.Instant
 
 interface OutboxHandler {
-  fun supports(type: OutboxType): Boolean
+  fun getSupportedType(): OutboxType
 
   fun serialize(payload: OutboxPayload): String
 
