@@ -85,7 +85,8 @@ internal class TransactionalOutboxImpl(
   private fun markForProcessing(items: List<OutboxItem>) =
     items.map {
       it.status = OutboxStatus.RUNNING
-      it.lastExecution = Instant.now(clock)
-      it.rerunAfter = it.lastExecution?.plus(rerunAfterDuration)
+      val now = Instant.now(clock)
+      it.lastExecution = now
+      it.rerunAfter = now.plus(rerunAfterDuration)
     }
 }
