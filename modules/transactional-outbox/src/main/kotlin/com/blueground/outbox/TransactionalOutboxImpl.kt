@@ -18,7 +18,6 @@ import java.util.concurrent.ExecutorService
 internal class TransactionalOutboxImpl(
   private val clock: Clock,
   private val outboxHandlers: Map<OutboxType, OutboxHandler>,
-  private val lockIdentifier: Long,
   private val locksProvider: OutboxLocksProvider,
   private val outboxStore: OutboxStore,
   private val rerunAfterDuration: Duration,
@@ -56,7 +55,7 @@ internal class TransactionalOutboxImpl(
 
   override fun monitor() {
     runCatching {
-      locksProvider.acquire(lockIdentifier)
+      locksProvider.acquire()
 
       val items = fetchEligibleItems()
       markForProcessing(items)
@@ -71,7 +70,7 @@ internal class TransactionalOutboxImpl(
       logger.error("Failure in monitor", it)
     }
 
-    kotlin.runCatching { locksProvider.release(lockIdentifier) }.onFailure {
+    kotlin.runCatching { locksProvider.release() }.onFailure {
       logger.error("Failed to release lock of ${locksProvider.javaClass::getSimpleName} with id: $locksProvider")
     }
   }
