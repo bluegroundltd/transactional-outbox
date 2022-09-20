@@ -4,6 +4,7 @@ import com.blueground.outbox.item.OutboxType
 import com.blueground.outbox.store.OutboxStore
 import com.blueground.outbox.utils.DummyOutboxHandler
 import com.blueground.outbox.utils.UnitTestSpecification
+import spock.lang.Unroll
 
 import java.time.Clock
 import java.time.Instant
@@ -15,7 +16,8 @@ class TransactionalOutboxBuilderSpec extends UnitTestSpecification {
   def locksProvider = GroovyMock(OutboxLocksProvider)
   def store = GroovyMock(OutboxStore)
 
-  def "Should build a transactional outbox instance"() {
+  @Unroll
+  def "Should build a transactional outbox instance #testCase"() {
     given:
       def builder = TransactionalOutboxBuilder.make(clock)
 
@@ -26,12 +28,20 @@ class TransactionalOutboxBuilderSpec extends UnitTestSpecification {
       def handlers = Set.of(handlerA, handlerB)
       def expectedOutboxTypes = Set.of(handlerA.getSupportedType(), mockedBType)
 
+
     when:
-      def transactionalOutbox = builder
+      def transactionalOutboxBuilder = builder
         .withHandlers(handlers)
         .withLocksProvider(lockIdentifier, locksProvider)
         .withStore(store)
-        .build()
+
+      and:
+        TransactionalOutbox transactionalOutbox
+        if (withCustomThreadPoolSize) {
+          transactionalOutbox = transactionalOutboxBuilder.withThreadPoolSize(5).build()
+        } else {
+          transactionalOutbox = transactionalOutboxBuilder.build()
+        }
 
     and:
       def mappedHandlers = builder.getHandlers() as Map<OutboxType, OutboxHandler>
@@ -41,6 +51,11 @@ class TransactionalOutboxBuilderSpec extends UnitTestSpecification {
       2 * handlerB.getSupportedType() >> mockedBType
       mappedHandlers.size() == 2
       mappedHandlers.keySet() == expectedOutboxTypes
+
+    where:
+      testCase                        | withCustomThreadPoolSize
+      "with default thread pool size" | false
+      "with custom thread pool size"  | true
   }
 
   def "Should throw if handlers with same supporting type are added"() {

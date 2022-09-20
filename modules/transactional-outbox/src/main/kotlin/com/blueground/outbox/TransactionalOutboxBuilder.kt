@@ -14,6 +14,7 @@ class TransactionalOutboxBuilder(
 ) : OutboxHandlersStep, LocksProviderStep, StoreStep, BuildStep {
   val handlers: MutableMap<OutboxType, OutboxHandler> = mutableMapOf()
   private var locksIdentifier by Delegates.notNull<Long>()
+  private var threadPoolSize by Delegates.notNull<Int>()
   private lateinit var locksProvider: OutboxLocksProvider
   private lateinit var store: OutboxStore
 
@@ -70,6 +71,11 @@ class TransactionalOutboxBuilder(
     return this
   }
 
+  override fun withThreadPoolSize(threadPoolSize: Int): BuildStep {
+    this.threadPoolSize = threadPoolSize
+    return this
+  }
+
   override fun build(): TransactionalOutbox {
     val executorServiceFactory = FixedThreadPoolExecutorServiceFactory()
 
@@ -98,5 +104,6 @@ interface StoreStep {
 }
 
 interface BuildStep {
+  fun withThreadPoolSize(threadPoolSize: Int): BuildStep
   fun build(): TransactionalOutbox
 }
