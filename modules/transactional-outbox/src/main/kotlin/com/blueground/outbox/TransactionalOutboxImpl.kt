@@ -55,16 +55,24 @@ internal class TransactionalOutboxImpl(
   }
 
   override fun monitor() {
-    locksProvider.acquire(lockIdentifier)
-    val items = fetchEligibleItems()
-    markForProcessing(items)
-    items.map { outboxStore.update(it) }
-    locksProvider.release(lockIdentifier)
+    runCatching {
+      locksProvider.acquire(lockIdentifier)
 
-    items.forEach { item ->
-      executor.execute(
-        OutboxItemProcessor(item, outboxHandlers[item.type]!!, outboxStore)
-      )
+      val items = fetchEligibleItems()
+      markForProcessing(items)
+      items.map { outboxStore.update(it) }
+
+      items.forEach { item ->
+        executor.execute(
+          OutboxItemProcessor(item, outboxHandlers[item.type]!!, outboxStore)
+        )
+      }
+    }.onFailure {
+      logger.error("Failure in monitor", it)
+    }
+
+    kotlin.runCatching { locksProvider.release(lockIdentifier) }.onFailure {
+      logger.error("Failed to release lock of ${locksProvider.javaClass::getSimpleName} with id: $locksProvider")
     }
   }
 
