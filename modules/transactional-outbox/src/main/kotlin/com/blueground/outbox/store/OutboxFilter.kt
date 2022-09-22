@@ -4,7 +4,7 @@ import com.blueground.outbox.item.OutboxStatus
 import java.time.Instant
 
 sealed class AbstractOutboxFilter(
-  protected val status: OutboxStatus
+  val status: OutboxStatus
 )
 
 class OutboxPendingFilter(
