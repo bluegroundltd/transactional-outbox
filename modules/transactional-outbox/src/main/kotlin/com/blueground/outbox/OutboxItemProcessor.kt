@@ -14,12 +14,13 @@ class OutboxItemProcessor(
 ) : Runnable {
 
   companion object {
+    private const val LOGGER_PREFIX = "[OUTBOX-ITEM-PROCESSOR]"
     private val logger: Logger = LoggerFactory.getLogger(OutboxItemProcessor::class.java)
   }
 
   override fun run() {
     if (!handler.supports(item.type)) {
-      logger.warn("Handler ${handler::class.java} does not support item of type ${item.type}")
+      logger.warn("$LOGGER_PREFIX Handler ${handler::class.java} does not support item of type ${item.type}")
       return
     }
 
@@ -39,7 +40,7 @@ class OutboxItemProcessor(
 
   private fun handleTerminalFailure(exception: Exception) {
     logger.info(
-      "Failure handling outbox item with id: ${item.id} and type: ${item.type}. " +
+      "$LOGGER_PREFIX Failure handling outbox item with id: ${item.id} and type: ${item.type}. " +
         "Item reached max-retries (${item.retries}), delegating failure to handler.",
       exception
     )
@@ -51,7 +52,7 @@ class OutboxItemProcessor(
     item.retries += 1
     item.nextRun = handler.getNextExecutionTime(item.retries)
     logger.info(
-      "Failure handling outbox item with id: ${item.id} and type: ${item.type}. " +
+      "$LOGGER_PREFIX Failure handling outbox item with id: ${item.id} and type: ${item.type}. " +
         "Updated retries (${item.retries}) and next run is on ${item.nextRun}.",
       exception
     )
