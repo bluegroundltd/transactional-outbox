@@ -26,12 +26,13 @@ internal class TransactionalOutboxImpl(
 ) : TransactionalOutbox {
 
   companion object {
+    private const val LOGGER_PREFIX = "[OUTBOX]"
     private val logger: Logger = LoggerFactory.getLogger(TransactionalOutboxImpl::class.java)
     private val STATUSES_ELIGIBLE_FOR_PROCESSING = EnumSet.of(OutboxStatus.PENDING, OutboxStatus.RUNNING)
   }
 
   override fun add(type: OutboxType, payload: OutboxPayload) {
-    logger.info("Adding item of type: ${type.getType()} and payload: $payload")
+    logger.info("$LOGGER_PREFIX Adding item of type: ${type.getType()} and payload: $payload")
     val handler = outboxHandlers[type]
       ?: throw UnsupportedOperationException("Outbox item type \"{${type.getType()}\" isn't supported")
 
@@ -74,7 +75,7 @@ internal class TransactionalOutboxImpl(
 
     erroneouslyFetchedItems.forEach {
       logger.warn(
-        "Outbox item with id ${it.id} erroneously fetched, as its status is ${it.status}. " +
+        "$LOGGER_PREFIX Outbox item with id ${it.id} erroneously fetched, as its status is ${it.status}. " +
           "Expected status to be one of $STATUSES_ELIGIBLE_FOR_PROCESSING"
       )
     }
