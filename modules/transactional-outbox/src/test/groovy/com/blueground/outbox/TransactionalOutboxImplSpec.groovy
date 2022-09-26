@@ -126,11 +126,9 @@ class TransactionalOutboxImplSpec extends Specification {
       0 * _
   }
 
-  def "Should do nothing with an item that is erronously fetched"() {
+  def "Should do nothing with an item that is erroneously fetched"() {
     given:
       def completedItem = OutboxItemBuilder.make().withStatus(OutboxStatus.COMPLETED).build()
-
-    and:
       def items = [completedItem]
 
     when:
@@ -141,5 +139,28 @@ class TransactionalOutboxImplSpec extends Specification {
       1 * store.fetch(_) >> items
       1 * locksProvider.release(LOCK_IDENTIFIER)
       0 * _
+  }
+
+  def "Should call release when an exception occurs"() {
+    when:
+      transactionalOutbox.monitor()
+
+    then:
+      1 * locksProvider.acquire(LOCK_IDENTIFIER)
+      1 * store.fetch(_) >> { throw new RuntimeException() }
+      1 * locksProvider.release(LOCK_IDENTIFIER)
+      0 * _
+  }
+
+  def "Should handle an exception when it occurs upon release"() {
+    when:
+      transactionalOutbox.monitor()
+
+    then:
+      1 * locksProvider.acquire(LOCK_IDENTIFIER)
+      1 * store.fetch(_) >> []
+      1 * locksProvider.release(LOCK_IDENTIFIER) >> { throw new RuntimeException() }
+      0 * _
+      noExceptionThrown()
   }
 }
