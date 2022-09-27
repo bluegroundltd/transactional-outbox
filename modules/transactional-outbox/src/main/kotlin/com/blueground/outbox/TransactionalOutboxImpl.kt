@@ -67,11 +67,11 @@ internal class TransactionalOutboxImpl(
         )
       }
     }.onFailure {
-      logger.error("Failure in monitor", it)
+      logger.error("$LOGGER_PREFIX Failure in monitor", it)
     }
 
     kotlin.runCatching { locksProvider.release() }.onFailure {
-      logger.error("Failed to release lock of ${locksProvider.javaClass::getSimpleName} with id: $locksProvider")
+      logger.error("$LOGGER_PREFIX Failed to release lock of $locksProvider", it)
     }
   }
 
