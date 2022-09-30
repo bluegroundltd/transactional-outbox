@@ -20,7 +20,7 @@ class OutboxItemProcessor(
 
   override fun run() {
     if (!handler.supports(item.type)) {
-      logger.warn("$LOGGER_PREFIX Handler ${handler::class.java} does not support item of type: ${item.type}")
+      logger.error("$LOGGER_PREFIX Handler ${handler::class.java} does not support item of type: ${item.type}")
       return
     }
 
