@@ -78,7 +78,7 @@ class OutboxItemProcessorSpec extends Specification {
       1 * handler.getNextExecutionTime(_) >> expectedNextRun
       1 * store.update(_) >> { OutboxItem item ->
         with (item) {
-          status == OutboxStatus.RUNNING
+          status == OutboxStatus.PENDING
           retries == 1
           nextRun == expectedNextRun
         }

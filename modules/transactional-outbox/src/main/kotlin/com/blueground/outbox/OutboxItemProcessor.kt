@@ -52,6 +52,7 @@ class OutboxItemProcessor(
   private fun handleRetryableFailure(exception: Exception) {
     item.retries += 1
     item.nextRun = handler.getNextExecutionTime(item.retries)
+    item.status = OutboxStatus.PENDING
     logger.info(
       "$LOGGER_PREFIX Failure handling outbox item with id: ${item.id} and type: ${item.type}. " +
         "Updated retries (${item.retries}) and next run is on ${item.nextRun}.",
