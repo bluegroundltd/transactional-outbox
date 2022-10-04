@@ -58,6 +58,12 @@ internal class TransactionalOutboxImpl(
       locksProvider.acquire()
 
       val items = fetchEligibleItems()
+      if (items.isEmpty()) {
+        logger.info("$LOGGER_PREFIX No outbox items to process")
+      } else {
+        logger.info("$LOGGER_PREFIX Will process ${items.size} outbox items")
+      }
+
       markForProcessing(items)
       items.map { outboxStore.update(it) }
 
