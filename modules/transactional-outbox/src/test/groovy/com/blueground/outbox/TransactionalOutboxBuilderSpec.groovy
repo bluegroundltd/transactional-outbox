@@ -12,7 +12,6 @@ import java.time.ZoneId
 
 class TransactionalOutboxBuilderSpec extends UnitTestSpecification {
   def clock = Clock.fixed(Instant.now(), ZoneId.systemDefault())
-  def lockIdentifier = 1L
   def locksProvider = GroovyMock(OutboxLocksProvider)
   def store = GroovyMock(OutboxStore)
 
@@ -32,7 +31,7 @@ class TransactionalOutboxBuilderSpec extends UnitTestSpecification {
     when:
       def transactionalOutboxBuilder = builder
         .withHandlers(handlers)
-        .withLocksProvider(lockIdentifier, locksProvider)
+        .withLocksProvider(locksProvider)
         .withStore(store)
 
       and:
@@ -70,7 +69,7 @@ class TransactionalOutboxBuilderSpec extends UnitTestSpecification {
     when:
       builder
         .withHandlers(handlers)
-        .withLocksProvider(lockIdentifier, locksProvider)
+        .withLocksProvider(locksProvider)
         .withStore(store)
         .build()
 

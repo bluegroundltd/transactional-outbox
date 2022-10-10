@@ -13,7 +13,6 @@ class TransactionalOutboxBuilder(
   private val rerunAfterDuration: Duration = DEFAULT_RERUN_AFTER_DURATION
 ) : OutboxHandlersStep, LocksProviderStep, StoreStep, BuildStep {
   val handlers: MutableMap<OutboxType, OutboxHandler> = mutableMapOf()
-  private var locksIdentifier by Delegates.notNull<Long>()
   private var threadPoolSize by Delegates.notNull<Int>()
   private lateinit var locksProvider: OutboxLocksProvider
   private lateinit var store: OutboxStore
@@ -60,8 +59,7 @@ class TransactionalOutboxBuilder(
     return typesWithMoreThanOneHandlersFlattened
   }
 
-  override fun withLocksProvider(locksIdentifier: Long, locksProvider: OutboxLocksProvider): StoreStep {
-    this.locksIdentifier = locksIdentifier
+  override fun withLocksProvider(locksProvider: OutboxLocksProvider): StoreStep {
     this.locksProvider = locksProvider
     return this
   }
@@ -82,7 +80,6 @@ class TransactionalOutboxBuilder(
     return TransactionalOutboxImpl(
       clock,
       handlers.toMap(),
-      locksIdentifier,
       locksProvider,
       store,
       rerunAfterDuration,
@@ -96,7 +93,7 @@ interface OutboxHandlersStep {
 }
 
 interface LocksProviderStep {
-  fun withLocksProvider(locksIdentifier: Long, locksProvider: OutboxLocksProvider): StoreStep
+  fun withLocksProvider(locksProvider: OutboxLocksProvider): StoreStep
 }
 
 interface StoreStep {

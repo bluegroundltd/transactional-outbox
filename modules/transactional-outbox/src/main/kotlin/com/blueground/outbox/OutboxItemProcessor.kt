@@ -20,11 +20,12 @@ class OutboxItemProcessor(
 
   override fun run() {
     if (!handler.supports(item.type)) {
-      logger.warn("$LOGGER_PREFIX Handler ${handler::class.java} does not support item of type ${item.type}")
+      logger.error("$LOGGER_PREFIX Handler ${handler::class.java} does not support item of type: ${item.type}")
       return
     }
 
     try {
+      logger.info("$LOGGER_PREFIX Handling item with id: ${item.id} and type: ${item.type}")
       handler.handle(item.payload)
       item.status = OutboxStatus.COMPLETED
     } catch (exception: Exception) {
@@ -49,8 +50,9 @@ class OutboxItemProcessor(
   }
 
   private fun handleRetryableFailure(exception: Exception) {
-    item.retries += 1
     item.nextRun = handler.getNextExecutionTime(item.retries)
+    item.retries += 1
+    item.status = OutboxStatus.PENDING
     logger.info(
       "$LOGGER_PREFIX Failure handling outbox item with id: ${item.id} and type: ${item.type}. " +
         "Updated retries (${item.retries}) and next run is on ${item.nextRun}.",

@@ -16,7 +16,6 @@ import java.time.ZoneId
 import java.util.concurrent.ExecutorService
 
 class TransactionalOutboxImplSpec extends Specification {
-  private static final long LOCK_IDENTIFIER = 1L
   private static final Duration DURATION_ONE_HOUR = Duration.ofHours(1)
   Clock clock = Clock.fixed(Instant.now(), ZoneId.systemDefault())
   Map<OutboxType, OutboxHandler> handlers = Mock()
@@ -29,7 +28,6 @@ class TransactionalOutboxImplSpec extends Specification {
     transactionalOutbox = new TransactionalOutboxImpl(
       clock,
       handlers,
-      LOCK_IDENTIFIER,
       locksProvider,
       store,
       DURATION_ONE_HOUR,
@@ -105,7 +103,7 @@ class TransactionalOutboxImplSpec extends Specification {
       transactionalOutbox.monitor()
 
     then:
-      1 * locksProvider.acquire(LOCK_IDENTIFIER)
+      1 * locksProvider.acquire()
       1 * store.fetch(_) >> { OutboxFilter filter ->
         with (filter) {
           outboxPendingFilter.nextRunLessThan == now
@@ -120,7 +118,7 @@ class TransactionalOutboxImplSpec extends Specification {
           item.rerunAfter == item.lastExecution + DURATION_ONE_HOUR
         }
       }
-      1 * locksProvider.release(LOCK_IDENTIFIER)
+      1 * locksProvider.release()
       items.size() * handlers.get(_) >> expectedHandler
       items.size() * executor.execute(_)
       0 * _
@@ -135,9 +133,9 @@ class TransactionalOutboxImplSpec extends Specification {
       transactionalOutbox.monitor()
 
     then:
-      1 * locksProvider.acquire(LOCK_IDENTIFIER)
+      1 * locksProvider.acquire()
       1 * store.fetch(_) >> items
-      1 * locksProvider.release(LOCK_IDENTIFIER)
+      1 * locksProvider.release()
       0 * _
   }
 
@@ -146,9 +144,9 @@ class TransactionalOutboxImplSpec extends Specification {
       transactionalOutbox.monitor()
 
     then:
-      1 * locksProvider.acquire(LOCK_IDENTIFIER)
+      1 * locksProvider.acquire()
       1 * store.fetch(_) >> { throw new RuntimeException() }
-      1 * locksProvider.release(LOCK_IDENTIFIER)
+      1 * locksProvider.release()
       0 * _
   }
 
@@ -157,9 +155,9 @@ class TransactionalOutboxImplSpec extends Specification {
       transactionalOutbox.monitor()
 
     then:
-      1 * locksProvider.acquire(LOCK_IDENTIFIER)
+      1 * locksProvider.acquire()
       1 * store.fetch(_) >> []
-      1 * locksProvider.release(LOCK_IDENTIFIER) >> { throw new RuntimeException() }
+      1 * locksProvider.release() >> { throw new RuntimeException() }
       0 * _
       noExceptionThrown()
   }

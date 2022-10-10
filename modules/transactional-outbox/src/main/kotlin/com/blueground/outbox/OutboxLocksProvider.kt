@@ -9,15 +9,11 @@ interface OutboxLocksProvider {
 
   /**
    * Acquires a lock, waiting if it's not available (blocking).
-   *
-   * @param id The identifier for the lock
    */
-  fun acquire(id: Long)
+  fun acquire()
 
   /**
    * Release the lock associated with the id.
-   *
-   * @param id The identifier of the lock to be released
    */
-  fun release(id: Long)
+  fun release()
 }
