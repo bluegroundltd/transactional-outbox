@@ -42,7 +42,6 @@ abstract class SimpleOutboxHandler<T : OutboxPayload>(
     else -> Instant.now(clock).plusSeconds(ONE_MINUTE_IN_SECONDS)
   }
 
-
   override fun hasReachedMaxRetries(retries: Long): Boolean =
     retries >= maxRetries
 
