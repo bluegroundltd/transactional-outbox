@@ -44,7 +44,3 @@ tasks.withType<JacocoCoverageVerification> {
     }
   }
 }
-
-tasks.check {
-  dependsOn(tasks.jacocoTestCoverageVerification)
-}
