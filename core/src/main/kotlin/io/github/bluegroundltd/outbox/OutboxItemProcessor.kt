@@ -7,7 +7,8 @@ import io.github.bluegroundltd.outbox.store.OutboxStore
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
-class OutboxItemProcessor(
+@Suppress("TooGenericExceptionCaught")
+internal class OutboxItemProcessor(
   private val item: OutboxItem,
   private val handler: OutboxHandler,
   private val store: OutboxStore
