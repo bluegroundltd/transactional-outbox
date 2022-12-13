@@ -9,7 +9,7 @@ import java.util.concurrent.Executors
 /**
  * Creates a fixed thread pool executor service, using a default pool size and name format for threads.
  */
-class FixedThreadPoolExecutorServiceFactory(
+internal class FixedThreadPoolExecutorServiceFactory(
   private val threadPoolSize: Int = DEFAULT_THREAD_POOL_SIZE,
   private val threadNameFormat: String = DEFAULT_THEAD_NAME_FORMAT
 ) {

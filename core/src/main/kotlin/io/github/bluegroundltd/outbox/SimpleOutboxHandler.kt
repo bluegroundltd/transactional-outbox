@@ -9,7 +9,7 @@ import java.time.Instant
 /**
  * This class purpose is to create an easy way to create an outbox handler.
  *
- * In order to achieve this, the following assumputions are made:
+ * In order to achieve this, the following assumptions are made:
  * 1. Object mapper is used for serializing and deserializing outbox
  *  (Before invoking [handleWithParsedPayload] the object mapper deserializer is invoked)
  * 2. Linear retries are applied 1 minute from now (clock is used)
@@ -50,5 +50,14 @@ abstract class SimpleOutboxHandler<T : OutboxPayload>(
     handleWithParsedPayload(payloadParsed)
   }
 
+  /**
+   * This method is invoked after the payload is deserialized.
+   * The payload is already of type [T] and can be casted to it.
+   * This method should be implemented by the user.
+   *
+   * @param payload the payload of type [T]
+   * @see [SimpleOutboxHandler]
+   * @see [OutboxHandler]
+   */
   abstract fun handleWithParsedPayload(payload: T)
 }
