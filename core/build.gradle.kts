@@ -8,6 +8,8 @@ plugins {
   codenarc
   jacoco
   id("io.gitlab.arturbosch.detekt")
+  id("org.jetbrains.dokka") version "1.5.31"
+  id("com.vanniktech.maven.publish") version "0.18.0"
 }
 
 repositories {
@@ -71,9 +73,8 @@ tasks.detekt {
 }
 
 java {
-  sourceCompatibility = JavaVersion.VERSION_17
-  targetCompatibility = JavaVersion.VERSION_17
-  withJavadocJar()
+  sourceCompatibility = JavaVersion.VERSION_11
+  targetCompatibility = JavaVersion.VERSION_11
 }
 
 detekt {
@@ -90,4 +91,16 @@ codenarc {
 tasks.check.configure {
   dependsOn(tasks.jacocoTestReport)
   dependsOn(tasks.jacocoTestCoverageVerification)
+}
+
+apply(plugin = "com.vanniktech.maven.publish")
+
+tasks.dokkaHtml.configure {
+  outputDirectory.set(buildDir.resolve("dokka-html"))
+}
+
+plugins.withId("com.vanniktech.maven.publish") {
+  mavenPublish {
+    sonatypeHost = com.vanniktech.maven.publish.SonatypeHost.S01
+  }
 }
