@@ -15,6 +15,7 @@ application, developed by Blueground.
   - [Creating a new outbox handler](#creating-a-new-outbox-handler)
   - [Creating a new outbox entry](#creating-a-new-outbox-entry)
   - [Monitoring the outbox entries](#monitoring-the-outbox-entries)
+- [Publishing](#publishing)
 - [Maintainers](#maintainers)
 
 ## Installation
@@ -23,7 +24,7 @@ Transactional Outbox is published on `mavenCentral`. In order to use it just add
 
 ```gradle
 
-implementation("io.github.bluegroundltd:transactional-outbox:1.0.0")
+implementation("io.github.bluegroundltd:transactional-outbox-core:0.0.1")
 
 ```
 
@@ -150,6 +151,27 @@ class OutboxMonitor(
     transactionalOutbox.monitor()
   }
 }
+```
+
+## Publishing
+
+* Bump version in `gradle.properties` of `core` module.
+* Execute the following to upload artifact:
+```shell
+$ ./gradlew :core:publish \
+            --no-daemon --no-parallel \
+            -Psigning.secretKeyRingFile=<keyring_file_path> \
+            -Psigning.password=<keyring_password> \
+            -Psigning.keyId=<keyring_id> \
+            -PmavenCentralUsername=<nexus_username> \ 
+            -PmavenCentralPassword=<nexus_password>
+```
+
+After this operation finishes, you can promote the artifact to be released with:
+```shell
+$ ./gradlew closeAndReleaseRepository \
+            -PmavenCentralUsername=<nexus_username> \
+            -PmavenCentralPassword=<nexus_password>
 ```
 
 ## Maintainers
