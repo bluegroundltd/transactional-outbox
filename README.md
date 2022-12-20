@@ -1,5 +1,7 @@
 # Transactional Outbox Library
 
+[![Build](https://github.com/bluegroundltd/transactional-outbox/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/bluegroundltd/transactional-outbox/actions/workflows/ci.yml)
+
 Transactional Outbox is a library that provides a simple way to implement
 the [Transactional Outbox Pattern](https://microservices.io/patterns/data/transactional-outbox.html) in your
 application.
