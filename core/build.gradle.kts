@@ -86,3 +86,8 @@ detekt {
 codenarc {
   configFile = file("$rootDir/config/codenarc/codenarc.xml")
 }
+
+tasks.check.configure {
+  dependsOn(tasks.jacocoTestReport)
+  dependsOn(tasks.jacocoTestCoverageVerification)
+}
