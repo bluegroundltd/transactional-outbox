@@ -1,0 +1,153 @@
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>OutboxHandler</title>
+<link href="../../../images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "../../../";</script><script type="text/javascript" src="../../../scripts/sourceset_dependencies.js" async="async"></script><link href="../../../styles/style.css" rel="Stylesheet"><link href="../../../styles/logo-styles.css" rel="Stylesheet"><link href="../../../styles/jetbrains-mono.css" rel="Stylesheet"><link href="../../../styles/main.css" rel="Stylesheet"><script type="text/javascript" src="../../../scripts/clipboard.js" async="async"></script><script type="text/javascript" src="../../../scripts/navigation-loader.js" async="async"></script><script type="text/javascript" src="../../../scripts/platform-content-handler.js" async="async"></script><script type="text/javascript" src="../../../scripts/main.js" async="async"></script>  </head>
+  <body>
+    <div id="container">
+      <div id="leftColumn"><a href="../../../index.html">
+          <div id="logo"></div>
+        </a>
+        <div id="paneSearch"></div>
+        <div id="sideMenu"></div>
+      </div>
+      <div id="main">
+        <div id="leftToggler"><span class="icon-toggler"></span></div>
+<script type="text/javascript" src="../../../scripts/main.js"></script>        <div class="main-content" id="content" pageIds="core::io.github.bluegroundltd.outbox/OutboxHandler///PointingToDeclaration//-121426938">
+          <div class="navigation-wrapper" id="navigation-wrapper">
+            <div class="breadcrumbs"><a href="../../../index.html">core</a>/<a href="../index.html">io.github.bluegroundltd.outbox</a>/<a href="index.html">OutboxHandler</a></div>
+            <div class="pull-right d-flex">
+              <div id="searchBar"></div>
+            </div>
+          </div>
+          <div class="cover ">
+            <h1 class="cover"><span>Outbox</span><wbr></wbr><span><span>Handler</span></span></h1>
+            <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":core:dokkaHtml/main"><div class="symbol monospace">interface <a href="index.html">OutboxHandler</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><p class="paragraph">OutboxHandler is responsible for:</p><ul><li><p class="paragraph">handling the outbox item</p></li><li><p class="paragraph">serializing the payload</p></li><li><p class="paragraph">calculating the next execution time</p></li><li><p class="paragraph">checking if the max retries has been reached</p></li><li><p class="paragraph">handling the payload and</p></li><li><p class="paragraph">handling the failure.</p></li></ul><p class="paragraph">Example:</p><div class="sample-container"><code class="" theme="idea"><pre>class MyOutboxHandler : OutboxHandler {<br> override fun getSupportedType(): OutboxType {<br>   return MyOutboxType<br> }<br> override fun serialize(payload: OutboxPayload): String {<br>   return payload.toString()<br> }<br> override fun getNextExecutionTime(currentRetries: Long): Instant {<br>   return Instant.now()<br> }<br> override fun hasReachedMaxRetries(retries: Long): Boolean {<br>   return retries &gt;= 3<br> }<br> override fun handle(payload: String) {<br>   // handle the payload<br> }<br> override fun handleFailure(payload: String) {<br>   // handle the failure<br>   // e.g. send an email to the admin<br> }<br>}</pre></code></div></div></div>
+          </div>
+          <div class="tabbedcontent">
+            <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="Functions">Functions</button><button class="section-tab" data-togglable="Inheritors">Inheritors</button></div>
+            <div class="tabs-section-body">
+              <h2 class="">Functions</h2>
+              <div class="table" data-togglable="Functions"><a data-name="-1068482666%2FFunctions%2F-121426938" anchor-label="getNextExecutionTime" id="-1068482666%2FFunctions%2F-121426938" data-filterable-set=":core:dokkaHtml/main"></a>
+                <div class="table-row" data-filterable-current=":core:dokkaHtml/main" data-filterable-set=":core:dokkaHtml/main">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="get-next-execution-time.html"><span>get</span><wbr></wbr><span>Next</span><wbr></wbr><span>Execution</span><wbr></wbr><span><span>Time</span></span></a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1068482666%2FFunctions%2F-121426938"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title"><div class="divergent-group" data-filterable-current=":core:dokkaHtml/main" data-filterable-set=":core:dokkaHtml/main"><div class="with-platform-tags"><span class="pull-right"></span></div>
+
+  <div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":core:dokkaHtml/main"><div class="symbol monospace">abstract fun <a href="get-next-execution-time.html">getNextExecutionTime</a>(currentRetries: <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html">Long</a>): <a href="https://docs.oracle.com/javase/8/docs/api/java/time/Instant.html">Instant</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+  </div>
+<div class="brief "><p class="paragraph">Returns the next execution time for the outbox item.</p></div></div>
+</div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="-2099665587%2FFunctions%2F-121426938" anchor-label="getSupportedType" id="-2099665587%2FFunctions%2F-121426938" data-filterable-set=":core:dokkaHtml/main"></a>
+                <div class="table-row" data-filterable-current=":core:dokkaHtml/main" data-filterable-set=":core:dokkaHtml/main">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="get-supported-type.html"><span>get</span><wbr></wbr><span>Supported</span><wbr></wbr><span><span>Type</span></span></a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2099665587%2FFunctions%2F-121426938"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title"><div class="divergent-group" data-filterable-current=":core:dokkaHtml/main" data-filterable-set=":core:dokkaHtml/main"><div class="with-platform-tags"><span class="pull-right"></span></div>
+
+  <div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":core:dokkaHtml/main"><div class="symbol monospace">abstract fun <a href="get-supported-type.html">getSupportedType</a>(): <a href="../../io.github.bluegroundltd.outbox.item/-outbox-type/index.html">OutboxType</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+  </div>
+<div class="brief "><p class="paragraph">Returns the type of the outbox item that this handler can handle.</p></div></div>
+</div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="138956461%2FFunctions%2F-121426938" anchor-label="handle" id="138956461%2FFunctions%2F-121426938" data-filterable-set=":core:dokkaHtml/main"></a>
+                <div class="table-row" data-filterable-current=":core:dokkaHtml/main" data-filterable-set=":core:dokkaHtml/main">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="handle.html"><span><span>handle</span></span></a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="138956461%2FFunctions%2F-121426938"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title"><div class="divergent-group" data-filterable-current=":core:dokkaHtml/main" data-filterable-set=":core:dokkaHtml/main"><div class="with-platform-tags"><span class="pull-right"></span></div>
+
+  <div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":core:dokkaHtml/main"><div class="symbol monospace">abstract fun <a href="handle.html">handle</a>(payload: <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a>)<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+  </div>
+<div class="brief "><p class="paragraph">Handles the outbox item.</p></div></div>
+</div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="1775628619%2FFunctions%2F-121426938" anchor-label="handleFailure" id="1775628619%2FFunctions%2F-121426938" data-filterable-set=":core:dokkaHtml/main"></a>
+                <div class="table-row" data-filterable-current=":core:dokkaHtml/main" data-filterable-set=":core:dokkaHtml/main">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="handle-failure.html"><span>handle</span><wbr></wbr><span><span>Failure</span></span></a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1775628619%2FFunctions%2F-121426938"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title"><div class="divergent-group" data-filterable-current=":core:dokkaHtml/main" data-filterable-set=":core:dokkaHtml/main"><div class="with-platform-tags"><span class="pull-right"></span></div>
+
+  <div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":core:dokkaHtml/main"><div class="symbol monospace">abstract fun <a href="handle-failure.html">handleFailure</a>(payload: <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a>)<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+  </div>
+<div class="brief "><p class="paragraph">Handles the outbox item when it has reached the maximum number of retries.</p></div></div>
+</div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="-143663564%2FFunctions%2F-121426938" anchor-label="hasReachedMaxRetries" id="-143663564%2FFunctions%2F-121426938" data-filterable-set=":core:dokkaHtml/main"></a>
+                <div class="table-row" data-filterable-current=":core:dokkaHtml/main" data-filterable-set=":core:dokkaHtml/main">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="has-reached-max-retries.html"><span>has</span><wbr></wbr><span>Reached</span><wbr></wbr><span>Max</span><wbr></wbr><span><span>Retries</span></span></a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-143663564%2FFunctions%2F-121426938"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title"><div class="divergent-group" data-filterable-current=":core:dokkaHtml/main" data-filterable-set=":core:dokkaHtml/main"><div class="with-platform-tags"><span class="pull-right"></span></div>
+
+  <div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":core:dokkaHtml/main"><div class="symbol monospace">abstract fun <a href="has-reached-max-retries.html">hasReachedMaxRetries</a>(retries: <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html">Long</a>): <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+  </div>
+<div class="brief "><p class="paragraph">Returns true if the outbox item has reached the maximum number of retries.</p></div></div>
+</div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="-1947895754%2FFunctions%2F-121426938" anchor-label="serialize" id="-1947895754%2FFunctions%2F-121426938" data-filterable-set=":core:dokkaHtml/main"></a>
+                <div class="table-row" data-filterable-current=":core:dokkaHtml/main" data-filterable-set=":core:dokkaHtml/main">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="serialize.html"><span><span>serialize</span></span></a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1947895754%2FFunctions%2F-121426938"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title"><div class="divergent-group" data-filterable-current=":core:dokkaHtml/main" data-filterable-set=":core:dokkaHtml/main"><div class="with-platform-tags"><span class="pull-right"></span></div>
+
+  <div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":core:dokkaHtml/main"><div class="symbol monospace">abstract fun <a href="serialize.html">serialize</a>(payload: <a href="../../io.github.bluegroundltd.outbox.item/-outbox-payload/index.html">OutboxPayload</a>): <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+  </div>
+<div class="brief "><p class="paragraph">Serializes the payload into a string.</p></div></div>
+</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <h2 class="">Inheritors</h2>
+              <div class="table" data-togglable="Inheritors"><a data-name="1531660146%2FInheritors%2F-121426938" anchor-label="SimpleOutboxHandler" id="1531660146%2FInheritors%2F-121426938" data-filterable-set=":core:dokkaHtml/main"></a>
+                <div class="table-row" data-filterable-current=":core:dokkaHtml/main" data-filterable-set=":core:dokkaHtml/main">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="../-simple-outbox-handler/index.html">SimpleOutboxHandler</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1531660146%2FInheritors%2F-121426938"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="footer"><span class="go-to-top-icon"><a href="#content"></a></span><span>© 2022 Copyright</span><span class="pull-right"><span>Generated by </span><a href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span></div>
+      </div>
+    </div>
+  </body>
+</html>
+
