@@ -7,6 +7,8 @@ Transactional Outbox is a library that provides a simple way to implement
 the [Transactional Outbox Pattern](https://microservices.io/patterns/data/transactional-outbox.html) in your
 application, developed by Blueground.
 
+Api Docs: https://bluegroundltd.github.io/transactional-outbox/
+
 ## Table of Contents
 
 - [Installation](#installation)
