@@ -133,7 +133,7 @@ fun addGoogleCalendarOutboxItem(user: User) {
     user.getFullname(),
     user.getEmail()
   )
-  outbox.add(AdminOutboxType.GOOGLE_CALENDAR_CREATE, payload);
+  outbox.add(MyOutboxType.GOOGLE_CALENDAR_CREATE, payload)
 }
 ```
 
