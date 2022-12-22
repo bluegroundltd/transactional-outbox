@@ -127,7 +127,7 @@ Finally, you can create a new `OutboxEntry` and save it to the `Outbox`,
 called inside a higher level transaction:
 
 ```kotlin
-void fun addGoogleCalendarOutboxItem(user: User) {
+fun addGoogleCalendarOutboxItem(user: User) {
   val payload = GoogleCalendarCreationOutboxPayload(
     user.getId(),
     user.getFullname(),
