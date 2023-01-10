@@ -8,7 +8,7 @@ import spock.lang.Unroll
 
 import java.time.Clock
 import java.time.Instant
-import java.time.InstantSource
+import java.time.ZoneId
 import java.util.function.Function
 
 class SimpleOutboxHandlerSpec extends Specification {
@@ -23,7 +23,7 @@ class SimpleOutboxHandlerSpec extends Specification {
   SimpleOutboxHandlerTestImpl handler
 
   void setup() {
-    Clock clock = InstantSource.fixed(now)
+    Clock clock = Clock.fixed(now, ZoneId.systemDefault())
     handleWithParsedPayloadCallback = Mock()
     handler = new SimpleOutboxHandlerTestImpl(
       supportedType,

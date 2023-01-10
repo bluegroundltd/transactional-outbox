@@ -1,7 +1,9 @@
 package io.github.bluegroundltd.outbox
 
+import io.github.bluegroundltd.outbox.event.OnDemandOutboxPublisher
 import io.github.bluegroundltd.outbox.executor.FixedThreadPoolExecutorServiceFactory
 import io.github.bluegroundltd.outbox.item.OutboxType
+import io.github.bluegroundltd.outbox.item.factory.OutboxItemFactory
 import io.github.bluegroundltd.outbox.store.OutboxStore
 import java.time.Clock
 import java.time.Duration
@@ -12,20 +14,13 @@ import kotlin.properties.Delegates
  *
  * Example on Spring Boot:
  * ``` kotlin
- *   @Bean
  *   fun transactionalOutbox(): TransactionalOutbox {
- *     val locksProvider = OutboxLocksProvider(postgresLockDao, id)
- *
- *     logger.info(
- *       "Initializing outbox with handler(s) [${outboxHandlers.joinToString { it.javaClass.simpleName }}], " +
- *         "locks provider \"${locksProvider}\" and store \"${outboxStore.javaClass.simpleName}\""
- *     )
- *
  *     return TransactionalOutboxBuilder
  *       .make(clock)
  *       .withHandlers(outboxHandlers)
  *       .withLocksProvider(locksProvider)
  *       .withStore(outboxStore)
+ *       .withOnDemandOutboxPublisher(onDemandOutboxPublisher)
  *       .build()
  *   }
  *   ```
@@ -33,12 +28,13 @@ import kotlin.properties.Delegates
 class TransactionalOutboxBuilder(
     private val clock: Clock,
     private val rerunAfterDuration: Duration = DEFAULT_RERUN_AFTER_DURATION
-) : OutboxHandlersStep, LocksProviderStep, StoreStep, BuildStep {
-  val handlers: MutableMap<OutboxType, OutboxHandler> = mutableMapOf()
+) : OutboxHandlersStep, LocksProviderStep, StoreStep, OnDemandOutboxPublisherStep, BuildStep {
+  private val handlers: MutableMap<OutboxType, OutboxHandler> = mutableMapOf()
   private var threadPoolSize by Delegates.notNull<Int>()
   private var threadPoolTimeOut: Duration = DEFAULT_THREAD_POOL_TIMEOUT
   private lateinit var locksProvider: OutboxLocksProvider
   private lateinit var store: OutboxStore
+  private lateinit var onDemandOutboxPublisher: OnDemandOutboxPublisher
 
   companion object {
     private val DEFAULT_RERUN_AFTER_DURATION: Duration = Duration.ofHours(1)
@@ -100,8 +96,16 @@ class TransactionalOutboxBuilder(
   /**
    * Sets the store for the outbox.
    */
-  override fun withStore(store: OutboxStore): BuildStep {
+  override fun withStore(store: OutboxStore): OnDemandOutboxPublisherStep {
     this.store = store
+    return this
+  }
+
+  /**
+   * Sets the publisher for on demand outboxes.
+   */
+  override fun withOnDemandOutboxPublisher(onDemandOutboxPublisher: OnDemandOutboxPublisher): BuildStep {
+    this.onDemandOutboxPublisher = onDemandOutboxPublisher
     return this
   }
 
@@ -126,12 +130,15 @@ class TransactionalOutboxBuilder(
    */
   override fun build(): TransactionalOutbox {
     val executorServiceFactory = FixedThreadPoolExecutorServiceFactory()
+    val outboxItemFactory = OutboxItemFactory(clock, handlers.toMap(), rerunAfterDuration)
 
     return TransactionalOutboxImpl(
         clock,
         handlers.toMap(),
         locksProvider,
         store,
+        onDemandOutboxPublisher,
+        outboxItemFactory,
         rerunAfterDuration,
         executorServiceFactory.make(),
         threadPoolTimeOut
@@ -148,7 +155,11 @@ interface LocksProviderStep {
 }
 
 interface StoreStep {
-  fun withStore(store: OutboxStore): BuildStep
+  fun withStore(store: OutboxStore): OnDemandOutboxPublisherStep
+}
+
+interface OnDemandOutboxPublisherStep {
+  fun withOnDemandOutboxPublisher(onDemandOutboxPublisher: OnDemandOutboxPublisher): BuildStep
 }
 
 interface BuildStep {
