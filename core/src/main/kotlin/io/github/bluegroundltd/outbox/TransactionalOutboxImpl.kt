@@ -1,18 +1,21 @@
 package io.github.bluegroundltd.outbox
 
+import io.github.bluegroundltd.outbox.event.OnDemandOutboxEvent
+import io.github.bluegroundltd.outbox.event.OnDemandOutboxPublisher
 import io.github.bluegroundltd.outbox.item.OutboxItem
 import io.github.bluegroundltd.outbox.item.OutboxPayload
 import io.github.bluegroundltd.outbox.item.OutboxStatus
 import io.github.bluegroundltd.outbox.item.OutboxType
+import io.github.bluegroundltd.outbox.item.factory.OutboxItemFactory
 import io.github.bluegroundltd.outbox.store.OutboxFilter
 import io.github.bluegroundltd.outbox.store.OutboxStore
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 import java.time.Clock
 import java.time.Duration
 import java.time.Instant
 import java.util.EnumSet
 import java.util.concurrent.ExecutorService
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 @SuppressWarnings("LongParameterList")
 internal class TransactionalOutboxImpl(
@@ -20,8 +23,10 @@ internal class TransactionalOutboxImpl(
   private val outboxHandlers: Map<OutboxType, OutboxHandler>,
   private val locksProvider: OutboxLocksProvider,
   private val outboxStore: OutboxStore,
+  private val onDemandOutboxPublisher: OnDemandOutboxPublisher,
+  private val outboxItemFactory: OutboxItemFactory,
   private val rerunAfterDuration: Duration,
-  private val executor: ExecutorService
+  private val executor: ExecutorService,
 ) : TransactionalOutbox {
 
   companion object {
@@ -32,25 +37,30 @@ internal class TransactionalOutboxImpl(
 
   override fun add(type: OutboxType, payload: OutboxPayload) {
     logger.info("$LOGGER_PREFIX Adding item of type: ${type.getType()} and payload: $payload")
-    val handler = outboxHandlers[type]
-      ?: throw UnsupportedOperationException("Outbox item type \"{${type.getType()}\" isn't supported")
 
-    val outboxItem = makePendingItem(type, payload, handler)
+    val outboxItem = outboxItemFactory.makeScheduledOutboxItem(type, payload)
     outboxStore.insert(outboxItem)
   }
 
-  // TODO extract to factory
-  private fun makePendingItem(type: OutboxType, payload: OutboxPayload, handler: OutboxHandler): OutboxItem {
-    return OutboxItem(
-      null,
-      type,
-      OutboxStatus.PENDING,
-      handler.serialize(payload),
-      0,
-      handler.getNextExecutionTime(0),
-      null,
-      null
-    )
+  override fun addOnDemandOutbox(type: OutboxType, payload: OutboxPayload) {
+    logger.info("$LOGGER_PREFIX Adding item of type: ${type.getType()} and payload: $payload")
+
+    val outboxItem = outboxItemFactory.makeOnDemandOutboxItem(type, payload)
+    outboxStore.insert(outboxItem)
+      .also {
+        onDemandOutboxPublisher.publish(OnDemandOutboxEvent(outbox = it))
+      }
+  }
+
+  override fun handleOnDemandOutbox(outbox: OutboxItem) {
+    runCatching {
+      logger.info("$LOGGER_PREFIX On demand processing of \"${outbox.type.getType()}\" outbox")
+      executor.execute(
+        OutboxItemProcessor(outbox, outboxHandlers[outbox.type]!!, outboxStore)
+      )
+    }.onFailure {
+      logger.error("$LOGGER_PREFIX Failure in on demand handling", it)
+    }
   }
 
   override fun monitor() {
@@ -65,13 +75,12 @@ internal class TransactionalOutboxImpl(
       }
 
       markForProcessing(items)
-      items.map { outboxStore.update(it) }
-
-      items.forEach { item ->
-        executor.execute(
-          OutboxItemProcessor(item, outboxHandlers[item.type]!!, outboxStore)
-        )
-      }
+        .map { outboxStore.update(it) }
+        .forEach { item ->
+          executor.execute(
+            OutboxItemProcessor(item, outboxHandlers[item.type]!!, outboxStore)
+          )
+        }
     }.onFailure {
       logger.error("$LOGGER_PREFIX Failure in monitor", it)
     }
@@ -96,11 +105,14 @@ internal class TransactionalOutboxImpl(
     return eligibleItems
   }
 
-  private fun markForProcessing(items: List<OutboxItem>) =
-    items.map {
-      it.status = OutboxStatus.RUNNING
-      val now = Instant.now(clock)
-      it.lastExecution = now
-      it.rerunAfter = now.plus(rerunAfterDuration)
+  private fun markForProcessing(items: List<OutboxItem>): List<OutboxItem> {
+    val now = Instant.now(clock)
+    return items.map {
+      it.copy(
+        status = OutboxStatus.RUNNING,
+        lastExecution = now,
+        rerunAfter = now.plus(rerunAfterDuration)
+      )
     }
+  }
 }

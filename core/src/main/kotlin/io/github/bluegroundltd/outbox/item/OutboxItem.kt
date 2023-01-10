@@ -2,14 +2,13 @@ package io.github.bluegroundltd.outbox.item
 
 import java.time.Instant
 
-@SuppressWarnings("LongParameterList")
-class OutboxItem(
-  val id: Long?,
+data class OutboxItem(
+  val id: Long? = null,
   val type: OutboxType,
   var status: OutboxStatus,
   val payload: String,
-  var retries: Long,
+  var retries: Long = 0,
   var nextRun: Instant,
-  var lastExecution: Instant?,
-  var rerunAfter: Instant?
+  var lastExecution: Instant? = null,
+  var rerunAfter: Instant? = null
 )
