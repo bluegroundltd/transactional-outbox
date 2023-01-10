@@ -1,6 +1,7 @@
 package io.github.bluegroundltd.outbox.item.factory
 
 import io.github.bluegroundltd.outbox.OutboxHandler
+import io.github.bluegroundltd.outbox.annotation.TestableOpenClass
 import io.github.bluegroundltd.outbox.item.OutboxItem
 import io.github.bluegroundltd.outbox.item.OutboxPayload
 import io.github.bluegroundltd.outbox.item.OutboxStatus
@@ -9,6 +10,7 @@ import java.time.Clock
 import java.time.Duration
 import java.time.Instant
 
+@TestableOpenClass
 internal class OutboxItemFactory(
   private val clock: Clock,
   private val outboxHandlers: Map<OutboxType, OutboxHandler>,

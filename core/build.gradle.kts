@@ -10,6 +10,7 @@ plugins {
   id("io.gitlab.arturbosch.detekt")
   id("org.jetbrains.dokka") version "1.5.31"
   id("com.vanniktech.maven.publish") version "0.18.0"
+  id("org.jetbrains.kotlin.plugin.allopen") version "1.8.0"
 }
 
 repositories {
@@ -39,6 +40,10 @@ dependencies {
 
   detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:$detektVersion")
   detektPlugins("io.gitlab.arturbosch.detekt:detekt-rules-libraries:$detektVersion")
+}
+
+allOpen {
+  annotation("io.github.bluegroundltd.outbox.annotation.TestableOpenClass")
 }
 
 tasks.test {
