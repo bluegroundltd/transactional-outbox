@@ -1,9 +1,11 @@
 package io.github.bluegroundltd.outbox
 
+import io.github.bluegroundltd.outbox.event.OnDemandOutboxPublisher
 import io.github.bluegroundltd.outbox.item.OutboxItem
 import io.github.bluegroundltd.outbox.item.OutboxPayload
 import io.github.bluegroundltd.outbox.item.OutboxStatus
 import io.github.bluegroundltd.outbox.item.OutboxType
+import io.github.bluegroundltd.outbox.item.factory.OutboxItemFactory
 import io.github.bluegroundltd.outbox.store.OutboxFilter
 import io.github.bluegroundltd.outbox.store.OutboxStore
 import io.github.bluegroundltd.outbox.utils.OutboxItemBuilder
@@ -21,6 +23,8 @@ class TransactionalOutboxImplSpec extends Specification {
   Map<OutboxType, OutboxHandler> handlers = Mock()
   OutboxLocksProvider locksProvider = Mock()
   OutboxStore store = Mock()
+  OnDemandOutboxPublisher onDemandOutboxPublisher = Mock()
+  OutboxItemFactory outboxItemFactory = Mock()
   ExecutorService executor = Mock()
   TransactionalOutbox transactionalOutbox
 
@@ -30,63 +34,85 @@ class TransactionalOutboxImplSpec extends Specification {
       handlers,
       locksProvider,
       store,
+      onDemandOutboxPublisher,
+      outboxItemFactory,
       DURATION_ONE_HOUR,
       executor
     )
-  }
-
-  def "Should throw UnsupportedOperationException when item isn't supported"() {
-    given:
-      def payload = GroovyMock(OutboxPayload)
-      def type = GroovyMock(OutboxType)
-
-    when:
-      transactionalOutbox.add(type, payload)
-
-    then:
-      1 * handlers.get(type) >> null
-      2 * type.getType() >> "type"
-      0 * _
-
-    and:
-      thrown(UnsupportedOperationException)
   }
 
   def "Should delegate to outbox store when add is called"() {
     given:
       def payload = GroovyMock(OutboxPayload)
       def type = GroovyMock(OutboxType)
-      def handler = GroovyMock(OutboxHandler)
 
     and:
-      def serializedPayload = "serializedPayload"
-      def nextRun = GroovyMock(Instant)
-
-    and:
-      def expectedOutboxItem =
-        OutboxItemBuilder.make().withType(type).withPayload(serializedPayload).withNextRun(nextRun).build()
+      def outboxItem = OutboxItemBuilder.make().build()
 
     when:
       transactionalOutbox.add(type, payload)
 
     then:
       1 * type.getType() >> "type"
-      1 * handlers.get(type) >> handler
-      1 * handler.serialize(payload) >> serializedPayload
-      1 * handler.getNextExecutionTime(0) >> nextRun
-      1 * store.insert(_) >> { OutboxItem item ->
-        with(item) {
-          id == null
-          type == expectedOutboxItem.type
-          status == expectedOutboxItem.status
-          item.payload == expectedOutboxItem.payload
-          retries == expectedOutboxItem.retries
-          nextRun == expectedOutboxItem.nextRun
-          lastExecution == expectedOutboxItem.lastExecution
-          rerunAfter == expectedOutboxItem.rerunAfter
-        }
-      }
+      1 * outboxItemFactory.makeScheduledOutboxItem(type, payload) >> outboxItem
+      1 * store.insert(outboxItem)
       0 * _
+  }
+
+  def "Should delegate to outbox store and publisher when addOnDemand is called"() {
+    given:
+      def payload = GroovyMock(OutboxPayload)
+      def type = GroovyMock(OutboxType)
+
+    and:
+      def outboxItem = OutboxItemBuilder.make().build()
+      def savedOutbox = OutboxItemBuilder.make().build()
+
+    when:
+      transactionalOutbox.addOnDemandOutbox(type, payload)
+
+    then:
+      1 * type.getType() >> "type"
+      1 * outboxItemFactory.makeOnDemandOutboxItem(type, payload) >> outboxItem
+      1 * store.insert(outboxItem) >> savedOutbox
+      1 * onDemandOutboxPublisher.publish({
+        assert it.outbox == savedOutbox
+      })
+      0 * _
+  }
+
+  def "Should delegate to the executor thread pool when an on-demand outbox is processed"(){
+    given:
+      def onDemandOutbox = OutboxItemBuilder.make().build()
+
+    and:
+      def expectedHandler = GroovyMock(OutboxHandler)
+
+    when:
+      transactionalOutbox.handleOnDemandOutbox(onDemandOutbox)
+
+    then:
+      1 * handlers.get(_) >> expectedHandler
+      1 * executor.execute(_)
+  }
+
+  def "Should handle a failure while an on-demand outbox is being processed"() {
+    given:
+      def onDemandOutbox = OutboxItemBuilder.make().build()
+
+    and:
+      def expectedHandler = GroovyMock(OutboxHandler)
+
+    when:
+      transactionalOutbox.handleOnDemandOutbox(onDemandOutbox)
+
+    then:
+      1 * handlers.get(_) >> expectedHandler
+      1 * executor.execute(_) >> { throw new RuntimeException() }
+      0 * _
+
+    and:
+      noExceptionThrown()
   }
 
   def "Should delegate to the executor thread pool when monitor is called"() {
@@ -113,10 +139,11 @@ class TransactionalOutboxImplSpec extends Specification {
       }
       items.size() * store.update(_) >> { OutboxItem item ->
         with(item) {
-          item.status == OutboxStatus.RUNNING
-          item.lastExecution == now
-          item.rerunAfter == item.lastExecution + DURATION_ONE_HOUR
+          it.status == OutboxStatus.RUNNING
+          it.lastExecution == now
+          it.rerunAfter == item.lastExecution + DURATION_ONE_HOUR
         }
+        return item
       }
       1 * locksProvider.release()
       items.size() * handlers.get(_) >> expectedHandler
