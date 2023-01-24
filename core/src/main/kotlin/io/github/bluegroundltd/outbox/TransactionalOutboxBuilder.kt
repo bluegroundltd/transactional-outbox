@@ -36,11 +36,13 @@ class TransactionalOutboxBuilder(
 ) : OutboxHandlersStep, LocksProviderStep, StoreStep, BuildStep {
   val handlers: MutableMap<OutboxType, OutboxHandler> = mutableMapOf()
   private var threadPoolSize by Delegates.notNull<Int>()
+  private var threadPoolTimeOut: Duration = DEFAULT_THREAD_POOL_TIMEOUT
   private lateinit var locksProvider: OutboxLocksProvider
   private lateinit var store: OutboxStore
 
   companion object {
     private val DEFAULT_RERUN_AFTER_DURATION: Duration = Duration.ofHours(1)
+    private val DEFAULT_THREAD_POOL_TIMEOUT: Duration = Duration.ofSeconds(5)
 
     /**
      * Creates a new [OutboxHandlersStep] for the builder.
@@ -112,6 +114,14 @@ class TransactionalOutboxBuilder(
   }
 
   /**
+   * Sets the thread pool timeout upon shutdown for the outbox.
+   */
+  override fun withThreadPoolTimeOut(threadPoolTimeOut: Duration): BuildStep {
+    this.threadPoolTimeOut = threadPoolTimeOut
+    return this
+  }
+
+  /**
    * Builds the outbox.
    */
   override fun build(): TransactionalOutbox {
@@ -123,7 +133,8 @@ class TransactionalOutboxBuilder(
         locksProvider,
         store,
         rerunAfterDuration,
-        executorServiceFactory.make()
+        executorServiceFactory.make(),
+        threadPoolTimeOut
     )
   }
 }
@@ -142,5 +153,6 @@ interface StoreStep {
 
 interface BuildStep {
   fun withThreadPoolSize(threadPoolSize: Int): BuildStep
+  fun withThreadPoolTimeOut(threadPoolTimeOut: Duration): BuildStep
   fun build(): TransactionalOutbox
 }

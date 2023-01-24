@@ -7,6 +7,7 @@ import io.github.bluegroundltd.outbox.utils.UnitTestSpecification
 import spock.lang.Unroll
 
 import java.time.Clock
+import java.time.Duration
 import java.time.Instant
 import java.time.ZoneId
 
@@ -36,8 +37,12 @@ class TransactionalOutboxBuilderSpec extends UnitTestSpecification {
 
     and:
       TransactionalOutbox transactionalOutbox
-      if (withCustomThreadPoolSize) {
+      if (withCustomThreadPoolSize && withCustomThreadPoolTimeOut) {
+        transactionalOutbox = transactionalOutboxBuilder.withThreadPoolSize(5).withThreadPoolTimeOut(Duration.ofSeconds(5)).build()
+      } else if (withCustomThreadPoolSize && !withCustomThreadPoolTimeOut) {
         transactionalOutbox = transactionalOutboxBuilder.withThreadPoolSize(5).build()
+      } else if (!withCustomThreadPoolSize && withCustomThreadPoolTimeOut) {
+        transactionalOutbox = transactionalOutboxBuilder.withThreadPoolTimeOut(Duration.ofSeconds(5)).build()
       } else {
         transactionalOutbox = transactionalOutboxBuilder.build()
       }
@@ -52,9 +57,11 @@ class TransactionalOutboxBuilderSpec extends UnitTestSpecification {
       mappedHandlers.keySet() == expectedOutboxTypes
 
     where:
-      testCase                        | withCustomThreadPoolSize
-      "with default thread pool size" | false
-      "with custom thread pool size"  | true
+      testCase                                                        | withCustomThreadPoolSize | withCustomThreadPoolTimeOut
+      "with default thread pool size and default thread pool timeout" | false                    | false
+      "with custom thread pool size and custom thread pool timeout"   | true                     | true
+      "with default thread pool size and custom thread pool timeout"  | false                    | true
+      "with custom thread pool size and default thread pool timeout"  | true                     | false
   }
 
   def "Should throw if handlers with same supporting type are added"() {
