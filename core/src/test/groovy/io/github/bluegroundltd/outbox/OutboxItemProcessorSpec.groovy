@@ -27,7 +27,7 @@ class OutboxItemProcessorSpec extends Specification {
     )
   }
 
-  def "Should don nothing when an erroneous item type is provided"() {
+  def "Should do nothing when an erroneous item type is provided"() {
     when:
       processor.run()
 

@@ -40,6 +40,10 @@ internal class OutboxItemProcessor(
     }
   }
 
+  fun getItem(): OutboxItem {
+    return item
+  }
+
   private fun handleTerminalFailure(exception: Exception) {
     logger.info(
       "$LOGGER_PREFIX Failure handling outbox item with id: ${item.id} and type: ${item.type}. " +

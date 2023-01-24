@@ -42,4 +42,11 @@ sealed interface TransactionalOutbox {
    * Monitors the outbox for new items and processes them
    */
   fun monitor()
+
+  /**
+   * Blocks new tasks and waits up to a specified period of time for all tasks to be completed.
+   * If that time expires, the execution is stopped immediately.
+   * Any tasks that were not executed will have their corresponding item's status set to PENDING.
+   */
+  fun shutdown()
 }

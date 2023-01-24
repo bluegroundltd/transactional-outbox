@@ -14,6 +14,8 @@ import java.time.Duration
 import java.time.Instant
 import java.time.ZoneId
 import java.util.concurrent.ExecutorService
+import java.util.concurrent.RejectedExecutionException
+import java.util.concurrent.TimeUnit
 
 class TransactionalOutboxImplSpec extends Specification {
   private static final Duration DURATION_ONE_HOUR = Duration.ofHours(1)
@@ -22,6 +24,7 @@ class TransactionalOutboxImplSpec extends Specification {
   OutboxLocksProvider locksProvider = Mock()
   OutboxStore store = Mock()
   ExecutorService executor = Mock()
+  Duration threadPoolTimeOut = Duration.ofMillis(5000)
   TransactionalOutbox transactionalOutbox
 
   def setup() {
@@ -31,7 +34,8 @@ class TransactionalOutboxImplSpec extends Specification {
       locksProvider,
       store,
       DURATION_ONE_HOUR,
-      executor
+      executor,
+      threadPoolTimeOut
     )
   }
 
@@ -89,6 +93,17 @@ class TransactionalOutboxImplSpec extends Specification {
       0 * _
   }
 
+  def "Should return when monitor is called after a shutdown request"() {
+    when:
+      transactionalOutbox.shutdown()
+      transactionalOutbox.monitor()
+
+    then:
+      1 * executor.shutdown()
+      1 * executor.awaitTermination(threadPoolTimeOut.toSeconds(), TimeUnit.SECONDS) >> true
+      0 * _
+  }
+
   def "Should delegate to the executor thread pool when monitor is called"() {
     given:
       def pendingItem = OutboxItemBuilder.makePending()
@@ -121,6 +136,45 @@ class TransactionalOutboxImplSpec extends Specification {
       1 * locksProvider.release()
       items.size() * handlers.get(_) >> expectedHandler
       items.size() * executor.execute(_)
+      0 * _
+  }
+
+  def "Should delegate to the outbox store when monitor is called and the executor rejects the tasks"() {
+    given:
+      def pendingItem = OutboxItemBuilder.makePending()
+
+    and:
+      def expectedHandler = GroovyMock(OutboxHandler)
+      def now = Instant.now(clock)
+
+    when:
+      transactionalOutbox.monitor()
+
+    then:
+      1 * locksProvider.acquire()
+      1 * store.fetch(_) >> { OutboxFilter filter ->
+        with(filter) {
+          outboxPendingFilter.nextRunLessThan == now
+        }
+        [pendingItem]
+      }
+      1 * store.update(_) >> { OutboxItem item ->
+        with(item) {
+          item.status == OutboxStatus.RUNNING
+          item.lastExecution == now
+          item.rerunAfter == item.lastExecution + DURATION_ONE_HOUR
+        }
+      }
+      1 * locksProvider.release()
+      1 * handlers.get(_) >> expectedHandler
+      1 * executor.execute(_) >> { throw new RejectedExecutionException() }
+      1 * store.update(_) >> { OutboxItem item ->
+        with(item) {
+          item.status == OutboxStatus.PENDING
+          item.nextRun == now
+          item.rerunAfter == null
+        }
+      }
       0 * _
   }
 
@@ -160,5 +214,65 @@ class TransactionalOutboxImplSpec extends Specification {
       1 * locksProvider.release() >> { throw new RuntimeException() }
       0 * _
       noExceptionThrown()
+  }
+
+  def "Should delegate to the outbox store when shutdown is called and the timeout elapsed before termination"() {
+    given:
+      def runningItem = OutboxItemBuilder.makeRunning()
+      def handler = GroovyMock(OutboxHandler)
+      def processor = new OutboxItemProcessor(runningItem, handler, store)
+      def expected = [processor]
+      def now = Instant.now(clock)
+
+    when:
+      transactionalOutbox.shutdown()
+
+    then:
+      1 * executor.shutdown()
+      1 * executor.awaitTermination(threadPoolTimeOut.toSeconds(), TimeUnit.SECONDS) >> false
+      1 * executor.shutdownNow() >> expected
+      1 * store.update(_) >> { OutboxItem item ->
+        with(item) {
+          item.status == OutboxStatus.PENDING
+          item.nextRun == now
+          item.rerunAfter == null
+        }
+      }
+      0 * _
+      noExceptionThrown()
+  }
+
+  def "Should return when shutdown is called while already in shutdown mode"() {
+    when:
+      transactionalOutbox.shutdown()
+      transactionalOutbox.shutdown()
+
+
+    then:
+      1 * executor.shutdown()
+      1 * executor.awaitTermination(threadPoolTimeOut.toSeconds(), TimeUnit.SECONDS) >> true
+      0 * _
+  }
+
+  def "Should do nothing when shutdown is called and all tasks have completed execution"() {
+    when:
+      transactionalOutbox.shutdown()
+
+    then:
+      1 * executor.shutdown()
+      1 * executor.awaitTermination(threadPoolTimeOut.toSeconds(), TimeUnit.SECONDS) >> true
+      0 * _
+      noExceptionThrown()
+  }
+
+  def "Should throw an exception when it occurs while awaiting tasks to be executed or while shutting down"() {
+    when:
+      transactionalOutbox.shutdown()
+
+    then:
+      1 * executor.shutdown()
+      1 * executor.awaitTermination(threadPoolTimeOut.toSeconds(), TimeUnit.SECONDS) >> { throw new InterruptedException() }
+      thrown(InterruptedException)
+      0 * _
   }
 }
