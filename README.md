@@ -17,6 +17,7 @@ Api Docs: https://bluegroundltd.github.io/transactional-outbox/
   - [Creating a new outbox handler](#creating-a-new-outbox-handler)
   - [Creating a new outbox entry](#creating-a-new-outbox-entry)
   - [Monitoring the outbox entries](#monitoring-the-outbox-entries)
+  - [Shutting down](#shutting-down)
 - [Publishing](#publishing)
 - [Maintainers](#maintainers)
 
@@ -34,7 +35,7 @@ implementation("io.github.bluegroundltd:transactional-outbox-core:0.0.2")
 
 ### Creating an Outbox library instance
 
-When you have an operation that you want to be executed asynchronously you can start by configuring the `Outbox`. 
+When you have an operation that you want to be executed asynchronously you can start by configuring the `Outbox`.
 If you're using `Spring` for example, you can configure the library as shown below using the provided builder.
 
 ```kotlin
@@ -80,7 +81,7 @@ Then you can create a new `OutboxHandler` that will be responsible for processin
 ```kotlin
 enum class MyOutboxType: OutboxType {
   GOOGLE_CALENDAR_CREATE, OTHER_TYPE;
-  
+
   override fun getType(): String {
     return name
   }
@@ -139,7 +140,7 @@ fun addGoogleCalendarOutboxItem(user: User) {
 
 ### Monitoring the Outbox Entries
 
-You can monitor the `Outbox` entries by using the `TransactionalOutbox::monitor()` method
+You can monitor the `Outbox` entries by using the `TransactionalOutbox::monitor` method
 using a data store poller. For example, if you're using `Spring` you can use the `@Scheduled` annotation:
 
 ```kotlin
@@ -155,10 +156,41 @@ class OutboxMonitor(
 }
 ```
 
+### Shutting down
+
+You can shut down the `Outbox` by using the `TransactionalOutbox::shutdown` method.
+
+`shutdown()` blocks new tasks from being processed and waits up to a specified period of time for all tasks to be
+completed. You can configure this timeout with the `TransactionalOutboxBuilder`.
+The default `shutdownTimeout` is set to 5 seconds. If that time expires, the execution is stopped immediately.
+Any tasks that did not start execution will have their corresponding item's status set to `PENDING`.
+
+If you're using `Spring` you can use the `@PreDestroy` annotation:
+
+```kotlin
+@Component
+class OutboxMonitor(
+    private val transactionalOutbox: TransactionalOutbox
+) {
+
+  @Scheduled(fixedDelay = 1000)
+  fun monitor() {
+    transactionalOutbox.monitor()
+  }
+
+  @PreDestroy
+  fun shutdown() {
+    transactionalOutbox.shutdown()
+  }
+
+}
+```
+
 ## Publishing
 
 * Bump version in `gradle.properties` of `core` module.
 * Execute the following to upload artifact:
+
 ```shell
 $ ./gradlew :core:publish \
             --no-daemon --no-parallel \
@@ -170,6 +202,7 @@ $ ./gradlew :core:publish \
 ```
 
 After this operation finishes, you can promote the artifact to be released with:
+
 ```shell
 $ ./gradlew closeAndReleaseRepository \
             -PmavenCentralUsername=<nexus_username> \
