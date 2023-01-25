@@ -27,7 +27,7 @@ Transactional Outbox is published on `mavenCentral`. In order to use it just add
 
 ```gradle
 
-implementation("io.github.bluegroundltd:transactional-outbox-core:0.0.2")
+implementation("io.github.bluegroundltd:transactional-outbox-core:0.1.0")
 
 ```
 
@@ -190,7 +190,6 @@ class OutboxMonitor(
 
 * Bump version in `gradle.properties` of `core` module.
 * Execute the following to upload artifact:
-
 ```shell
 $ ./gradlew :core:publish \
             --no-daemon --no-parallel \
@@ -202,7 +201,6 @@ $ ./gradlew :core:publish \
 ```
 
 After this operation finishes, you can promote the artifact to be released with:
-
 ```shell
 $ ./gradlew closeAndReleaseRepository \
             -PmavenCentralUsername=<nexus_username> \
