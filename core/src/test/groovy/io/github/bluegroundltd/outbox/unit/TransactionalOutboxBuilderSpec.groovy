@@ -1,5 +1,10 @@
-package io.github.bluegroundltd.outbox
+package io.github.bluegroundltd.outbox.unit
 
+import io.github.bluegroundltd.outbox.OutboxHandler
+import io.github.bluegroundltd.outbox.OutboxLocksProvider
+import io.github.bluegroundltd.outbox.TransactionalOutbox
+import io.github.bluegroundltd.outbox.TransactionalOutboxBuilder
+import io.github.bluegroundltd.outbox.TransactionalOutboxImpl
 import io.github.bluegroundltd.outbox.item.OutboxType
 import io.github.bluegroundltd.outbox.store.OutboxStore
 import io.github.bluegroundltd.outbox.utils.DummyOutboxHandler
