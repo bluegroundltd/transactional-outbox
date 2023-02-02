@@ -46,7 +46,10 @@ sealed interface TransactionalOutbox {
   /**
    * Blocks new tasks and waits up to a specified period of time for all tasks to be completed.
    * If that time expires, the execution is stopped immediately.
-   * Any tasks that were not executed will have their corresponding item's status set to PENDING.
+   * Any tasks that did not start execution will have their corresponding item's status set to PENDING.
+   * Shutdown is idempotent, so multiple invocations will have no additional effect.
+   * Note that if the library is used in Spring, you may notice two invocations of shutdown, one from the
+   * [@PreDestroy] and one via the automatic inference as described [here](https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/context/annotation/Bean.html#destroyMethod()).
    */
   fun shutdown()
 }
