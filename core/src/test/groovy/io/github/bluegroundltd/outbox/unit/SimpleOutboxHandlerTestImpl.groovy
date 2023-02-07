@@ -1,6 +1,7 @@
-package io.github.bluegroundltd.outbox
+package io.github.bluegroundltd.outbox.unit
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import io.github.bluegroundltd.outbox.SimpleOutboxHandler
 import io.github.bluegroundltd.outbox.item.OutboxType
 
 import java.time.Clock

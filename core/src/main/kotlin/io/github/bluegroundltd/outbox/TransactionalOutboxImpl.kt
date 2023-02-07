@@ -13,6 +13,9 @@ import java.time.Duration
 import java.time.Instant
 import java.util.EnumSet
 import java.util.concurrent.ExecutorService
+import java.util.concurrent.RejectedExecutionException
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicBoolean
 
 @SuppressWarnings("LongParameterList")
 internal class TransactionalOutboxImpl(
@@ -21,8 +24,11 @@ internal class TransactionalOutboxImpl(
   private val locksProvider: OutboxLocksProvider,
   private val outboxStore: OutboxStore,
   private val rerunAfterDuration: Duration,
-  private val executor: ExecutorService
+  private val executor: ExecutorService,
+  private val threadPoolTimeOut: Duration
 ) : TransactionalOutbox {
+
+  private var inShutdownMode = AtomicBoolean(false)
 
   companion object {
     private const val LOGGER_PREFIX = "[OUTBOX]"
@@ -54,6 +60,11 @@ internal class TransactionalOutboxImpl(
   }
 
   override fun monitor() {
+    if (inShutdownMode.get()) {
+      logger.info("$LOGGER_PREFIX Shutdown in process - no longer accepting items for processing")
+      return
+    }
+
     runCatching {
       locksProvider.acquire()
 
@@ -68,9 +79,7 @@ internal class TransactionalOutboxImpl(
       items.map { outboxStore.update(it) }
 
       items.forEach { item ->
-        executor.execute(
-          OutboxItemProcessor(item, outboxHandlers[item.type]!!, outboxStore)
-        )
+        processItem(item)
       }
     }.onFailure {
       logger.error("$LOGGER_PREFIX Failure in monitor", it)
@@ -103,4 +112,52 @@ internal class TransactionalOutboxImpl(
       it.lastExecution = now
       it.rerunAfter = now.plus(rerunAfterDuration)
     }
+
+  private fun processItem(item: OutboxItem) {
+    val processor = OutboxItemProcessor(item, outboxHandlers[item.type]!!, outboxStore)
+    try {
+      executor.execute(processor)
+    } catch (exception: RejectedExecutionException) {
+      revertToPending(item)
+      outboxStore.update(item)
+    }
+  }
+
+  private fun revertToPending(item: OutboxItem) {
+    logger.info("$LOGGER_PREFIX Outbox item with id ${item.id} is reverting to PENDING")
+
+    item.status = OutboxStatus.PENDING
+    item.nextRun = Instant.now(clock)
+    item.rerunAfter = null
+  }
+
+  override fun shutdown() {
+    if (!inShutdownMode.compareAndSet(false, true)) {
+      logger.info("$LOGGER_PREFIX Outbox shutdown already in progress")
+      return
+    }
+
+    logger.info("$LOGGER_PREFIX Shutting down the outbox")
+    executor.shutdown()
+    val notExecutedRunnables =
+      try {
+        if (!executor.awaitTermination(threadPoolTimeOut.toSeconds(), TimeUnit.SECONDS)) {
+          logger.debug("$LOGGER_PREFIX Forcing outbox shutdown")
+          executor.shutdownNow()
+        } else {
+          logger.debug("$LOGGER_PREFIX All tasks executed")
+          emptyList()
+        }
+      } catch (exception: Exception) {
+        logger.warn("$LOGGER_PREFIX Shutdown failed.", exception)
+        throw exception
+      }
+
+    notExecutedRunnables.filterIsInstance<OutboxItemProcessor>().forEach {
+      val item = it.getItem()
+      revertToPending(item)
+      outboxStore.update(item)
+    }
+    logger.info("$LOGGER_PREFIX Outbox shutdown completed")
+  }
 }

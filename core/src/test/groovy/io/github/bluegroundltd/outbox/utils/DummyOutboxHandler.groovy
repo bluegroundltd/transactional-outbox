@@ -35,3 +35,19 @@ class DummyOutboxHandler implements OutboxHandler {
   @Override
   void handleFailure(String payload) {}
 }
+
+class DummyHandler extends DummyOutboxHandler {
+
+  @Override
+  String serialize(OutboxPayload payload) {
+    return "dummyPayload"
+  }
+
+  @Override
+  Instant getNextExecutionTime(long currentRetries) {
+    return Instant.now()
+  }
+
+  @Override
+  void handle(String payload) { sleep(50000); }
+}

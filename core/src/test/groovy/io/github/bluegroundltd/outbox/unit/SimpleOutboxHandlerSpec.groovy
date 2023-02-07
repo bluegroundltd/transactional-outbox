@@ -1,4 +1,4 @@
-package io.github.bluegroundltd.outbox
+package io.github.bluegroundltd.outbox.unit
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.github.bluegroundltd.outbox.item.OutboxType

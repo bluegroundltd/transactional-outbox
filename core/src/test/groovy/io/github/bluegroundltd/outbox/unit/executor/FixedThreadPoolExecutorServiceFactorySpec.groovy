@@ -1,5 +1,6 @@
-package io.github.bluegroundltd.outbox.executor
+package io.github.bluegroundltd.outbox.unit.executor
 
+import io.github.bluegroundltd.outbox.executor.FixedThreadPoolExecutorServiceFactory
 import io.github.bluegroundltd.outbox.utils.UnitTestSpecification
 import java.util.concurrent.ThreadPoolExecutor
 
