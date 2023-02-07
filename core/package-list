@@ -40,6 +40,7 @@ $dokka.location:io.github.bluegroundltd.outbox////PointingToDeclaration/core/io
 $dokka.location:io.github.bluegroundltd.outbox/BuildStep///PointingToDeclaration/core/io.github.bluegroundltd.outbox/-build-step/index.html
 $dokka.location:io.github.bluegroundltd.outbox/BuildStep/build/#/PointingToDeclaration/core/io.github.bluegroundltd.outbox/-build-step/build.html
 $dokka.location:io.github.bluegroundltd.outbox/BuildStep/withThreadPoolSize/#kotlin.Int/PointingToDeclaration/core/io.github.bluegroundltd.outbox/-build-step/with-thread-pool-size.html
+$dokka.location:io.github.bluegroundltd.outbox/BuildStep/withThreadPoolTimeOut/#java.time.Duration/PointingToDeclaration/core/io.github.bluegroundltd.outbox/-build-step/with-thread-pool-time-out.html
 $dokka.location:io.github.bluegroundltd.outbox/LocksProviderStep///PointingToDeclaration/core/io.github.bluegroundltd.outbox/-locks-provider-step/index.html
 $dokka.location:io.github.bluegroundltd.outbox/LocksProviderStep/withLocksProvider/#io.github.bluegroundltd.outbox.OutboxLocksProvider/PointingToDeclaration/core/io.github.bluegroundltd.outbox/-locks-provider-step/with-locks-provider.html
 $dokka.location:io.github.bluegroundltd.outbox/OutboxHandler///PointingToDeclaration/core/io.github.bluegroundltd.outbox/-outbox-handler/index.html
@@ -68,6 +69,7 @@ $dokka.location:io.github.bluegroundltd.outbox/StoreStep/withStore/#io.github.bl
 $dokka.location:io.github.bluegroundltd.outbox/TransactionalOutbox///PointingToDeclaration/core/io.github.bluegroundltd.outbox/-transactional-outbox/index.html
 $dokka.location:io.github.bluegroundltd.outbox/TransactionalOutbox/add/#io.github.bluegroundltd.outbox.item.OutboxType#io.github.bluegroundltd.outbox.item.OutboxPayload/PointingToDeclaration/core/io.github.bluegroundltd.outbox/-transactional-outbox/add.html
 $dokka.location:io.github.bluegroundltd.outbox/TransactionalOutbox/monitor/#/PointingToDeclaration/core/io.github.bluegroundltd.outbox/-transactional-outbox/monitor.html
+$dokka.location:io.github.bluegroundltd.outbox/TransactionalOutbox/shutdown/#/PointingToDeclaration/core/io.github.bluegroundltd.outbox/-transactional-outbox/shutdown.html
 $dokka.location:io.github.bluegroundltd.outbox/TransactionalOutboxBuilder.Companion///PointingToDeclaration/core/io.github.bluegroundltd.outbox/-transactional-outbox-builder/-companion/index.html
 $dokka.location:io.github.bluegroundltd.outbox/TransactionalOutboxBuilder.Companion/make/#java.time.Clock/PointingToDeclaration/core/io.github.bluegroundltd.outbox/-transactional-outbox-builder/-companion/make.html
 $dokka.location:io.github.bluegroundltd.outbox/TransactionalOutboxBuilder///PointingToDeclaration/core/io.github.bluegroundltd.outbox/-transactional-outbox-builder/index.html
@@ -78,6 +80,7 @@ $dokka.location:io.github.bluegroundltd.outbox/TransactionalOutboxBuilder/withHa
 $dokka.location:io.github.bluegroundltd.outbox/TransactionalOutboxBuilder/withLocksProvider/#io.github.bluegroundltd.outbox.OutboxLocksProvider/PointingToDeclaration/core/io.github.bluegroundltd.outbox/-transactional-outbox-builder/with-locks-provider.html
 $dokka.location:io.github.bluegroundltd.outbox/TransactionalOutboxBuilder/withStore/#io.github.bluegroundltd.outbox.store.OutboxStore/PointingToDeclaration/core/io.github.bluegroundltd.outbox/-transactional-outbox-builder/with-store.html
 $dokka.location:io.github.bluegroundltd.outbox/TransactionalOutboxBuilder/withThreadPoolSize/#kotlin.Int/PointingToDeclaration/core/io.github.bluegroundltd.outbox/-transactional-outbox-builder/with-thread-pool-size.html
+$dokka.location:io.github.bluegroundltd.outbox/TransactionalOutboxBuilder/withThreadPoolTimeOut/#java.time.Duration/PointingToDeclaration/core/io.github.bluegroundltd.outbox/-transactional-outbox-builder/with-thread-pool-time-out.html
 io.github.bluegroundltd.outbox
 io.github.bluegroundltd.outbox.item
 io.github.bluegroundltd.outbox.store
