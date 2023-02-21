@@ -5,9 +5,11 @@ import io.github.bluegroundltd.outbox.OutboxItemProcessor
 import io.github.bluegroundltd.outbox.OutboxLocksProvider
 import io.github.bluegroundltd.outbox.TransactionalOutbox
 import io.github.bluegroundltd.outbox.TransactionalOutboxImpl
+import io.github.bluegroundltd.outbox.event.InstantOutboxPublisher
 import io.github.bluegroundltd.outbox.item.OutboxItem
 import io.github.bluegroundltd.outbox.item.OutboxStatus
 import io.github.bluegroundltd.outbox.item.OutboxType
+import io.github.bluegroundltd.outbox.item.factory.OutboxItemFactory
 import io.github.bluegroundltd.outbox.store.OutboxStore
 import io.github.bluegroundltd.outbox.utils.OutboxItemBuilder
 import spock.lang.Specification
@@ -25,6 +27,8 @@ class OutboxShutdownSpec extends Specification {
   Map<OutboxType, OutboxHandler> handlers = Mock()
   OutboxLocksProvider locksProvider = Mock()
   OutboxStore store = Mock()
+  InstantOutboxPublisher instantOutboxPublisher = Mock()
+  OutboxItemFactory outboxItemFactory = Mock()
   ExecutorService executor = Mock()
   Duration threadPoolTimeOut = Duration.ofMillis(5000)
   TransactionalOutbox transactionalOutbox
@@ -35,6 +39,8 @@ class OutboxShutdownSpec extends Specification {
       handlers,
       locksProvider,
       store,
+      instantOutboxPublisher,
+      outboxItemFactory,
       DURATION_ONE_HOUR,
       executor,
       threadPoolTimeOut

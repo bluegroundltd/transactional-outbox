@@ -1,7 +1,7 @@
 package io.github.bluegroundltd.outbox
 
-import io.github.bluegroundltd.outbox.event.OnDemandOutboxEvent
-import io.github.bluegroundltd.outbox.event.OnDemandOutboxPublisher
+import io.github.bluegroundltd.outbox.event.InstantOutboxEvent
+import io.github.bluegroundltd.outbox.event.InstantOutboxPublisher
 import io.github.bluegroundltd.outbox.item.OutboxItem
 import io.github.bluegroundltd.outbox.item.OutboxPayload
 import io.github.bluegroundltd.outbox.item.OutboxStatus
@@ -26,7 +26,7 @@ internal class TransactionalOutboxImpl(
   private val outboxHandlers: Map<OutboxType, OutboxHandler>,
   private val locksProvider: OutboxLocksProvider,
   private val outboxStore: OutboxStore,
-  private val onDemandOutboxPublisher: OnDemandOutboxPublisher,
+  private val instantOutboxPublisher: InstantOutboxPublisher,
   private val outboxItemFactory: OutboxItemFactory,
   private val rerunAfterDuration: Duration,
   private val executor: ExecutorService,
@@ -41,31 +41,25 @@ internal class TransactionalOutboxImpl(
     private val STATUSES_ELIGIBLE_FOR_PROCESSING = EnumSet.of(OutboxStatus.PENDING, OutboxStatus.RUNNING)
   }
 
-  override fun add(type: OutboxType, payload: OutboxPayload) {
+  override fun add(type: OutboxType, payload: OutboxPayload, shouldPublishAfterInsertion: Boolean) {
     logger.info("$LOGGER_PREFIX Adding item of type: ${type.getType()} and payload: $payload")
 
-    val outboxItem = outboxItemFactory.makeScheduledOutboxItem(type, payload)
-    outboxStore.insert(outboxItem)
+    when {
+      shouldPublishAfterInsertion -> outboxItemFactory.makeInstantOutbox(type, payload)
+      else -> outboxItemFactory.makeScheduledOutboxItem(type, payload)
+    }.run { outboxStore.insert(this) }
+      .takeIf { shouldPublishAfterInsertion }
+      ?.let { instantOutboxPublisher.publish(InstantOutboxEvent(outbox = it)) }
   }
 
-  override fun addOnDemandOutbox(type: OutboxType, payload: OutboxPayload) {
-    logger.info("$LOGGER_PREFIX Adding item of type: ${type.getType()} and payload: $payload")
-
-    val outboxItem = outboxItemFactory.makeOnDemandOutboxItem(type, payload)
-    outboxStore.insert(outboxItem)
-      .also {
-        onDemandOutboxPublisher.publish(OnDemandOutboxEvent(outbox = it))
-      }
-  }
-
-  override fun handleOnDemandOutbox(outbox: OutboxItem) {
+  override fun processInstantOutbox(outbox: OutboxItem) {
     runCatching {
-      logger.info("$LOGGER_PREFIX On demand processing of \"${outbox.type.getType()}\" outbox")
+      logger.info("$LOGGER_PREFIX Instant processing of \"${outbox.type.getType()}\" outbox")
       executor.execute(
         OutboxItemProcessor(outbox, outboxHandlers[outbox.type]!!, outboxStore)
       )
     }.onFailure {
-      logger.error("$LOGGER_PREFIX Failure in on demand handling", it)
+      logger.error("$LOGGER_PREFIX Failure in instant handling", it)
     }
   }
 

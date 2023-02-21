@@ -1,12 +1,11 @@
 package io.github.bluegroundltd.outbox.unit
 
-import io.github.bluegroundltd.outbox.event.OnDemandOutboxPublisher
 import io.github.bluegroundltd.outbox.OutboxHandler
 import io.github.bluegroundltd.outbox.OutboxLocksProvider
 import io.github.bluegroundltd.outbox.TransactionalOutbox
 import io.github.bluegroundltd.outbox.TransactionalOutboxImpl
+import io.github.bluegroundltd.outbox.event.InstantOutboxPublisher
 import io.github.bluegroundltd.outbox.item.OutboxItem
-import io.github.bluegroundltd.outbox.item.OutboxPayload
 import io.github.bluegroundltd.outbox.item.OutboxStatus
 import io.github.bluegroundltd.outbox.item.OutboxType
 import io.github.bluegroundltd.outbox.item.factory.OutboxItemFactory
@@ -29,7 +28,7 @@ class OutboxMonitorSpec extends Specification {
   Map<OutboxType, OutboxHandler> handlers = Mock()
   OutboxLocksProvider locksProvider = Mock()
   OutboxStore store = Mock()
-  OnDemandOutboxPublisher onDemandOutboxPublisher = Mock()
+  InstantOutboxPublisher instantOutboxPublisher = Mock()
   OutboxItemFactory outboxItemFactory = Mock()
   ExecutorService executor = Mock()
   Duration threadPoolTimeOut = Duration.ofMillis(5000)
@@ -41,7 +40,7 @@ class OutboxMonitorSpec extends Specification {
       handlers,
       locksProvider,
       store,
-      onDemandOutboxPublisher,
+      instantOutboxPublisher,
       outboxItemFactory,
       DURATION_ONE_HOUR,
       executor,
@@ -49,43 +48,19 @@ class OutboxMonitorSpec extends Specification {
     )
   }
 
-  def "Should delegate to outbox store when add is called"() {
+  def "Should delegate to the executor thread pool when an instant outbox is processed"(){
     given:
-      def payload = GroovyMock(OutboxPayload)
-      def type = GroovyMock(OutboxType)
+      def instantOutbox = OutboxItemBuilder.make().build()
 
     and:
-      def outboxItem = OutboxItemBuilder.make().build()
+      def expectedHandler = GroovyMock(OutboxHandler)
 
     when:
-      transactionalOutbox.add(type, payload)
+      transactionalOutbox.processInstantOutbox(instantOutbox)
 
     then:
-      1 * type.getType() >> "type"
-      1 * outboxItemFactory.makeScheduledOutboxItem(type, payload) >> outboxItem
-      1 * store.insert(outboxItem)
-      0 * _
-  }
-
-  def "Should delegate to outbox store and publisher when addOnDemand is called"() {
-    given:
-      def payload = GroovyMock(OutboxPayload)
-      def type = GroovyMock(OutboxType)
-
-    and:
-      def outboxItem = OutboxItemBuilder.make().build()
-      def savedOutbox = OutboxItemBuilder.make().build()
-
-    when:
-      transactionalOutbox.addOnDemandOutbox(type, payload)
-
-    then:
-      1 * type.getType() >> "type"
-      1 * outboxItemFactory.makeOnDemandOutboxItem(type, payload) >> outboxItem
-      1 * store.insert(outboxItem) >> savedOutbox
-      1 * onDemandOutboxPublisher.publish({
-        assert it.outbox == savedOutbox
-      })
+      1 * handlers.get(_) >> expectedHandler
+      1 * executor.execute(_)
       0 * _
   }
 
@@ -104,15 +79,15 @@ class OutboxMonitorSpec extends Specification {
       0 * _
   }
 
-  def "Should handle a failure while an on-demand outbox is being processed"() {
+  def "Should handle a failure while an instant outbox is being processed"() {
     given:
-      def onDemandOutbox = OutboxItemBuilder.make().build()
+      def instantOutbox = OutboxItemBuilder.make().build()
 
     and:
       def expectedHandler = GroovyMock(OutboxHandler)
 
     when:
-      transactionalOutbox.handleOnDemandOutbox(onDemandOutbox)
+      transactionalOutbox.processInstantOutbox(instantOutbox)
 
     then:
       1 * handlers.get(_) >> expectedHandler
@@ -180,20 +155,22 @@ class OutboxMonitorSpec extends Specification {
       }
       1 * store.update(_) >> { OutboxItem item ->
         with(item) {
-          item.status == OutboxStatus.RUNNING
-          item.lastExecution == now
-          item.rerunAfter == item.lastExecution + DURATION_ONE_HOUR
+          it.status == OutboxStatus.RUNNING
+          it.lastExecution == now
+          it.rerunAfter == item.lastExecution + DURATION_ONE_HOUR
         }
+        return item
       }
       1 * locksProvider.release()
       1 * handlers.get(_) >> expectedHandler
       1 * executor.execute(_) >> { throw new RejectedExecutionException() }
       1 * store.update(_) >> { OutboxItem item ->
         with(item) {
-          item.status == OutboxStatus.PENDING
-          item.nextRun == now
-          item.rerunAfter == null
+          it.status == OutboxStatus.PENDING
+          it.nextRun == now
+          it.rerunAfter == null
         }
+        return item
       }
       0 * _
   }

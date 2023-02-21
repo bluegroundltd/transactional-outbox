@@ -1,6 +1,6 @@
 package io.github.bluegroundltd.outbox
 
-import io.github.bluegroundltd.outbox.event.OnDemandOutboxPublisher
+import io.github.bluegroundltd.outbox.event.InstantOutboxPublisher
 import io.github.bluegroundltd.outbox.executor.FixedThreadPoolExecutorServiceFactory
 import io.github.bluegroundltd.outbox.item.OutboxType
 import io.github.bluegroundltd.outbox.item.factory.OutboxItemFactory
@@ -20,7 +20,7 @@ import kotlin.properties.Delegates
  *       .withHandlers(outboxHandlers)
  *       .withLocksProvider(locksProvider)
  *       .withStore(outboxStore)
- *       .withOnDemandOutboxPublisher(onDemandOutboxPublisher)
+ *       .withInstantOutboxPublisher(instantOutboxPublisher)
  *       .build()
  *   }
  *   ```
@@ -28,13 +28,13 @@ import kotlin.properties.Delegates
 class TransactionalOutboxBuilder(
     private val clock: Clock,
     private val rerunAfterDuration: Duration = DEFAULT_RERUN_AFTER_DURATION
-) : OutboxHandlersStep, LocksProviderStep, StoreStep, OnDemandOutboxPublisherStep, BuildStep {
+) : OutboxHandlersStep, LocksProviderStep, StoreStep, InstantOutboxPublisherStep, BuildStep {
   private val handlers: MutableMap<OutboxType, OutboxHandler> = mutableMapOf()
   private var threadPoolSize by Delegates.notNull<Int>()
   private var threadPoolTimeOut: Duration = DEFAULT_THREAD_POOL_TIMEOUT
   private lateinit var locksProvider: OutboxLocksProvider
   private lateinit var store: OutboxStore
-  private lateinit var onDemandOutboxPublisher: OnDemandOutboxPublisher
+  private lateinit var instantOutboxPublisher: InstantOutboxPublisher
 
   companion object {
     private val DEFAULT_RERUN_AFTER_DURATION: Duration = Duration.ofHours(1)
@@ -96,16 +96,16 @@ class TransactionalOutboxBuilder(
   /**
    * Sets the store for the outbox.
    */
-  override fun withStore(store: OutboxStore): OnDemandOutboxPublisherStep {
+  override fun withStore(store: OutboxStore): InstantOutboxPublisherStep {
     this.store = store
     return this
   }
 
   /**
-   * Sets the publisher for on demand outboxes.
+   * Sets the publisher for instant outboxes.
    */
-  override fun withOnDemandOutboxPublisher(onDemandOutboxPublisher: OnDemandOutboxPublisher): BuildStep {
-    this.onDemandOutboxPublisher = onDemandOutboxPublisher
+  override fun withInstantOutboxPublisher(instantOutboxPublisher: InstantOutboxPublisher): BuildStep {
+    this.instantOutboxPublisher = instantOutboxPublisher
     return this
   }
 
@@ -137,7 +137,7 @@ class TransactionalOutboxBuilder(
         handlers.toMap(),
         locksProvider,
         store,
-        onDemandOutboxPublisher,
+        instantOutboxPublisher,
         outboxItemFactory,
         rerunAfterDuration,
         executorServiceFactory.make(),
@@ -155,11 +155,11 @@ interface LocksProviderStep {
 }
 
 interface StoreStep {
-  fun withStore(store: OutboxStore): OnDemandOutboxPublisherStep
+  fun withStore(store: OutboxStore): InstantOutboxPublisherStep
 }
 
-interface OnDemandOutboxPublisherStep {
-  fun withOnDemandOutboxPublisher(onDemandOutboxPublisher: OnDemandOutboxPublisher): BuildStep
+interface InstantOutboxPublisherStep {
+  fun withInstantOutboxPublisher(instantOutboxPublisher: InstantOutboxPublisher): BuildStep
 }
 
 interface BuildStep {

@@ -4,11 +4,11 @@ import io.github.bluegroundltd.outbox.TransactionalOutbox
 import io.github.bluegroundltd.outbox.TransactionalOutboxBuilder
 
 /**
- * The publisher will emit an event upon the creation of the on demand outbox.
- * Having an event emitted upon the outbox creation enables us handle an on demand outbox
+ * The publisher will emit an event upon the creation of the instant outbox.
+ * Having an event emitted upon the outbox creation enables us handle an instant outbox
  * processing in separate transactions. We can listen for the published event after
  * transaction is committed, and then we can process the outbox
- * by calling [TransactionalOutbox.handleOnDemandOutbox].
+ * by calling [TransactionalOutbox.processInstantOutbox].
  *
  * The implementation is specific to the framework that uses the library so the
  * caller needs to provide the specifics.
@@ -18,15 +18,16 @@ import io.github.bluegroundltd.outbox.TransactionalOutboxBuilder
  *
  * Example of the publisher implementation on Spring framework:
  * ```kotlin
- * class OnDemandOutboxPublisherImpl(
+ * class InstantOutboxPublisherImpl(
  *   private val applicationEventPublisher: ApplicationEventPublisher,
- * ) : OnDemandOutboxPublisher {
+ * ) : InstantOutboxPublisher {
  *
- * override fun publish(event: OnDemandOutboxEvent) =
+ * override fun publish(event: InstantOutboxEvent) =
  *   applicationEventPublisher.publishEvent(
  *     SpringApplicationEvent(
- *       source = this,
- *       payload = event.outbox)
+ *        source = this,
+ *        payload = event.outbox
+ *       )
  *     )
  * }
  * ```
@@ -39,11 +40,11 @@ import io.github.bluegroundltd.outbox.TransactionalOutboxBuilder
  *
  *   @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
  *   fun handle(event: SpringApplicationEvent) {
- *     transactionalOutbox.handleOnDemandOutbox(event.payload)
+ *     transactionalOutbox.processInstantOutbox(event.payload)
  *   }
  * }
  * ```
  */
-interface OnDemandOutboxPublisher {
-  fun publish(event: OnDemandOutboxEvent)
+interface InstantOutboxPublisher {
+  fun publish(event: InstantOutboxEvent)
 }

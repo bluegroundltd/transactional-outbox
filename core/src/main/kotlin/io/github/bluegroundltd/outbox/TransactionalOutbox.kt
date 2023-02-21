@@ -7,8 +7,8 @@ import io.github.bluegroundltd.outbox.item.OutboxType
 /**
  * TransactionalOutbox is the main entry point for the library.
  * It is responsible for:
- * * adding outbox items (on demand or not)
- * * handling an on demand outbox
+ * * adding outbox items (instant or not)
+ * * handling an instant outbox
  * * monitoring the outbox items
  *
  * To instantiate a TransactionalOutbox, use the [TransactionalOutboxBuilder].
@@ -39,26 +39,21 @@ sealed interface TransactionalOutbox {
    *
    * @param type the type of the outbox item
    * @param payload the payload of the outbox item
+   * @param shouldPublishAfterInsertion flag that indicates if and event should be published
+   *                                    to indicate that the created outbox should be processes
+   *                                    immediately.
    */
-  fun add(type: OutboxType, payload: OutboxPayload)
+  fun add(type: OutboxType, payload: OutboxPayload, shouldPublishAfterInsertion: Boolean = false)
 
   /**
-   * Adds and outbox and emits an event to signal on-demand handling.
+   * Will process an instant outbox, should be called by the listener of
+   * the event emitted by [add] with the `shouldPublishAfterInsertion` as true
+   * and in a separate transaction.
    *
-   * @param type the type of the outbox item
-   * @param payload the payload of the outbox item
-   */
-  fun addOnDemandOutbox(type: OutboxType, payload: OutboxPayload)
-
-  /**
-   * Will process the on-demand outbox, should be called by the
-   * listener of the event emitted by [addOnDemandOutbox] and
-   * in a separate transaction.
-   *
-   * Handles a specific on-demand outbox
+   * Handles a specific instant outbox
    * @param outbox
    */
-  fun handleOnDemandOutbox(outbox: OutboxItem)
+  fun processInstantOutbox(outbox: OutboxItem)
 
   /**
    * Monitors the outbox for new items and processes them

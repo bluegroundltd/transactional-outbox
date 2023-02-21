@@ -27,7 +27,7 @@ internal class OutboxItemFactory(
     )
   }
 
-  fun makeOnDemandOutboxItem(type: OutboxType, payload: OutboxPayload): OutboxItem {
+  fun makeInstantOutbox(type: OutboxType, payload: OutboxPayload): OutboxItem {
     val handler = findHandler(type)
     val now = Instant.now(clock)
     return OutboxItem(

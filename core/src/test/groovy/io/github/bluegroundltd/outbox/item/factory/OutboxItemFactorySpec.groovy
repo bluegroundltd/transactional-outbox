@@ -35,7 +35,7 @@ class OutboxItemFactorySpec extends Specification {
       def type = GroovyMock(OutboxType)
 
     when:
-      outboxItemFactory.makeOnDemandOutboxItem(type, payload)
+      outboxItemFactory.makeInstantOutbox(type, payload)
 
     then:
       1 * handlers.get(type)
@@ -75,7 +75,7 @@ class OutboxItemFactorySpec extends Specification {
       !result.rerunAfter
   }
 
-  def "Should make an outbox to be processed on demand"(){
+  def "Should make an outbox to be processed instantly"(){
     given:
       def payload = GroovyMock(OutboxPayload)
       def type = GroovyMock(OutboxType)
@@ -86,7 +86,7 @@ class OutboxItemFactorySpec extends Specification {
       def nextRun = GroovyMock(Instant)
 
     when:
-      OutboxItem result = outboxItemFactory.makeOnDemandOutboxItem(type, payload)
+      OutboxItem result = outboxItemFactory.makeInstantOutbox(type, payload)
 
     then:
       1 * handlers.get(type) >> handler
