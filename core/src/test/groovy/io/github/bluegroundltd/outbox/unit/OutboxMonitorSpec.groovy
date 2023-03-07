@@ -1,6 +1,7 @@
 package io.github.bluegroundltd.outbox.unit
 
 import io.github.bluegroundltd.outbox.OutboxHandler
+import io.github.bluegroundltd.outbox.OutboxItemProcessorDecorator
 import io.github.bluegroundltd.outbox.OutboxLocksProvider
 import io.github.bluegroundltd.outbox.TransactionalOutbox
 import io.github.bluegroundltd.outbox.TransactionalOutboxImpl
@@ -13,6 +14,7 @@ import io.github.bluegroundltd.outbox.store.OutboxFilter
 import io.github.bluegroundltd.outbox.store.OutboxStore
 import io.github.bluegroundltd.outbox.utils.OutboxItemBuilder
 import spock.lang.Specification
+import spock.lang.Unroll
 
 import java.time.Clock
 import java.time.Duration
@@ -35,7 +37,11 @@ class OutboxMonitorSpec extends Specification {
   TransactionalOutbox transactionalOutbox
 
   def setup() {
-    transactionalOutbox = new TransactionalOutboxImpl(
+    transactionalOutbox = makeTransactionalOutbox()
+  }
+
+  private TransactionalOutboxImpl makeTransactionalOutbox(List<OutboxItemProcessorDecorator> decorators = []) {
+    new TransactionalOutboxImpl(
       clock,
       handlers,
       locksProvider,
@@ -44,6 +50,7 @@ class OutboxMonitorSpec extends Specification {
       outboxItemFactory,
       DURATION_ONE_HOUR,
       executor,
+      decorators,
       threadPoolTimeOut
     )
   }
@@ -98,11 +105,27 @@ class OutboxMonitorSpec extends Specification {
       noExceptionThrown()
   }
 
+  @Unroll
   def "Should delegate to the executor thread pool when monitor is called"() {
     given:
+      def firstDecorator = null
+      def secondDecorator = null
+      def processorDecoratedByFirstDecorator = Mock(Runnable)
+      List<OutboxItemProcessorDecorator> decorators = []
+      if (hasDecorators) {
+        firstDecorator = Mock(OutboxItemProcessorDecorator)
+        secondDecorator = Mock(OutboxItemProcessorDecorator)
+        decorators = [firstDecorator, secondDecorator]
+      }
+      transactionalOutbox = makeTransactionalOutbox(decorators)
+
+    and:
       def pendingItem = OutboxItemBuilder.makePending()
       def runningItem = OutboxItemBuilder.make().withStatus(OutboxStatus.RUNNING).build()
       def items = [pendingItem, runningItem]
+
+    and:
+      def decoratorCalls = hasDecorators ? items.size() : 0
 
     and:
       def expectedHandler = GroovyMock(OutboxHandler)
@@ -130,8 +153,13 @@ class OutboxMonitorSpec extends Specification {
       }
       1 * locksProvider.release()
       items.size() * handlers.get(_) >> expectedHandler
+      decoratorCalls * firstDecorator.decorate(_) >> processorDecoratedByFirstDecorator
+      decoratorCalls * secondDecorator.decorate(processorDecoratedByFirstDecorator) >> Mock(Runnable)
       items.size() * executor.execute(_)
       0 * _
+
+    where:
+      hasDecorators << [false, true]
   }
 
   def "Should delegate to the outbox store when monitor is called and the executor rejects the tasks"() {

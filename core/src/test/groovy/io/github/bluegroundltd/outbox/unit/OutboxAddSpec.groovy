@@ -40,6 +40,7 @@ class OutboxAddSpec extends UnitTestSpecification {
       outboxItemFactory,
       DURATION_ONE_HOUR,
       executor,
+      [],
       threadPoolTimeOut
     )
   }

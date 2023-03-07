@@ -32,6 +32,7 @@ class TransactionalOutboxBuilder(
   private val handlers: MutableMap<OutboxType, OutboxHandler> = mutableMapOf()
   private var threadPoolSize by Delegates.notNull<Int>()
   private var threadPoolTimeOut: Duration = DEFAULT_THREAD_POOL_TIMEOUT
+  private var decorators: MutableList<OutboxItemProcessorDecorator> = mutableListOf()
   private lateinit var locksProvider: OutboxLocksProvider
   private lateinit var store: OutboxStore
   private lateinit var instantOutboxPublisher: InstantOutboxPublisher
@@ -126,6 +127,18 @@ class TransactionalOutboxBuilder(
   }
 
   /**
+   * Adds a decorator to be applied before asynchronously invoking Outbox Item Processors which,
+   * in turn, invokes the corresponding [OutboxHandler].
+   *
+   * Decorators are applied in the order they have been added, so a decorator will wrap the one added before it.
+   * Decorators are optional; not adding any just means that the Processors will be invoked directly.
+   */
+  override fun addProcessorDecorator(decorator: OutboxItemProcessorDecorator): BuildStep {
+    this.decorators.add(decorator)
+    return this
+  }
+
+  /**
    * Builds the outbox.
    */
   override fun build(): TransactionalOutbox {
@@ -141,6 +154,7 @@ class TransactionalOutboxBuilder(
         outboxItemFactory,
         rerunAfterDuration,
         executorServiceFactory.make(),
+        decorators,
         threadPoolTimeOut
     )
   }
@@ -165,5 +179,6 @@ interface InstantOutboxPublisherStep {
 interface BuildStep {
   fun withThreadPoolSize(threadPoolSize: Int): BuildStep
   fun withThreadPoolTimeOut(threadPoolTimeOut: Duration): BuildStep
+  fun addProcessorDecorator(decorator: OutboxItemProcessorDecorator): BuildStep
   fun build(): TransactionalOutbox
 }

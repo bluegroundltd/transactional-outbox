@@ -45,6 +45,7 @@ class TransactionalOutboxImplSpec extends Specification {
       outboxItemFactory,
       DURATION_ONE_HOUR,
       new FixedThreadPoolExecutorServiceFactory(1, "").make(),
+      [],
       DURATION_ONE_NANO
     )
   }
