@@ -37,6 +37,7 @@ class OutboxShutdownSpec extends Specification {
       store,
       DURATION_ONE_HOUR,
       executor,
+      null,
       threadPoolTimeOut
     )
   }

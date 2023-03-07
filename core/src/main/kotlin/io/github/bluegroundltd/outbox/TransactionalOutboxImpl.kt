@@ -25,6 +25,7 @@ internal class TransactionalOutboxImpl(
   private val outboxStore: OutboxStore,
   private val rerunAfterDuration: Duration,
   private val executor: ExecutorService,
+  private val decorator: OutboxItemProcessorDecorator? = null,
   private val threadPoolTimeOut: Duration
 ) : TransactionalOutbox {
 
@@ -114,7 +115,7 @@ internal class TransactionalOutboxImpl(
     }
 
   private fun processItem(item: OutboxItem) {
-    val processor = OutboxItemProcessor(item, outboxHandlers[item.type]!!, outboxStore)
+    val processor = decorate(OutboxItemProcessor(item, outboxHandlers[item.type]!!, outboxStore))
     try {
       executor.execute(processor)
     } catch (exception: RejectedExecutionException) {
@@ -122,6 +123,9 @@ internal class TransactionalOutboxImpl(
       outboxStore.update(item)
     }
   }
+
+  private fun decorate(processor: OutboxItemProcessor) =
+    decorator?.decorate(processor) ?: processor
 
   private fun revertToPending(item: OutboxItem) {
     logger.info("$LOGGER_PREFIX Outbox item with id ${item.id} is reverting to PENDING")
