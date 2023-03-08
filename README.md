@@ -185,7 +185,28 @@ class OutboxMonitor(
 
 }
 ```
+## Local Development
+If you're working on a new version of the `core` module, and you want this version to be available to other project before
+publishing it, you can do so in two ways
 
+* Alternative 1: Install the new version to Maven
+```shell
+$ mvn install:install-file \ 
+   -Dfile=core/build/libs/core-x.y.z.jar \
+   -DgroupId=io.github.bluegroundltd \ 
+   -DartifactId=transactional-outbox-core \
+   -Dversion=x.y.z \
+   -Dpackaging=jar \
+   -DgeneratePom=true
+```
+then depend on the `x.y.z` version as usual. 
+```gradle
+implementation("io.github.bluegroundltd:transactional-outbox-core:x.y.z")
+```
+* Alternative 2: Change your dependencies to directly reference the jar file
+```gradle
+implementation("files("../../../transactional-outbox/core/build/libs/core-x.y.z.jar"))
+```
 ## Publishing
 
 * Bump version in `gradle.properties` of `core` module.
