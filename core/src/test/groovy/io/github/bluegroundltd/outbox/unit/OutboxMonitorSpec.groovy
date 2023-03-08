@@ -106,7 +106,7 @@ class OutboxMonitorSpec extends Specification {
     where:
       decorator                           | decoratorCalls
       null                                || 0
-      Mock(OutboxItemProcessorDecorator)  || 0
+      Mock(OutboxItemProcessorDecorator)  || 2
   }
 
   def "Should delegate to the outbox store when monitor is called and the executor rejects the tasks"() {
