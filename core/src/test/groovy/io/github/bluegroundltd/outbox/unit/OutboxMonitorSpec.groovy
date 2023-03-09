@@ -139,7 +139,7 @@ class OutboxMonitorSpec extends Specification {
       1 * store.fetch(_) >> { OutboxFilter filter ->
         with(filter) {
           outboxPendingFilter.nextRunLessThan == now
-          outboxRunningFilter.rerunAfterGreaterThan == now
+          outboxRunningFilter.rerunAfterLessThan == now
         }
         items
       }
