@@ -22,10 +22,10 @@
           </div>
           <div class="cover ">
             <h1 class="cover"><span>Transactional</span><wbr></wbr><span>Outbox</span><wbr></wbr><span><span>Builder</span></span></h1>
-            <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":core:dokkaHtml/main"><div class="symbol monospace">class <a href="index.html">TransactionalOutboxBuilder</a>(clock: <a href="https://docs.oracle.com/javase/8/docs/api/java/time/Clock.html">Clock</a>, rerunAfterDuration: <a href="https://docs.oracle.com/javase/8/docs/api/java/time/Duration.html">Duration</a>) : <a href="../-outbox-handlers-step/index.html">OutboxHandlersStep</a>, <a href="../-locks-provider-step/index.html">LocksProviderStep</a>, <a href="../-store-step/index.html">StoreStep</a>, <a href="../-build-step/index.html">BuildStep</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><p class="paragraph">Builder for <a href="../-transactional-outbox/index.html">TransactionalOutbox</a>.</p><p class="paragraph">Example on Spring Boot:</p><div class="sample-container"><code class="" theme="idea"><pre>@Bean<br>fun transactionalOutbox(): TransactionalOutbox {<br>  val locksProvider = OutboxLocksProvider(postgresLockDao, id)<br><br>  logger.info(<br>    &quot;Initializing outbox with handler(s) [${outboxHandlers.joinToString { it.javaClass.simpleName }}], &quot; +<br>      &quot;locks provider \&quot;${locksProvider}\&quot; and store \&quot;${outboxStore.javaClass.simpleName}\&quot;&quot;<br>  )<br><br>  return TransactionalOutboxBuilder<br>    .make(clock)<br>    .withHandlers(outboxHandlers)<br>    .withLocksProvider(locksProvider)<br>    .withStore(outboxStore)<br>    .build()<br>}</pre></code></div></div></div>
+            <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":core:dokkaHtml/main"><div class="symbol monospace">class <a href="index.html">TransactionalOutboxBuilder</a>(clock: <a href="https://docs.oracle.com/javase/8/docs/api/java/time/Clock.html">Clock</a>, rerunAfterDuration: <a href="https://docs.oracle.com/javase/8/docs/api/java/time/Duration.html">Duration</a>) : <a href="../-outbox-handlers-step/index.html">OutboxHandlersStep</a>, <a href="../-locks-provider-step/index.html">LocksProviderStep</a>, <a href="../-store-step/index.html">StoreStep</a>, <a href="../-instant-outbox-publisher-step/index.html">InstantOutboxPublisherStep</a>, <a href="../-build-step/index.html">BuildStep</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><p class="paragraph">Builder for <a href="../-transactional-outbox/index.html">TransactionalOutbox</a>.</p><p class="paragraph">Example on Spring Boot:</p><div class="sample-container"><code class="" theme="idea"><pre>fun transactionalOutbox(): TransactionalOutbox {<br>  return TransactionalOutboxBuilder<br>    .make(clock)<br>    .withHandlers(outboxHandlers)<br>    .withLocksProvider(locksProvider)<br>    .withStore(outboxStore)<br>    .withInstantOutboxPublisher(instantOutboxPublisher)<br>    .build()<br>}</pre></code></div></div></div>
           </div>
           <div class="tabbedcontent">
-            <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="Types">Types</button><button class="section-tab" data-togglable="Constructors">Constructors</button><button class="section-tab" data-togglable="Functions">Functions</button><button class="section-tab" data-togglable="Properties">Properties</button></div>
+            <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="Types">Types</button><button class="section-tab" data-togglable="Constructors">Constructors</button><button class="section-tab" data-togglable="Functions">Functions</button></div>
             <div class="tabs-section-body">
               <h2 class="tabbedcontent">Constructors</h2>
               <div class="table" data-togglable="Constructors"><a data-name="1748287959%2FConstructors%2F-121426938" anchor-label="TransactionalOutboxBuilder" id="1748287959%2FConstructors%2F-121426938" data-filterable-set=":core:dokkaHtml/main"></a>
@@ -96,6 +96,23 @@
                     </div>
                   </div>
                 </div>
+<a data-name="1231868890%2FFunctions%2F-121426938" anchor-label="withInstantOutboxPublisher" id="1231868890%2FFunctions%2F-121426938" data-filterable-set=":core:dokkaHtml/main"></a>
+                <div class="table-row" data-filterable-current=":core:dokkaHtml/main" data-filterable-set=":core:dokkaHtml/main">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="with-instant-outbox-publisher.html"><span>with</span><wbr></wbr><span>Instant</span><wbr></wbr><span>Outbox</span><wbr></wbr><span><span>Publisher</span></span></a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1231868890%2FFunctions%2F-121426938"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title"><div class="divergent-group" data-filterable-current=":core:dokkaHtml/main" data-filterable-set=":core:dokkaHtml/main"><div class="with-platform-tags"><span class="pull-right"></span></div>
+
+  <div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":core:dokkaHtml/main"><div class="symbol monospace">open override fun <a href="with-instant-outbox-publisher.html">withInstantOutboxPublisher</a>(instantOutboxPublisher: <a href="../../io.github.bluegroundltd.outbox.event/-instant-outbox-publisher/index.html">InstantOutboxPublisher</a>): <a href="../-build-step/index.html">BuildStep</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+  </div>
+<div class="brief "><p class="paragraph">Sets the publisher for instant outboxes.</p></div></div>
+</div>
+                    </div>
+                  </div>
+                </div>
 <a data-name="-451850169%2FFunctions%2F-121426938" anchor-label="withLocksProvider" id="-451850169%2FFunctions%2F-121426938" data-filterable-set=":core:dokkaHtml/main"></a>
                 <div class="table-row" data-filterable-current=":core:dokkaHtml/main" data-filterable-set=":core:dokkaHtml/main">
                   <div class="main-subrow keyValue ">
@@ -123,7 +140,7 @@
                       <div class="title"><div class="divergent-group" data-filterable-current=":core:dokkaHtml/main" data-filterable-set=":core:dokkaHtml/main"><div class="with-platform-tags"><span class="pull-right"></span></div>
 
   <div>
-    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":core:dokkaHtml/main"><div class="symbol monospace">open override fun <a href="with-store.html">withStore</a>(store: <a href="../../io.github.bluegroundltd.outbox.store/-outbox-store/index.html">OutboxStore</a>): <a href="../-build-step/index.html">BuildStep</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":core:dokkaHtml/main"><div class="symbol monospace">open override fun <a href="with-store.html">withStore</a>(store: <a href="../../io.github.bluegroundltd.outbox.store/-outbox-store/index.html">OutboxStore</a>): <a href="../-instant-outbox-publisher-step/index.html">InstantOutboxPublisherStep</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
   </div>
 <div class="brief "><p class="paragraph">Sets the store for the outbox.</p></div></div>
 </div>
@@ -161,21 +178,6 @@
   </div>
 <div class="brief "><p class="paragraph">Sets the thread pool timeout upon shutdown for the outbox.</p></div></div>
 </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <h2 class="">Properties</h2>
-              <div class="table" data-togglable="Properties"><a data-name="1503039254%2FProperties%2F-121426938" anchor-label="handlers" id="1503039254%2FProperties%2F-121426938" data-filterable-set=":core:dokkaHtml/main"></a>
-                <div class="table-row" data-filterable-current=":core:dokkaHtml/main" data-filterable-set=":core:dokkaHtml/main">
-                  <div class="main-subrow keyValue ">
-                    <div class=""><span class="inline-flex"><a href="handlers.html">handlers</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1503039254%2FProperties%2F-121426938"></span>
-                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                        </span></span></div>
-                    <div>
-                      <div class="title">
-                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-depenent-content" data-active="" data-togglable=":core:dokkaHtml/main"><a data-name="1503039254%2FProperties%2F-121426938" anchor-label="handlers" id="1503039254%2FProperties%2F-121426938" data-filterable-set=":core:dokkaHtml/main"></a><div class="symbol monospace">val <a href="handlers.html">handlers</a>: <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-mutable-map/index.html">MutableMap</a>&lt;<a href="../../io.github.bluegroundltd.outbox.item/-outbox-type/index.html">OutboxType</a>, <a href="../-outbox-handler/index.html">OutboxHandler</a>&gt;<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
-                      </div>
                     </div>
                   </div>
                 </div>

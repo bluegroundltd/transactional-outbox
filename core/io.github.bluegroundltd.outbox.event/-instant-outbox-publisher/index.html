@@ -1,0 +1,57 @@
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>InstantOutboxPublisher</title>
+<link href="../../../images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "../../../";</script><script type="text/javascript" src="../../../scripts/sourceset_dependencies.js" async="async"></script><link href="../../../styles/style.css" rel="Stylesheet"><link href="../../../styles/logo-styles.css" rel="Stylesheet"><link href="../../../styles/jetbrains-mono.css" rel="Stylesheet"><link href="../../../styles/main.css" rel="Stylesheet"><script type="text/javascript" src="../../../scripts/clipboard.js" async="async"></script><script type="text/javascript" src="../../../scripts/navigation-loader.js" async="async"></script><script type="text/javascript" src="../../../scripts/platform-content-handler.js" async="async"></script><script type="text/javascript" src="../../../scripts/main.js" async="async"></script>  </head>
+  <body>
+    <div id="container">
+      <div id="leftColumn"><a href="../../../index.html">
+          <div id="logo"></div>
+        </a>
+        <div id="paneSearch"></div>
+        <div id="sideMenu"></div>
+      </div>
+      <div id="main">
+        <div id="leftToggler"><span class="icon-toggler"></span></div>
+<script type="text/javascript" src="../../../scripts/main.js"></script>        <div class="main-content" id="content" pageIds="core::io.github.bluegroundltd.outbox.event/InstantOutboxPublisher///PointingToDeclaration//-121426938">
+          <div class="navigation-wrapper" id="navigation-wrapper">
+            <div class="breadcrumbs"><a href="../../../index.html">core</a>/<a href="../index.html">io.github.bluegroundltd.outbox.event</a>/<a href="index.html">InstantOutboxPublisher</a></div>
+            <div class="pull-right d-flex">
+              <div id="searchBar"></div>
+            </div>
+          </div>
+          <div class="cover ">
+            <h1 class="cover"><span>Instant</span><wbr></wbr><span>Outbox</span><wbr></wbr><span><span>Publisher</span></span></h1>
+            <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":core:dokkaHtml/main"><div class="symbol monospace">interface <a href="index.html">InstantOutboxPublisher</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><p class="paragraph">The publisher will emit an event upon the creation of the instant outbox. Having an event emitted upon the outbox creation enables us handle an instant outbox processing in separate transactions. We can listen for the published event after transaction is committed, and then we can process the outbox by calling <a href="../../io.github.bluegroundltd.outbox/-transactional-outbox/process-instant-outbox.html">TransactionalOutbox.processInstantOutbox</a>.</p><p class="paragraph">The implementation is specific to the framework that uses the library so the caller needs to provide the specifics.</p><p class="paragraph">The publisher is required so that an instance of <a href="../../io.github.bluegroundltd.outbox/-transactional-outbox/index.html">TransactionalOutbox</a> is created using the <a href="../../io.github.bluegroundltd.outbox/-transactional-outbox-builder/index.html">TransactionalOutboxBuilder</a>.</p><p class="paragraph">Example of the publisher implementation on Spring framework:</p><div class="sample-container"><code class="" theme="idea"><pre>class InstantOutboxPublisherImpl(<br>  private val applicationEventPublisher: ApplicationEventPublisher,<br>) : InstantOutboxPublisher {<br><br>override fun publish(event: InstantOutboxEvent) =<br>  applicationEventPublisher.publishEvent(<br>    SpringApplicationEvent(<br>       source = this,<br>       payload = event.outbox<br>      )<br>    )<br>}</pre></code></div><p class="paragraph">Example of a listener on Spring framework:</p><div class="sample-container"><code class="" theme="idea"><pre>class AfterCommitEventListener(<br>  private val transactionalOutbox: TransactionalOutbox<br>) {<br><br>  @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)<br>  fun handle(event: SpringApplicationEvent) {<br>    transactionalOutbox.processInstantOutbox(event.payload)<br>  }<br>}</pre></code></div></div></div>
+          </div>
+          <div class="tabbedcontent">
+            <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="Functions">Functions</button></div>
+            <div class="tabs-section-body">
+              <h2 class="">Functions</h2>
+              <div class="table" data-togglable="Functions"><a data-name="-830418264%2FFunctions%2F-121426938" anchor-label="publish" id="-830418264%2FFunctions%2F-121426938" data-filterable-set=":core:dokkaHtml/main"></a>
+                <div class="table-row" data-filterable-current=":core:dokkaHtml/main" data-filterable-set=":core:dokkaHtml/main">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="publish.html"><span><span>publish</span></span></a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-830418264%2FFunctions%2F-121426938"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title"><div class="divergent-group" data-filterable-current=":core:dokkaHtml/main" data-filterable-set=":core:dokkaHtml/main"><div class="with-platform-tags"><span class="pull-right"></span></div>
+
+  <div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":core:dokkaHtml/main"><div class="symbol monospace">abstract fun <a href="publish.html">publish</a>(event: <a href="../-instant-outbox-event/index.html">InstantOutboxEvent</a>)<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+  </div>
+</div>
+</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="footer"><span class="go-to-top-icon"><a href="#content"></a></span><span>© 2023 Copyright</span><span class="pull-right"><span>Generated by </span><a href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span></div>
+      </div>
+    </div>
+  </body>
+</html>
+
