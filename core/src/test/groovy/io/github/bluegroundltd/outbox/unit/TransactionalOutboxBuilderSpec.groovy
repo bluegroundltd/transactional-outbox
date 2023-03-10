@@ -5,6 +5,7 @@ import io.github.bluegroundltd.outbox.OutboxLocksProvider
 import io.github.bluegroundltd.outbox.TransactionalOutbox
 import io.github.bluegroundltd.outbox.TransactionalOutboxBuilder
 import io.github.bluegroundltd.outbox.TransactionalOutboxImpl
+import io.github.bluegroundltd.outbox.event.InstantOutboxPublisher
 import io.github.bluegroundltd.outbox.item.OutboxType
 import io.github.bluegroundltd.outbox.store.OutboxStore
 import io.github.bluegroundltd.outbox.utils.DummyOutboxHandler
@@ -20,6 +21,7 @@ class TransactionalOutboxBuilderSpec extends UnitTestSpecification {
   def clock = Clock.fixed(Instant.now(), ZoneId.systemDefault())
   def locksProvider = GroovyMock(OutboxLocksProvider)
   def store = GroovyMock(OutboxStore)
+  def instantOutboxPublisher = GroovyMock(InstantOutboxPublisher)
 
   @Unroll
   def "Should build a transactional outbox instance #testCase"() {
@@ -39,6 +41,7 @@ class TransactionalOutboxBuilderSpec extends UnitTestSpecification {
         .withHandlers(handlers)
         .withLocksProvider(locksProvider)
         .withStore(store)
+        .withInstantOutboxPublisher(instantOutboxPublisher)
 
     and:
       TransactionalOutbox transactionalOutbox
@@ -53,7 +56,7 @@ class TransactionalOutboxBuilderSpec extends UnitTestSpecification {
       }
 
     and:
-      def mappedHandlers = builder.getHandlers() as Map<OutboxType, OutboxHandler>
+      def mappedHandlers = builder.handlers as Map<OutboxType, OutboxHandler>
 
     then:
       transactionalOutbox instanceof TransactionalOutboxImpl
@@ -83,6 +86,7 @@ class TransactionalOutboxBuilderSpec extends UnitTestSpecification {
         .withHandlers(handlers)
         .withLocksProvider(locksProvider)
         .withStore(store)
+        .withInstantOutboxPublisher(instantOutboxPublisher)
         .build()
 
     then:

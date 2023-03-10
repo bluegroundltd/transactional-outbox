@@ -20,4 +20,8 @@ trait SpecHelper {
 
     Instant.ofEpochMilli(randomTime)
   }
+
+  Boolean generateBoolean() {
+    srng.nextBoolean()
+  }
 }

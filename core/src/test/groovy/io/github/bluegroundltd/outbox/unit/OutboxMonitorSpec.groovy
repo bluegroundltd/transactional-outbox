@@ -4,9 +4,11 @@ import io.github.bluegroundltd.outbox.OutboxHandler
 import io.github.bluegroundltd.outbox.OutboxLocksProvider
 import io.github.bluegroundltd.outbox.TransactionalOutbox
 import io.github.bluegroundltd.outbox.TransactionalOutboxImpl
+import io.github.bluegroundltd.outbox.event.InstantOutboxPublisher
 import io.github.bluegroundltd.outbox.item.OutboxItem
 import io.github.bluegroundltd.outbox.item.OutboxStatus
 import io.github.bluegroundltd.outbox.item.OutboxType
+import io.github.bluegroundltd.outbox.item.factory.OutboxItemFactory
 import io.github.bluegroundltd.outbox.store.OutboxFilter
 import io.github.bluegroundltd.outbox.store.OutboxStore
 import io.github.bluegroundltd.outbox.utils.OutboxItemBuilder
@@ -26,6 +28,8 @@ class OutboxMonitorSpec extends Specification {
   Map<OutboxType, OutboxHandler> handlers = Mock()
   OutboxLocksProvider locksProvider = Mock()
   OutboxStore store = Mock()
+  InstantOutboxPublisher instantOutboxPublisher = Mock()
+  OutboxItemFactory outboxItemFactory = Mock()
   ExecutorService executor = Mock()
   Duration threadPoolTimeOut = Duration.ofMillis(5000)
   TransactionalOutbox transactionalOutbox
@@ -36,10 +40,28 @@ class OutboxMonitorSpec extends Specification {
       handlers,
       locksProvider,
       store,
+      instantOutboxPublisher,
+      outboxItemFactory,
       DURATION_ONE_HOUR,
       executor,
       threadPoolTimeOut
     )
+  }
+
+  def "Should delegate to the executor thread pool when an instant outbox is processed"(){
+    given:
+      def instantOutbox = OutboxItemBuilder.make().build()
+
+    and:
+      def expectedHandler = GroovyMock(OutboxHandler)
+
+    when:
+      transactionalOutbox.processInstantOutbox(instantOutbox)
+
+    then:
+      1 * handlers.get(_) >> expectedHandler
+      1 * executor.execute(_)
+      0 * _
   }
 
   def "Should return when monitor is called after a shutdown request"() {
@@ -55,6 +77,25 @@ class OutboxMonitorSpec extends Specification {
 
     then:
       0 * _
+  }
+
+  def "Should handle a failure while an instant outbox is being processed"() {
+    given:
+      def instantOutbox = OutboxItemBuilder.make().build()
+
+    and:
+      def expectedHandler = GroovyMock(OutboxHandler)
+
+    when:
+      transactionalOutbox.processInstantOutbox(instantOutbox)
+
+    then:
+      1 * handlers.get(_) >> expectedHandler
+      1 * executor.execute(_) >> { throw new RuntimeException() }
+      0 * _
+
+    and:
+      noExceptionThrown()
   }
 
   def "Should delegate to the executor thread pool when monitor is called"() {
@@ -81,10 +122,11 @@ class OutboxMonitorSpec extends Specification {
       }
       items.size() * store.update(_) >> { OutboxItem item ->
         with(item) {
-          item.status == OutboxStatus.RUNNING
-          item.lastExecution == now
-          item.rerunAfter == item.lastExecution + DURATION_ONE_HOUR
+          it.status == OutboxStatus.RUNNING
+          it.lastExecution == now
+          it.rerunAfter == item.lastExecution + DURATION_ONE_HOUR
         }
+        return item
       }
       1 * locksProvider.release()
       items.size() * handlers.get(_) >> expectedHandler
@@ -113,20 +155,22 @@ class OutboxMonitorSpec extends Specification {
       }
       1 * store.update(_) >> { OutboxItem item ->
         with(item) {
-          item.status == OutboxStatus.RUNNING
-          item.lastExecution == now
-          item.rerunAfter == item.lastExecution + DURATION_ONE_HOUR
+          it.status == OutboxStatus.RUNNING
+          it.lastExecution == now
+          it.rerunAfter == item.lastExecution + DURATION_ONE_HOUR
         }
+        return item
       }
       1 * locksProvider.release()
       1 * handlers.get(_) >> expectedHandler
       1 * executor.execute(_) >> { throw new RejectedExecutionException() }
       1 * store.update(_) >> { OutboxItem item ->
         with(item) {
-          item.status == OutboxStatus.PENDING
-          item.nextRun == now
-          item.rerunAfter == null
+          it.status == OutboxStatus.PENDING
+          it.nextRun == now
+          it.rerunAfter == null
         }
+        return item
       }
       0 * _
   }

@@ -20,7 +20,7 @@ interface OutboxStore {
    * @param outboxItem the outbox item to update
    * @return the updated outbox item
    */
-  fun update(outboxItem: OutboxItem): OutboxItem?
+  fun update(outboxItem: OutboxItem): OutboxItem
 
   /**
    * Fetches outbox items from the store.
