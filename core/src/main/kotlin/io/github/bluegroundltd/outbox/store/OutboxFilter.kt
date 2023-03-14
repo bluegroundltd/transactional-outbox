@@ -12,13 +12,13 @@ class OutboxPendingFilter(
 ) : AbstractOutboxFilter(OutboxStatus.PENDING)
 
 class OutboxRunningFilter(
-  val rerunAfterGreaterThan: Instant
+  val rerunAfterLessThan: Instant
 ) : AbstractOutboxFilter(OutboxStatus.RUNNING)
 
 class OutboxFilter(
-  nextExecutionAtGreaterThan: Instant,
-  rerunAfterGreaterThan: Instant = nextExecutionAtGreaterThan
+  nextRunLessThan: Instant,
+  rerunAfterLessThan: Instant = nextRunLessThan
 ) {
-  val outboxPendingFilter: OutboxPendingFilter = OutboxPendingFilter(nextExecutionAtGreaterThan)
-  val outboxRunningFilter: OutboxRunningFilter = OutboxRunningFilter(rerunAfterGreaterThan)
+  val outboxPendingFilter: OutboxPendingFilter = OutboxPendingFilter(nextRunLessThan)
+  val outboxRunningFilter: OutboxRunningFilter = OutboxRunningFilter(rerunAfterLessThan)
 }

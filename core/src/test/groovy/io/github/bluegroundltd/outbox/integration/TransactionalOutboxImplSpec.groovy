@@ -45,6 +45,7 @@ class TransactionalOutboxImplSpec extends Specification {
       outboxItemFactory,
       DURATION_ONE_HOUR,
       new FixedThreadPoolExecutorServiceFactory(1, "").make(),
+      [],
       DURATION_ONE_NANO
     )
   }
@@ -73,7 +74,7 @@ class TransactionalOutboxImplSpec extends Specification {
       1 * store.fetch(_) >> { OutboxFilter filter ->
         with(filter) {
           outboxPendingFilter.nextRunLessThan == now
-          outboxRunningFilter.rerunAfterGreaterThan == now
+          outboxRunningFilter.rerunAfterLessThan == now
         }
         [expectedOutboxItem]
       }

@@ -11,12 +11,12 @@ import java.util.concurrent.Executors
  */
 internal class FixedThreadPoolExecutorServiceFactory(
   private val threadPoolSize: Int = DEFAULT_THREAD_POOL_SIZE,
-  private val threadNameFormat: String = DEFAULT_THEAD_NAME_FORMAT
+  private val threadNameFormat: String = DEFAULT_THREAD_NAME_FORMAT
 ) {
 
   companion object {
     private const val DEFAULT_THREAD_POOL_SIZE = 10
-    private const val DEFAULT_THEAD_NAME_FORMAT = "outbox-item-processor-%d"
+    private const val DEFAULT_THREAD_NAME_FORMAT = "outbox-item-processor-%d"
     private val logger: Logger = LoggerFactory.getLogger(FixedThreadPoolExecutorServiceFactory::class.java)
   }
 
