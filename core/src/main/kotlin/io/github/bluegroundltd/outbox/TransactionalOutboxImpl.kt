@@ -57,7 +57,7 @@ internal class TransactionalOutboxImpl(
     runCatching {
       logger.info("$LOGGER_PREFIX Instant processing of \"${outbox.type.getType()}\" outbox")
       executor.execute(
-        OutboxItemProcessor(outbox, outboxHandlers[outbox.type]!!, outboxStore)
+        decorate(OutboxItemProcessor(outbox, outboxHandlers[outbox.type]!!, outboxStore))
       )
     }.onFailure {
       logger.error("$LOGGER_PREFIX Failure in instant handling", it)
