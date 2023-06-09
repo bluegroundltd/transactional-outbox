@@ -27,7 +27,7 @@ Transactional Outbox is published on `mavenCentral`. In order to use it just add
 
 ```gradle
 
-implementation("io.github.bluegroundltd:transactional-outbox-core:0.3.0")
+implementation("io.github.bluegroundltd:transactional-outbox-core:0.4.0")
 
 ```
 
@@ -205,7 +205,7 @@ implementation("io.github.bluegroundltd:transactional-outbox-core:x.y.z")
 ```
 * Alternative 2: Change your dependencies to directly reference the jar file
 ```gradle
-implementation("files("../../../transactional-outbox/core/build/libs/core-x.y.z.jar"))
+implementation(files("../../../transactional-outbox/core/build/libs/core-x.y.z.jar"))
 ```
 ## Publishing
 
