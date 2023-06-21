@@ -9,7 +9,7 @@ plugins {
   jacoco
   id("io.gitlab.arturbosch.detekt")
   id("org.jetbrains.dokka") version "1.5.31"
-  id("com.vanniktech.maven.publish") version "0.18.0"
+  id("com.vanniktech.maven.publish") version "0.25.2"
   id("org.jetbrains.kotlin.plugin.allopen") version "1.8.0"
 }
 
@@ -102,10 +102,4 @@ apply(plugin = "com.vanniktech.maven.publish")
 
 tasks.dokkaHtml.configure {
   outputDirectory.set(buildDir.resolve("dokka-html"))
-}
-
-plugins.withId("com.vanniktech.maven.publish") {
-  mavenPublish {
-    sonatypeHost = com.vanniktech.maven.publish.SonatypeHost.S01
-  }
 }
