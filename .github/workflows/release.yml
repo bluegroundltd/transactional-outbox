@@ -22,6 +22,12 @@ jobs:
             echo "Tag is not based on a merged commit in the main branch. Exiting."
             exit 0
           fi
+      - name: Check tag name pattern follows `vX.Y.Z`
+        run: |
+          if [[ ! "$GITHUB_REF" =~ ^refs/tags/v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Tag name does not match the pattern 'vX.Y.Z'. Exiting."
+            exit 0
+          fi
       - name: Setup Java
         uses: actions/setup-java@v3
         with:
