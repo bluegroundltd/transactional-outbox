@@ -209,11 +209,32 @@ implementation(files("../../../transactional-outbox/core/build/libs/core-x.y.z.j
 ```
 ## Publishing
 
-* Bump version in `gradle.properties` of `core` module.
+Firstly, bump version in `gradle.properties` of `core` module, commit and push a PR. Once it gets merged, follow one of the two options below.
+
+
+Now, you can either: 
+1. publish via GitHub, or
+2. locally from your machine
+
+### Publish via GitHub
+Using this method has the benefit of not having to provide any secrets whatsoever.  
+Simply, push a git tag **after** a PR is merged, which will trigger the 
+[release.yml](.github/workflows/release.yml) pipeline.  
+Said pipeline, will publish the artifact.
+
+Please note that this will be automated in future work.
+
+#### Tag formatting
+To tag, please follow a format like `v0.4.0`, that is prefixed with `v` and the version number of the artifact you're 
+about to release.  
+
+### Publish via your workstation
+
+* Having built the artifact
 * Execute the following to upload artifact:
 ```shell
-$ ./gradlew :core:publish \
-            --no-daemon --no-parallel \
+$ ./gradlew publishAllPublicationsToMavenCentral \
+            --no-configuration-cache \
             -Psigning.secretKeyRingFile=<keyring_file_path> \
             -Psigning.password=<keyring_password> \
             -Psigning.keyId=<keyring_id> \
@@ -221,12 +242,8 @@ $ ./gradlew :core:publish \
             -PmavenCentralPassword=<nexus_password>
 ```
 
-After this operation finishes, you can promote the artifact to be released with:
-```shell
-$ ./gradlew closeAndReleaseRepository \
-            -PmavenCentralUsername=<nexus_username> \
-            -PmavenCentralPassword=<nexus_password>
-```
+Note that if you maintain the properties above (`-P`) in your local `gradle.properties` file, you can omit them from the
+command.
 
 ## Maintainers
 
