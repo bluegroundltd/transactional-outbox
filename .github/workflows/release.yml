@@ -1,0 +1,47 @@
+name: Release
+on:
+  push:
+    tags:
+      - '*'
+jobs:
+  release-core:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.ref }}
+      - name: Issue a release only if a tag is based on a merged commit in `main` branch
+        run: |
+          tag_commit=$(git rev-parse ${{ github.ref }})
+          merged_commit=$(git rev-parse main)
+
+          if git merge-base --is-ancestor $tag_commit $merged_commit; then
+            echo "Tag is based on a merged commit in the main branch"
+          else
+            echo "Tag is not based on a merged commit in the main branch. Exiting."
+            exit 0
+          fi
+      - name: Check tag name pattern follows `vX.Y.Z`
+        run: |
+          if [[ ! "$GITHUB_REF" =~ ^refs/tags/v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Tag name does not match the pattern 'vX.Y.Z'. Exiting."
+            exit 0
+          fi
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          java-version: 17.0.1
+          distribution: 'zulu'
+      - name: Build and test
+        run: ./gradlew core:build
+      - name: Publish package
+        uses: gradle/gradle-build-action@v2.4.2
+        env:
+          # https://docs.gradle.org/current/userguide/signing_plugin.html#sec:in-memory-keys
+          ORG_GRADLE_PROJECT_signingKey: ${{ secrets.SIGNING_KEY }}
+          ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.SIGNING_PASSWORD }}
+          ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.SONATYPE_USERNAME }}
+          ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.SONATYPE_PASSWORD }}
+        with:
+          arguments: core:publishAllPublicationsToMavenCentral --no-configuration-cache
