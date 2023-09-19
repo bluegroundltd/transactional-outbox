@@ -16,7 +16,7 @@ jobs:
         run: |
           if [[ ! "$GITHUB_REF" =~ ^refs/tags/v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
             echo "Tag name ($GITHUB_REF) does not match the pattern 'vX.Y.Z'. Exiting."
-            exit 0
+            exit 1
           fi
 
       - name: Issue a release only if a tag is based on a merged commit in `main` branch
@@ -28,7 +28,7 @@ jobs:
             echo "Tag is based on a merged commit in the main branch"
           else
             echo "Tag is not based on a merged commit in the main branch. Exiting."
-            exit 0
+            exit 1
           fi
 
       - name: Setup Java
