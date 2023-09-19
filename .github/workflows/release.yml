@@ -13,8 +13,17 @@ jobs:
         with:
           ref: ${{ github.ref }}
 
+      - name: Check tag name pattern follows `vX.Y.Z`
+        run: |
+          if [[ ! "$GITHUB_REF" =~ ^refs/tags/v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Tag name ($GITHUB_REF) does not match the pattern 'vX.Y.Z'. Exiting."
+            exit 0
+          fi
+
       - name: Issue a release only if a tag is based on a merged commit in `main` branch
         run: |
+          git fetch main
+
           tag_commit=$(git rev-parse ${{ github.ref }})
           merged_commit=$(git rev-parse main)
 
@@ -22,13 +31,6 @@ jobs:
             echo "Tag is based on a merged commit in the main branch"
           else
             echo "Tag is not based on a merged commit in the main branch. Exiting."
-            exit 0
-          fi
-
-      - name: Check tag name pattern follows `vX.Y.Z`
-        run: |
-          if [[ ! "$GITHUB_REF" =~ ^refs/tags/v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-            echo "Tag name does not match the pattern 'vX.Y.Z'. Exiting."
             exit 0
           fi
 
