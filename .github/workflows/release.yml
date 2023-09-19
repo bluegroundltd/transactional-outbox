@@ -1,8 +1,9 @@
 name: Release
 on:
-  push:
+  create:
     tags:
       - '*'
+
 jobs:
   release-core:
     runs-on: ubuntu-latest
