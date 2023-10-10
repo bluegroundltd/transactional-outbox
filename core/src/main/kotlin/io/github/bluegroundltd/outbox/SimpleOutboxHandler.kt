@@ -1,9 +1,10 @@
 package io.github.bluegroundltd.outbox
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import io.github.bluegroundltd.outbox.item.OutboxPayload
 import io.github.bluegroundltd.outbox.item.OutboxType
-import com.fasterxml.jackson.databind.ObjectMapper
 import java.time.Clock
+import java.time.Duration
 import java.time.Instant
 
 /**
@@ -28,6 +29,7 @@ abstract class SimpleOutboxHandler<T : OutboxPayload>(
 
   companion object {
     private const val ONE_MINUTE_IN_SECONDS = 60L
+    private const val TEN_DAYS = 10L
   }
 
   override fun getSupportedType(): OutboxType {
@@ -50,9 +52,12 @@ abstract class SimpleOutboxHandler<T : OutboxPayload>(
     handleWithParsedPayload(payloadParsed)
   }
 
+  override fun getRetentionDuration(): Duration =
+    Duration.ofDays(TEN_DAYS)
+
   /**
    * This method is invoked after the payload is deserialized.
-   * The payload is already of type [T] and can be casted to it.
+   * The payload is already of type [T] and can be cast to it.
    * This method should be implemented by the user.
    *
    * @param payload the payload of type [T]

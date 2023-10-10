@@ -69,4 +69,9 @@ sealed interface TransactionalOutbox {
    * [@PreDestroy] and one via the automatic inference as described [here](https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/context/annotation/Bean.html#destroyMethod()).
    */
   fun shutdown()
+
+  /**
+   * Deletes all the outbox items that have been completed and have gone past their retention duration.
+   */
+  fun cleanup()
 }

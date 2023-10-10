@@ -138,4 +138,16 @@ class TransactionalOutboxImplSpec extends Specification {
       }
       0 * _
   }
+
+  def "Should delegate to outbox store when `cleanup` is invoked"() {
+    given:
+      def now = Instant.now(clock)
+
+    when:
+      transactionalOutbox.cleanup()
+
+    then:
+      1 * store.deleteCompletedItems(now)
+      0 * _
+  }
 }

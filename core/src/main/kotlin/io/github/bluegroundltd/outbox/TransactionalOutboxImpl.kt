@@ -9,13 +9,13 @@ import io.github.bluegroundltd.outbox.item.OutboxType
 import io.github.bluegroundltd.outbox.item.factory.OutboxItemFactory
 import io.github.bluegroundltd.outbox.store.OutboxFilter
 import io.github.bluegroundltd.outbox.store.OutboxStore
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import java.time.Clock
 import java.time.Duration
 import java.time.Instant
 import java.util.EnumSet
 import java.util.concurrent.ExecutorService
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 import java.util.concurrent.RejectedExecutionException
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
@@ -57,7 +57,7 @@ internal class TransactionalOutboxImpl(
     runCatching {
       logger.info("$LOGGER_PREFIX Instant processing of \"${outbox.type.getType()}\" outbox")
       executor.execute(
-        decorate(OutboxItemProcessor(outbox, outboxHandlers[outbox.type]!!, outboxStore))
+        decorate(OutboxItemProcessor(outbox, outboxHandlers[outbox.type]!!, outboxStore, clock))
       )
     }.onFailure {
       logger.error("$LOGGER_PREFIX Failure in instant handling", it)
@@ -119,7 +119,7 @@ internal class TransactionalOutboxImpl(
   }
 
   private fun processItem(item: OutboxItem) {
-    val processor = decorate(OutboxItemProcessor(item, outboxHandlers[item.type]!!, outboxStore))
+    val processor = decorate(OutboxItemProcessor(item, outboxHandlers[item.type]!!, outboxStore, clock))
     try {
       executor.execute(processor)
     } catch (exception: RejectedExecutionException) {
@@ -129,9 +129,8 @@ internal class TransactionalOutboxImpl(
   }
 
   private fun decorate(processor: OutboxItemProcessor) =
-    decorators.fold(processor as Runnable) {
-      decorated, decorator ->
-        decorator.decorate(decorated)
+    decorators.fold(processor as Runnable) { decorated, decorator ->
+      decorator.decorate(decorated)
     }
 
   private fun revertToPending(item: OutboxItem) {
@@ -170,5 +169,10 @@ internal class TransactionalOutboxImpl(
       outboxStore.update(item)
     }
     logger.info("$LOGGER_PREFIX Outbox shutdown completed")
+  }
+
+  override fun cleanup() {
+    logger.info("$LOGGER_PREFIX Cleaning up outbox items")
+    outboxStore.deleteCompletedItems(Instant.now(clock))
   }
 }

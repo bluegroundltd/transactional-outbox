@@ -1,6 +1,7 @@
 package io.github.bluegroundltd.outbox.store
 
 import io.github.bluegroundltd.outbox.item.OutboxItem
+import java.time.Instant
 
 /**
  * OutboxStore is responsible for storing and retrieving outbox items.
@@ -29,4 +30,11 @@ interface OutboxStore {
    * @return the list of outbox items
    */
   fun fetch(outboxFilter: OutboxFilter): List<OutboxItem>
+
+  /**
+   * Deletes completed outbox items from the store.
+   *
+   * @param now now
+   */
+  fun deleteCompletedItems(now: Instant)
 }

@@ -6,12 +6,15 @@ import io.github.bluegroundltd.outbox.item.OutboxType
 import io.github.bluegroundltd.outbox.store.OutboxStore
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import java.time.Clock
+import java.time.Instant
 
 @Suppress("TooGenericExceptionCaught")
 internal class OutboxItemProcessor(
   private val item: OutboxItem,
   private val handler: OutboxHandler,
-  private val store: OutboxStore
+  private val store: OutboxStore,
+  private val clock: Clock,
 ) : Runnable {
 
   companion object {
@@ -28,7 +31,10 @@ internal class OutboxItemProcessor(
     try {
       logger.info("$LOGGER_PREFIX Handling item with id: ${item.id} and type: ${item.type}")
       handler.handle(item.payload)
-      item.status = OutboxStatus.COMPLETED
+      item.apply {
+        status = OutboxStatus.COMPLETED
+        deleteAfter = Instant.now(clock) + handler.getRetentionDuration()
+      }
     } catch (exception: Exception) {
       if (handler.hasReachedMaxRetries(item.retries)) {
         handleTerminalFailure(exception)
