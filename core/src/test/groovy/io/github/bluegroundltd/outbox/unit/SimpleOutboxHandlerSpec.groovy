@@ -4,9 +4,9 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import io.github.bluegroundltd.outbox.item.OutboxType
 import spock.lang.Shared
 import spock.lang.Specification
-import spock.lang.Unroll
 
 import java.time.Clock
+import java.time.Duration
 import java.time.Instant
 import java.time.ZoneId
 import java.util.function.Function
@@ -63,7 +63,6 @@ class SimpleOutboxHandlerSpec extends Specification {
 
   }
 
-  @Unroll
   def "Should return #desc when getNextExecutionTime is invoked with #retries retries"() {
     when:
       def response = handler.getNextExecutionTime(retries)
@@ -81,7 +80,6 @@ class SimpleOutboxHandlerSpec extends Specification {
       "1 minute after now" | 2       | now.plusSeconds(60)
   }
 
-  @Unroll
   def "Should return #expectedResponse when `hasReachedMaxRetries` is invoked with #retries"() {
     when:
       def response = handler.hasReachedMaxRetries(retries)
@@ -111,5 +109,16 @@ class SimpleOutboxHandlerSpec extends Specification {
       1 * objectMapper.readValue(payload, OutboxPayloadTest) >> parsedPayload
       1 * handleWithParsedPayloadCallback.apply(parsedPayload)
       0 * _
+  }
+
+  def "Should get the item retention duration when `getRetentionDuration` is invoked"() {
+    when:
+      def response = handler.getRetentionDuration()
+
+    then:
+      0 * _
+
+    and:
+      response == Duration.ofDays(10)
   }
 }

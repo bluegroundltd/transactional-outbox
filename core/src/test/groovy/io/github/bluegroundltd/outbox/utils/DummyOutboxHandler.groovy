@@ -4,6 +4,7 @@ import io.github.bluegroundltd.outbox.OutboxHandler
 import io.github.bluegroundltd.outbox.item.OutboxPayload
 import io.github.bluegroundltd.outbox.item.OutboxType
 
+import java.time.Duration
 import java.time.Instant
 
 class DummyOutboxHandler implements OutboxHandler {
@@ -34,6 +35,13 @@ class DummyOutboxHandler implements OutboxHandler {
 
   @Override
   void handleFailure(String payload) {}
+
+  @Override
+
+  @Override
+  Duration getRetentionDuration() {
+    return null
+  }
 }
 
 class DummyHandler extends DummyOutboxHandler {

@@ -2,6 +2,7 @@ package io.github.bluegroundltd.outbox
 
 import io.github.bluegroundltd.outbox.item.OutboxPayload
 import io.github.bluegroundltd.outbox.item.OutboxType
+import java.time.Duration
 import java.time.Instant
 
 /**
@@ -82,4 +83,12 @@ interface OutboxHandler {
    * @param payload the payload of the outbox item
    */
   fun handleFailure(payload: String)
+
+  /**
+   * Returns the amount of time that the outbox items of this handler's type should be retained.
+   * The outbox items will be deleted after this amount of time has passed after their completion.
+   *
+   * @return the retention duration of the outbox items
+   */
+  fun getRetentionDuration(): Duration
 }

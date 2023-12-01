@@ -10,5 +10,6 @@ data class OutboxItem(
   var retries: Long = 0,
   var nextRun: Instant,
   var lastExecution: Instant? = null,
-  var rerunAfter: Instant? = null
+  var rerunAfter: Instant? = null,
+  var deleteAfter: Instant? = null,
 )

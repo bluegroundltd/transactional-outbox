@@ -52,7 +52,7 @@ class OutboxShutdownSpec extends Specification {
     given:
       def runningItem = OutboxItemBuilder.makeRunning()
       def handler = GroovyMock(OutboxHandler)
-      def processor = new OutboxItemProcessor(runningItem, handler, store)
+      def processor = new OutboxItemProcessor(runningItem, handler, store, clock)
       def expected = [processor]
       def now = Instant.now(clock)
 

@@ -10,6 +10,7 @@ import io.github.bluegroundltd.outbox.utils.OutboxItemBuilder
 import spock.lang.Specification
 
 import java.time.Clock
+import java.time.Duration
 import java.time.Instant
 import java.time.ZoneId
 
@@ -25,7 +26,8 @@ class OutboxItemProcessorSpec extends Specification {
     processor = new OutboxItemProcessor(
       item,
       handler,
-      store
+      store,
+      clock
     )
   }
 
@@ -39,14 +41,19 @@ class OutboxItemProcessorSpec extends Specification {
   }
 
   def "Should handle an item and update its status to completion when run is called"() {
+    given:
+      def retentionDuration = Duration.ofDays(10)
+
     when:
       processor.run()
 
     then:
       1 * handler.getSupportedType() >> item.type
       1 * handler.handle(item.payload)
+      1 * handler.getRetentionDuration() >> retentionDuration
       1 * store.update(_) >> { OutboxItem item ->
         assert item.status == OutboxStatus.COMPLETED
+        assert item.deleteAfter == Instant.now(clock) + retentionDuration
       }
       0 * _
   }

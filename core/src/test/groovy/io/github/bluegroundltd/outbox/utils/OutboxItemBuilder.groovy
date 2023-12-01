@@ -15,6 +15,7 @@ class OutboxItemBuilder implements SpecHelper {
   Instant nextRun
   Instant lastExecution
   Instant rerunAfter
+  Instant deleteAfter
 
   static OutboxItemBuilder make() {
     new OutboxItemBuilder().with {
@@ -26,6 +27,7 @@ class OutboxItemBuilder implements SpecHelper {
       nextRun = generateInstant()
       lastExecution = null
       rerunAfter = null
+      deleteAfter = null
 
       it
     }
@@ -68,7 +70,8 @@ class OutboxItemBuilder implements SpecHelper {
       retries,
       nextRun,
       lastExecution,
-      rerunAfter
+      rerunAfter,
+      deleteAfter
     )
   }
 }
