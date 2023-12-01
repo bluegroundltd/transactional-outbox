@@ -23,6 +23,8 @@ jobs:
       - name: Issue a release only if a tag is based on a merged commit in `main` branch
         run: |
           tag_commit=$(git rev-parse ${{ github.ref }})
+
+          git fetch -f origin main
           merged_commit=$(git rev-parse main)
 
           if git merge-base --is-ancestor $tag_commit $merged_commit; then
