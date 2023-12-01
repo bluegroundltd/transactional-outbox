@@ -11,7 +11,8 @@ $dokka.location:io.github.bluegroundltd.outbox.event/InstantOutboxPublisher///Po
 $dokka.location:io.github.bluegroundltd.outbox.event/InstantOutboxPublisher/publish/#io.github.bluegroundltd.outbox.event.InstantOutboxEvent/PointingToDeclaration/core/io.github.bluegroundltd.outbox.event/-instant-outbox-publisher/publish.html
 $dokka.location:io.github.bluegroundltd.outbox.item////PointingToDeclaration/core/io.github.bluegroundltd.outbox.item/index.html
 $dokka.location:io.github.bluegroundltd.outbox.item/OutboxItem///PointingToDeclaration/core/io.github.bluegroundltd.outbox.item/-outbox-item/index.html
-$dokka.location:io.github.bluegroundltd.outbox.item/OutboxItem/OutboxItem/#kotlin.Long?#io.github.bluegroundltd.outbox.item.OutboxType#io.github.bluegroundltd.outbox.item.OutboxStatus#kotlin.String#kotlin.Long#java.time.Instant#java.time.Instant?#java.time.Instant?/PointingToDeclaration/core/io.github.bluegroundltd.outbox.item/-outbox-item/-outbox-item.html
+$dokka.location:io.github.bluegroundltd.outbox.item/OutboxItem/OutboxItem/#kotlin.Long?#io.github.bluegroundltd.outbox.item.OutboxType#io.github.bluegroundltd.outbox.item.OutboxStatus#kotlin.String#kotlin.Long#java.time.Instant#java.time.Instant?#java.time.Instant?#java.time.Instant?/PointingToDeclaration/core/io.github.bluegroundltd.outbox.item/-outbox-item/-outbox-item.html
+$dokka.location:io.github.bluegroundltd.outbox.item/OutboxItem/deleteAfter/#/PointingToDeclaration/core/io.github.bluegroundltd.outbox.item/-outbox-item/delete-after.html
 $dokka.location:io.github.bluegroundltd.outbox.item/OutboxItem/id/#/PointingToDeclaration/core/io.github.bluegroundltd.outbox.item/-outbox-item/id.html
 $dokka.location:io.github.bluegroundltd.outbox.item/OutboxItem/lastExecution/#/PointingToDeclaration/core/io.github.bluegroundltd.outbox.item/-outbox-item/last-execution.html
 $dokka.location:io.github.bluegroundltd.outbox.item/OutboxItem/nextRun/#/PointingToDeclaration/core/io.github.bluegroundltd.outbox.item/-outbox-item/next-run.html
@@ -42,6 +43,7 @@ $dokka.location:io.github.bluegroundltd.outbox.store/OutboxRunningFilter///Point
 $dokka.location:io.github.bluegroundltd.outbox.store/OutboxRunningFilter/OutboxRunningFilter/#java.time.Instant/PointingToDeclaration/core/io.github.bluegroundltd.outbox.store/-outbox-running-filter/-outbox-running-filter.html
 $dokka.location:io.github.bluegroundltd.outbox.store/OutboxRunningFilter/rerunAfterLessThan/#/PointingToDeclaration/core/io.github.bluegroundltd.outbox.store/-outbox-running-filter/rerun-after-less-than.html
 $dokka.location:io.github.bluegroundltd.outbox.store/OutboxStore///PointingToDeclaration/core/io.github.bluegroundltd.outbox.store/-outbox-store/index.html
+$dokka.location:io.github.bluegroundltd.outbox.store/OutboxStore/deleteCompletedItems/#java.time.Instant/PointingToDeclaration/core/io.github.bluegroundltd.outbox.store/-outbox-store/delete-completed-items.html
 $dokka.location:io.github.bluegroundltd.outbox.store/OutboxStore/fetch/#io.github.bluegroundltd.outbox.store.OutboxFilter/PointingToDeclaration/core/io.github.bluegroundltd.outbox.store/-outbox-store/fetch.html
 $dokka.location:io.github.bluegroundltd.outbox.store/OutboxStore/insert/#io.github.bluegroundltd.outbox.item.OutboxItem/PointingToDeclaration/core/io.github.bluegroundltd.outbox.store/-outbox-store/insert.html
 $dokka.location:io.github.bluegroundltd.outbox.store/OutboxStore/update/#io.github.bluegroundltd.outbox.item.OutboxItem/PointingToDeclaration/core/io.github.bluegroundltd.outbox.store/-outbox-store/update.html
@@ -57,6 +59,7 @@ $dokka.location:io.github.bluegroundltd.outbox/LocksProviderStep///PointingToDec
 $dokka.location:io.github.bluegroundltd.outbox/LocksProviderStep/withLocksProvider/#io.github.bluegroundltd.outbox.OutboxLocksProvider/PointingToDeclaration/core/io.github.bluegroundltd.outbox/-locks-provider-step/with-locks-provider.html
 $dokka.location:io.github.bluegroundltd.outbox/OutboxHandler///PointingToDeclaration/core/io.github.bluegroundltd.outbox/-outbox-handler/index.html
 $dokka.location:io.github.bluegroundltd.outbox/OutboxHandler/getNextExecutionTime/#kotlin.Long/PointingToDeclaration/core/io.github.bluegroundltd.outbox/-outbox-handler/get-next-execution-time.html
+$dokka.location:io.github.bluegroundltd.outbox/OutboxHandler/getRetentionDuration/#/PointingToDeclaration/core/io.github.bluegroundltd.outbox/-outbox-handler/get-retention-duration.html
 $dokka.location:io.github.bluegroundltd.outbox/OutboxHandler/getSupportedType/#/PointingToDeclaration/core/io.github.bluegroundltd.outbox/-outbox-handler/get-supported-type.html
 $dokka.location:io.github.bluegroundltd.outbox/OutboxHandler/handle/#kotlin.String/PointingToDeclaration/core/io.github.bluegroundltd.outbox/-outbox-handler/handle.html
 $dokka.location:io.github.bluegroundltd.outbox/OutboxHandler/handleFailure/#kotlin.String/PointingToDeclaration/core/io.github.bluegroundltd.outbox/-outbox-handler/handle-failure.html
@@ -73,6 +76,7 @@ $dokka.location:io.github.bluegroundltd.outbox/SimpleOutboxHandler.Companion///P
 $dokka.location:io.github.bluegroundltd.outbox/SimpleOutboxHandler///PointingToDeclaration/core/io.github.bluegroundltd.outbox/-simple-outbox-handler/index.html
 $dokka.location:io.github.bluegroundltd.outbox/SimpleOutboxHandler/SimpleOutboxHandler/#io.github.bluegroundltd.outbox.item.OutboxType#com.fasterxml.jackson.databind.ObjectMapper#java.time.Clock#kotlin.Int#java.lang.Class[TypeParam(bounds=[io.github.bluegroundltd.outbox.item.OutboxPayload])]/PointingToDeclaration/core/io.github.bluegroundltd.outbox/-simple-outbox-handler/-simple-outbox-handler.html
 $dokka.location:io.github.bluegroundltd.outbox/SimpleOutboxHandler/getNextExecutionTime/#kotlin.Long/PointingToDeclaration/core/io.github.bluegroundltd.outbox/-simple-outbox-handler/get-next-execution-time.html
+$dokka.location:io.github.bluegroundltd.outbox/SimpleOutboxHandler/getRetentionDuration/#/PointingToDeclaration/core/io.github.bluegroundltd.outbox/-simple-outbox-handler/get-retention-duration.html
 $dokka.location:io.github.bluegroundltd.outbox/SimpleOutboxHandler/getSupportedType/#/PointingToDeclaration/core/io.github.bluegroundltd.outbox/-simple-outbox-handler/get-supported-type.html
 $dokka.location:io.github.bluegroundltd.outbox/SimpleOutboxHandler/handle/#kotlin.String/PointingToDeclaration/core/io.github.bluegroundltd.outbox/-simple-outbox-handler/handle.html
 $dokka.location:io.github.bluegroundltd.outbox/SimpleOutboxHandler/handleWithParsedPayload/#TypeParam(bounds=[io.github.bluegroundltd.outbox.item.OutboxPayload])/PointingToDeclaration/core/io.github.bluegroundltd.outbox/-simple-outbox-handler/handle-with-parsed-payload.html
@@ -82,6 +86,7 @@ $dokka.location:io.github.bluegroundltd.outbox/StoreStep///PointingToDeclaration
 $dokka.location:io.github.bluegroundltd.outbox/StoreStep/withStore/#io.github.bluegroundltd.outbox.store.OutboxStore/PointingToDeclaration/core/io.github.bluegroundltd.outbox/-store-step/with-store.html
 $dokka.location:io.github.bluegroundltd.outbox/TransactionalOutbox///PointingToDeclaration/core/io.github.bluegroundltd.outbox/-transactional-outbox/index.html
 $dokka.location:io.github.bluegroundltd.outbox/TransactionalOutbox/add/#io.github.bluegroundltd.outbox.item.OutboxType#io.github.bluegroundltd.outbox.item.OutboxPayload#kotlin.Boolean/PointingToDeclaration/core/io.github.bluegroundltd.outbox/-transactional-outbox/add.html
+$dokka.location:io.github.bluegroundltd.outbox/TransactionalOutbox/cleanup/#/PointingToDeclaration/core/io.github.bluegroundltd.outbox/-transactional-outbox/cleanup.html
 $dokka.location:io.github.bluegroundltd.outbox/TransactionalOutbox/monitor/#/PointingToDeclaration/core/io.github.bluegroundltd.outbox/-transactional-outbox/monitor.html
 $dokka.location:io.github.bluegroundltd.outbox/TransactionalOutbox/processInstantOutbox/#io.github.bluegroundltd.outbox.item.OutboxItem/PointingToDeclaration/core/io.github.bluegroundltd.outbox/-transactional-outbox/process-instant-outbox.html
 $dokka.location:io.github.bluegroundltd.outbox/TransactionalOutbox/shutdown/#/PointingToDeclaration/core/io.github.bluegroundltd.outbox/-transactional-outbox/shutdown.html
