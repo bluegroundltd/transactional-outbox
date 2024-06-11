@@ -10,7 +10,6 @@ import io.github.bluegroundltd.outbox.item.OutboxType
 import io.github.bluegroundltd.outbox.store.OutboxStore
 import io.github.bluegroundltd.outbox.utils.DummyOutboxHandler
 import io.github.bluegroundltd.outbox.utils.UnitTestSpecification
-import spock.lang.Unroll
 
 import java.time.Clock
 import java.time.Duration
@@ -19,11 +18,11 @@ import java.time.ZoneId
 
 class TransactionalOutboxBuilderSpec extends UnitTestSpecification {
   def clock = Clock.fixed(Instant.now(), ZoneId.systemDefault())
-  def locksProvider = GroovyMock(OutboxLocksProvider)
+  def monitorLocksProvider = GroovyMock(OutboxLocksProvider)
+  def cleanupLocksProvider = GroovyMock(OutboxLocksProvider)
   def store = GroovyMock(OutboxStore)
   def instantOutboxPublisher = GroovyMock(InstantOutboxPublisher)
 
-  @Unroll
   def "Should build a transactional outbox instance #testCase"() {
     given:
       def builder = TransactionalOutboxBuilder.make(clock)
@@ -39,7 +38,8 @@ class TransactionalOutboxBuilderSpec extends UnitTestSpecification {
     when:
       def transactionalOutboxBuilder = builder
         .withHandlers(handlers)
-        .withLocksProvider(locksProvider)
+        .withMonitorLocksProvider(monitorLocksProvider)
+        .withCleanupLocksProvider(cleanupLocksProvider)
         .withStore(store)
         .withInstantOutboxPublisher(instantOutboxPublisher)
 
@@ -84,7 +84,8 @@ class TransactionalOutboxBuilderSpec extends UnitTestSpecification {
     when:
       builder
         .withHandlers(handlers)
-        .withLocksProvider(locksProvider)
+        .withMonitorLocksProvider(monitorLocksProvider)
+        .withCleanupLocksProvider(cleanupLocksProvider)
         .withStore(store)
         .withInstantOutboxPublisher(instantOutboxPublisher)
         .build()
