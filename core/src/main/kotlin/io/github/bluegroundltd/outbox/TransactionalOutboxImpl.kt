@@ -20,11 +20,12 @@ import java.util.concurrent.RejectedExecutionException
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 
-@SuppressWarnings("LongParameterList")
+@SuppressWarnings("LongParameterList", "TooGenericExceptionCaught")
 internal class TransactionalOutboxImpl(
   private val clock: Clock,
   private val outboxHandlers: Map<OutboxType, OutboxHandler>,
-  private val locksProvider: OutboxLocksProvider,
+  private val monitorLocksProvider: OutboxLocksProvider,
+  private val cleanupLocksProvider: OutboxLocksProvider,
   private val outboxStore: OutboxStore,
   private val instantOutboxPublisher: InstantOutboxPublisher,
   private val outboxItemFactory: OutboxItemFactory,
@@ -66,12 +67,12 @@ internal class TransactionalOutboxImpl(
 
   override fun monitor() {
     if (inShutdownMode.get()) {
-      logger.info("$LOGGER_PREFIX Shutdown in process - no longer accepting items for processing")
+      logger.info("$LOGGER_PREFIX Shutdown in process, no longer accepting items for processing")
       return
     }
 
     runCatching {
-      locksProvider.acquire()
+      monitorLocksProvider.acquire()
 
       val items = fetchEligibleItems()
       if (items.isEmpty()) {
@@ -87,8 +88,8 @@ internal class TransactionalOutboxImpl(
       logger.error("$LOGGER_PREFIX Failure in monitor", it)
     }
 
-    kotlin.runCatching { locksProvider.release() }.onFailure {
-      logger.error("$LOGGER_PREFIX Failed to release lock of $locksProvider", it)
+    runCatching { monitorLocksProvider.release() }.onFailure {
+      logger.error("$LOGGER_PREFIX Failed to release lock of $monitorLocksProvider", it)
     }
   }
 
@@ -172,7 +173,29 @@ internal class TransactionalOutboxImpl(
   }
 
   override fun cleanup() {
-    logger.info("$LOGGER_PREFIX Cleaning up outbox items")
-    outboxStore.deleteCompletedItems(Instant.now(clock))
+    if (inShutdownMode.get()) {
+      logger.info("$LOGGER_PREFIX Shutdown in process, deferring cleanup")
+      return
+    }
+
+    var wasLockingAcquired = false
+    try {
+      cleanupLocksProvider.acquire()
+      wasLockingAcquired = true
+
+      val now = Instant.now(clock)
+      logger.info("$LOGGER_PREFIX Cleaning up completed outbox items, with deleteAfter <= $now")
+      outboxStore.deleteCompletedItems(now)
+    } catch (exception: Exception) {
+      logger.error("$LOGGER_PREFIX Failure in cleanup", exception)
+    } finally {
+      if (wasLockingAcquired) {
+        try {
+          cleanupLocksProvider.release()
+        } catch (exception: Exception) {
+          logger.error("$LOGGER_PREFIX Failed to release cleanup lock ($cleanupLocksProvider)", exception)
+        }
+      }
+    }
   }
 }

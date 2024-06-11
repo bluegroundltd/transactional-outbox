@@ -29,7 +29,8 @@ class TransactionalOutboxImplSpec extends Specification {
   OutboxType type = handler.getSupportedType()
   Map<OutboxType, OutboxHandler> handlers = Map.of(type, handler)
 
-  OutboxLocksProvider locksProvider = Mock()
+  OutboxLocksProvider monitorLocksProvider = Mock()
+  OutboxLocksProvider cleanupLocksProvider = Mock()
   OutboxStore store = Mock()
   InstantOutboxPublisher instantOutboxPublisher = Mock()
   OutboxItemFactory outboxItemFactory = Mock()
@@ -39,7 +40,8 @@ class TransactionalOutboxImplSpec extends Specification {
     transactionalOutbox = new TransactionalOutboxImpl(
       clock,
       handlers,
-      locksProvider,
+      monitorLocksProvider,
+      cleanupLocksProvider,
       store,
       instantOutboxPublisher,
       outboxItemFactory,
@@ -70,7 +72,7 @@ class TransactionalOutboxImplSpec extends Specification {
       transactionalOutbox.monitor()
 
     then:
-      1 * locksProvider.acquire()
+      1 * monitorLocksProvider.acquire()
       1 * store.fetch(_) >> { OutboxFilter filter ->
         with(filter) {
           outboxPendingFilter.nextRunLessThan == now
@@ -86,7 +88,7 @@ class TransactionalOutboxImplSpec extends Specification {
         }
         return item
       }
-      1 * locksProvider.release()
+      1 * monitorLocksProvider.release()
       0 * _
 
     when:
@@ -106,7 +108,7 @@ class TransactionalOutboxImplSpec extends Specification {
       transactionalOutbox.monitor()
 
     then:
-      1 * locksProvider.acquire()
+      1 * monitorLocksProvider.acquire()
       1 * store.fetch(_) >> { OutboxFilter filter ->
         with(filter) {
           outboxPendingFilter.nextRunLessThan == now
@@ -121,7 +123,7 @@ class TransactionalOutboxImplSpec extends Specification {
         }
         return item
       }
-      1 * locksProvider.release()
+      1 * monitorLocksProvider.release()
       0 * _
 
     when:
@@ -147,7 +149,58 @@ class TransactionalOutboxImplSpec extends Specification {
       transactionalOutbox.cleanup()
 
     then:
+      1 * cleanupLocksProvider.acquire()
       1 * store.deleteCompletedItems(now)
+      1 * cleanupLocksProvider.release()
       0 * _
+  }
+
+  def "Should early return from cleanup if in shutdown mode"() {
+    when:
+      transactionalOutbox.shutdown()
+      transactionalOutbox.cleanup()
+
+    then:
+      0 * _
+  }
+
+  def "Should handle an exception thrown from the cleanup store method"() {
+    when:
+      transactionalOutbox.cleanup()
+
+    then:
+      1 * cleanupLocksProvider.acquire()
+      1 * store.deleteCompletedItems(_) >> {
+        throw new InterruptedException()
+      }
+      1 * cleanupLocksProvider.release()
+      0 * _
+      noExceptionThrown()
+  }
+
+  def "Should handle an exception thrown during the cleanup release locks"() {
+    when:
+      transactionalOutbox.cleanup()
+
+    then:
+      1 * cleanupLocksProvider.acquire()
+      1 * store.deleteCompletedItems(_)
+      1 * cleanupLocksProvider.release() >> {
+        throw new InterruptedException()
+      }
+      0 * _
+      noExceptionThrown()
+  }
+
+  def "Should not release the lock in cleanup, after a failure in acquire"() {
+    when:
+      transactionalOutbox.cleanup()
+
+    then:
+      1 * cleanupLocksProvider.acquire() >> {
+        throw new InterruptedException()
+      }
+      0 * _
+      noExceptionThrown()
   }
 }
