@@ -28,7 +28,8 @@ class OutboxMonitorSpec extends Specification {
   private static final Duration DURATION_ONE_HOUR = Duration.ofHours(1)
   Clock clock = Clock.fixed(Instant.now(), ZoneId.systemDefault())
   Map<OutboxType, OutboxHandler> handlers = Mock()
-  OutboxLocksProvider locksProvider = Mock()
+  OutboxLocksProvider monitorLocksProvider = Mock()
+  OutboxLocksProvider cleanupLocksProvider = Mock()
   OutboxStore store = Mock()
   InstantOutboxPublisher instantOutboxPublisher = Mock()
   OutboxItemFactory outboxItemFactory = Mock()
@@ -44,7 +45,8 @@ class OutboxMonitorSpec extends Specification {
     new TransactionalOutboxImpl(
       clock,
       handlers,
-      locksProvider,
+      monitorLocksProvider,
+      cleanupLocksProvider,
       store,
       instantOutboxPublisher,
       outboxItemFactory,
@@ -135,7 +137,7 @@ class OutboxMonitorSpec extends Specification {
       transactionalOutbox.monitor()
 
     then:
-      1 * locksProvider.acquire()
+      1 * monitorLocksProvider.acquire()
       1 * store.fetch(_) >> { OutboxFilter filter ->
         with(filter) {
           outboxPendingFilter.nextRunLessThan == now
@@ -151,7 +153,7 @@ class OutboxMonitorSpec extends Specification {
         }
         return item
       }
-      1 * locksProvider.release()
+      1 * monitorLocksProvider.release()
       items.size() * handlers.get(_) >> expectedHandler
       decoratorCalls * firstDecorator.decorate(_) >> processorDecoratedByFirstDecorator
       decoratorCalls * secondDecorator.decorate(processorDecoratedByFirstDecorator) >> Mock(Runnable)
@@ -174,7 +176,7 @@ class OutboxMonitorSpec extends Specification {
       transactionalOutbox.monitor()
 
     then:
-      1 * locksProvider.acquire()
+      1 * monitorLocksProvider.acquire()
       1 * store.fetch(_) >> { OutboxFilter filter ->
         with(filter) {
           outboxPendingFilter.nextRunLessThan == now
@@ -189,7 +191,7 @@ class OutboxMonitorSpec extends Specification {
         }
         return item
       }
-      1 * locksProvider.release()
+      1 * monitorLocksProvider.release()
       1 * handlers.get(_) >> expectedHandler
       1 * executor.execute(_) >> { throw new RejectedExecutionException() }
       1 * store.update(_) >> { OutboxItem item ->
@@ -212,9 +214,9 @@ class OutboxMonitorSpec extends Specification {
       transactionalOutbox.monitor()
 
     then:
-      1 * locksProvider.acquire()
+      1 * monitorLocksProvider.acquire()
       1 * store.fetch(_) >> items
-      1 * locksProvider.release()
+      1 * monitorLocksProvider.release()
       0 * _
   }
 
@@ -223,9 +225,9 @@ class OutboxMonitorSpec extends Specification {
       transactionalOutbox.monitor()
 
     then:
-      1 * locksProvider.acquire()
+      1 * monitorLocksProvider.acquire()
       1 * store.fetch(_) >> { throw new RuntimeException() }
-      1 * locksProvider.release()
+      1 * monitorLocksProvider.release()
       0 * _
   }
 
@@ -234,9 +236,9 @@ class OutboxMonitorSpec extends Specification {
       transactionalOutbox.monitor()
 
     then:
-      1 * locksProvider.acquire()
+      1 * monitorLocksProvider.acquire()
       1 * store.fetch(_) >> []
-      1 * locksProvider.release() >> { throw new RuntimeException() }
+      1 * monitorLocksProvider.release() >> { throw new RuntimeException() }
       0 * _
       noExceptionThrown()
   }

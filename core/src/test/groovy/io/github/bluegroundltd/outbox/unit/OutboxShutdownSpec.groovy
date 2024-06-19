@@ -25,7 +25,8 @@ class OutboxShutdownSpec extends Specification {
   private static final Duration DURATION_ONE_HOUR = Duration.ofHours(1)
   Clock clock = Clock.fixed(Instant.now(), ZoneId.systemDefault())
   Map<OutboxType, OutboxHandler> handlers = Mock()
-  OutboxLocksProvider locksProvider = Mock()
+  OutboxLocksProvider monitorLocksProvider = Mock()
+  OutboxLocksProvider cleanupLocksProvider = Mock()
   OutboxStore store = Mock()
   InstantOutboxPublisher instantOutboxPublisher = Mock()
   OutboxItemFactory outboxItemFactory = Mock()
@@ -37,7 +38,8 @@ class OutboxShutdownSpec extends Specification {
     transactionalOutbox = new TransactionalOutboxImpl(
       clock,
       handlers,
-      locksProvider,
+      monitorLocksProvider,
+      cleanupLocksProvider,
       store,
       instantOutboxPublisher,
       outboxItemFactory,

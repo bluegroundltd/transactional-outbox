@@ -18,7 +18,8 @@ import kotlin.properties.Delegates
  *     return TransactionalOutboxBuilder
  *       .make(clock)
  *       .withHandlers(outboxHandlers)
- *       .withLocksProvider(locksProvider)
+ *       .withMonitorLocksProvider(monitorLocksProvider)
+ *       .withCleanupLocksProvider(cleanupLocksProvider)
  *       .withStore(outboxStore)
  *       .withInstantOutboxPublisher(instantOutboxPublisher)
  *       .build()
@@ -28,12 +29,18 @@ import kotlin.properties.Delegates
 class TransactionalOutboxBuilder(
     private val clock: Clock,
     private val rerunAfterDuration: Duration = DEFAULT_RERUN_AFTER_DURATION
-) : OutboxHandlersStep, LocksProviderStep, StoreStep, InstantOutboxPublisherStep, BuildStep {
+) : OutboxHandlersStep,
+  MonitorLocksProviderStep,
+  CleanupLocksProviderStep,
+  StoreStep,
+  InstantOutboxPublisherStep,
+  BuildStep {
   private val handlers: MutableMap<OutboxType, OutboxHandler> = mutableMapOf()
   private var threadPoolSize by Delegates.notNull<Int>()
   private var threadPoolTimeOut: Duration = DEFAULT_THREAD_POOL_TIMEOUT
   private var decorators: MutableList<OutboxItemProcessorDecorator> = mutableListOf()
-  private lateinit var locksProvider: OutboxLocksProvider
+  private lateinit var monitorLocksProvider: OutboxLocksProvider
+  private lateinit var cleanupLocksProvider: OutboxLocksProvider
   private lateinit var store: OutboxStore
   private lateinit var instantOutboxPublisher: InstantOutboxPublisher
 
@@ -53,7 +60,7 @@ class TransactionalOutboxBuilder(
   /**
    * Sets the handlers for the outbox.
    */
-  override fun withHandlers(handlers: Set<OutboxHandler>): LocksProviderStep {
+  override fun withHandlers(handlers: Set<OutboxHandler>): MonitorLocksProviderStep {
     validateNoDuplicateHandlerSupportedTypes(handlers)
     handlers.associateByTo(this.handlers) { it.getSupportedType() }
     return this
@@ -87,10 +94,18 @@ class TransactionalOutboxBuilder(
   }
 
   /**
-   * Sets the locks provider for the outbox.
+   * Sets the locks provider for the outbox monitor runs.
    */
-  override fun withLocksProvider(locksProvider: OutboxLocksProvider): StoreStep {
-    this.locksProvider = locksProvider
+  override fun withMonitorLocksProvider(locksProvider: OutboxLocksProvider): CleanupLocksProviderStep {
+    this.monitorLocksProvider = locksProvider
+    return this
+  }
+
+  /**
+   * Sets the locks provider for the outbox cleanup runs.
+   */
+  override fun withCleanupLocksProvider(locksProvider: OutboxLocksProvider): StoreStep {
+    this.cleanupLocksProvider = locksProvider
     return this
   }
 
@@ -148,7 +163,8 @@ class TransactionalOutboxBuilder(
     return TransactionalOutboxImpl(
         clock,
         handlers.toMap(),
-        locksProvider,
+        monitorLocksProvider,
+        cleanupLocksProvider,
         store,
         instantOutboxPublisher,
         outboxItemFactory,
@@ -161,11 +177,15 @@ class TransactionalOutboxBuilder(
 }
 
 interface OutboxHandlersStep {
-  fun withHandlers(handlers: Set<OutboxHandler>): LocksProviderStep
+  fun withHandlers(handlers: Set<OutboxHandler>): MonitorLocksProviderStep
 }
 
-interface LocksProviderStep {
-  fun withLocksProvider(locksProvider: OutboxLocksProvider): StoreStep
+interface MonitorLocksProviderStep {
+  fun withMonitorLocksProvider(locksProvider: OutboxLocksProvider): CleanupLocksProviderStep
+}
+
+interface CleanupLocksProviderStep {
+  fun withCleanupLocksProvider(locksProvider: OutboxLocksProvider): StoreStep
 }
 
 interface StoreStep {

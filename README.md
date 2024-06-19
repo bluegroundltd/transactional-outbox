@@ -7,7 +7,7 @@ Transactional Outbox is a library that provides a simple way to implement
 the [Transactional Outbox Pattern](https://microservices.io/patterns/data/transactional-outbox.html) in your
 application, developed by Blueground.
 
-Api Docs: https://bluegroundltd.github.io/transactional-outbox/
+API Docs: https://bluegroundltd.github.io/transactional-outbox/
 
 ## Table of Contents
 
@@ -27,7 +27,7 @@ Transactional Outbox is published on `mavenCentral`. In order to use it just add
 
 ```gradle
 
-implementation("io.github.bluegroundltd:transactional-outbox-core:1.0.0")
+implementation("io.github.bluegroundltd:transactional-outbox-core:2.0.0")
 
 ```
 
@@ -49,18 +49,20 @@ class OutboxConfiguration(
 
   @Bean
   fun transactionalOutbox(): TransactionalOutbox {
-    val locksProvider = OutboxLocksProvider(postgresLockDao, APPLICATION_SPECIFIC_ID)
+    val monitorLocksProvider = OutboxLocksProvider(postgresLockDao, MONITOR_APPLICATION_SPECIFIC_ID)
+    val cleanupLocksProvider = OutboxLocksProvider(postgresLockDao, CLEANUP_APPLICATION_SPECIFIC_ID)
 
     return TransactionalOutboxBuilder
       .make(clock)
       .withHandlers(outboxHandlers)
-      .withLocksProvider(locksProvider)
+      .withMonitorLocksProvider(monitorLocksProvider)
+      .withCleanupLocksProvider(cleanupLocksProvider)
       .withStore(outboxStore)
       .build()
   }
 }
 
-private class OutboxLocksProvider(
+private class OutboxLocksProviderImpl(
   private val postgresLockDao: PostgresLockDao,
   private val id: Long
 ) : OutboxLocksProvider {
@@ -76,7 +78,10 @@ private class OutboxLocksProvider(
 
 ### Creating a new Outbox Handler
 
-Then you can create a new `OutboxHandler` that will be responsible for processing the `Outbox` entries:
+Then you can create a new `OutboxHandler` that will be responsible for processing the `Outbox` entries.  
+Below you can see a barebones handler, but there's also a utility handler, which uses JSON (de)serialization and
+reduces the outbox handlers boilerplate code. Refer to [SimpleOutboxHandler](https://bluegroundltd.github.io/transactional-outbox/core/io.github.bluegroundltd.outbox/-simple-outbox-handler/index.html) in our [docs page](
+https://bluegroundltd.github.io/transactional-outbox/index.html).
 
 ```kotlin
 enum class MyOutboxType: OutboxType {
