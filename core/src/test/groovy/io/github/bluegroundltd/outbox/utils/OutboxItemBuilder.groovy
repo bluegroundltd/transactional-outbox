@@ -53,6 +53,15 @@ class OutboxItemBuilder implements SpecHelper {
     this
   }
 
+  OutboxItemBuilder withRerunAfter(Instant rerunAfter) {
+    this.rerunAfter = rerunAfter
+    this
+  }
+
+  OutboxItemBuilder withoutRerunAfter() {
+    withRerunAfter(null)
+  }
+
   static OutboxItem makePending() {
     make().build()
   }

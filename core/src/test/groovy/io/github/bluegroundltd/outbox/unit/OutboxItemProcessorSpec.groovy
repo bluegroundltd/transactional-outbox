@@ -15,16 +15,21 @@ import java.time.Instant
 import java.time.ZoneId
 
 class OutboxItemProcessorSpec extends Specification {
-  Clock clock = Clock.fixed(Instant.now(), ZoneId.systemDefault())
-  def item = OutboxItemBuilder.makeRunning()
-  def unsupportedOutboxType = GroovyMock(OutboxType)
-  OutboxHandler handler = GroovyMock()
-  OutboxStore store = GroovyMock()
-  OutboxItemProcessor processor
+  private Clock clock = Clock.fixed(Instant.now(), ZoneId.systemDefault())
+
+  private itemBuilder = OutboxItemBuilder.make()
+  private runningItem = itemBuilder.withStatus(OutboxStatus.RUNNING).build()
+  private resetItem = itemBuilder.withStatus(OutboxStatus.PENDING).withoutRerunAfter().build()
+
+  private unsupportedOutboxType = GroovyMock(OutboxType)
+  private OutboxHandler handler = GroovyMock()
+  private OutboxStore store = GroovyMock()
+
+  private OutboxItemProcessor processor
 
   def setup() {
     processor = new OutboxItemProcessor(
-      item,
+      runningItem,
       handler,
       store,
       clock
@@ -48,8 +53,8 @@ class OutboxItemProcessorSpec extends Specification {
       processor.run()
 
     then:
-      1 * handler.getSupportedType() >> item.type
-      1 * handler.handle(item.payload)
+      1 * handler.getSupportedType() >> runningItem.type
+      1 * handler.handle(runningItem.payload)
       1 * handler.getRetentionDuration() >> retentionDuration
       1 * store.update(_) >> { OutboxItem item ->
         assert item.status == OutboxStatus.COMPLETED
@@ -63,10 +68,10 @@ class OutboxItemProcessorSpec extends Specification {
       processor.run()
 
     then:
-      1 * handler.getSupportedType() >> item.type
-      1 * handler.handle(item.payload) >> { throw new Exception() }
+      1 * handler.getSupportedType() >> runningItem.type
+      1 * handler.handle(runningItem.payload) >> { throw new Exception() }
       1 * handler.hasReachedMaxRetries(_) >> true
-      1 * handler.handleFailure(item.payload)
+      1 * handler.handleFailure(runningItem.payload)
       1 * store.update(_) >> { OutboxItem item ->
         assert item.status == OutboxStatus.FAILED
       }
@@ -81,8 +86,8 @@ class OutboxItemProcessorSpec extends Specification {
       processor.run()
 
     then:
-      1 * handler.getSupportedType() >> item.type
-      1 * handler.handle(item.payload) >> { throw new Exception() }
+      1 * handler.getSupportedType() >> runningItem.type
+      1 * handler.handle(runningItem.payload) >> { throw new Exception() }
       1 * handler.hasReachedMaxRetries(_) >> false
       1 * handler.getNextExecutionTime(_) >> expectedNextRun
       1 * store.update(_) >> { OutboxItem item ->
@@ -93,5 +98,39 @@ class OutboxItemProcessorSpec extends Specification {
         }
       }
       0 * _
+  }
+
+  def "Should stop processing and set item status to 'PENDING' when [reset] is invoked"() {
+    when:
+      processor.reset()
+
+    then:
+      1 * store.update(resetItem)
+      0 * _
+
+    when:
+      processor.run()
+
+    then:
+      0 * _
+  }
+
+  def "Should stop processing and do nothing else when [reset] is invoked and item status is #itemStatus"() {
+    given:
+      def itemProcessor = new OutboxItemProcessor(
+        itemBuilder.withStatus(itemStatus).build(),
+        handler,
+        store,
+        clock
+      )
+
+    when:
+      itemProcessor.reset()
+
+    then:
+      0 * _
+
+    where:
+      itemStatus << (OutboxStatus.values() - OutboxStatus.RUNNING).toList()
   }
 }
