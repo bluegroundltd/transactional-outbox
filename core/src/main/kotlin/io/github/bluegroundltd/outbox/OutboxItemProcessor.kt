@@ -53,7 +53,12 @@ internal class OutboxItemProcessor(
    * the outbox item. Therefore, it is the responsibility of the caller to ensure that it is called in
    * a thread-safe manner.
    *
-   * Still, it should be noted that the result of a potential concurrency issue, i.e. updating the item
+   * Both callers of this method do indeed call it in a thread-safe manner. It's called in cases where
+   * the processor has not started and will NOT be started. Specifically, if the execution was rejected
+   * (inside [TransactionalOutboxImpl#processItem]) or a shutdown was requested by the executor service
+   * and the processor did not have time to start (inside [TransactionalOutboxImpl#shutdown]).
+   *
+   * Also, it should be noted that the result of a potential concurrency issue, i.e. updating the item
    * twice and overwriting its values is not critical. The worst case scenario is that an item that has
    * been completed (or failed) may revert to pending state and be retried. While this is not ideal,
    * this has always been the case and due to the nature of the problem, cannot be completely avoided.
@@ -72,10 +77,6 @@ internal class OutboxItemProcessor(
       item.rerunAfter = null
       store.update(item)
     }
-  }
-
-  fun getItem(): OutboxItem {
-    return item
   }
 
   private fun handleTerminalFailure(exception: Exception) {

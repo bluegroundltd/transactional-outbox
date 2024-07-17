@@ -58,6 +58,10 @@ class OutboxItemBuilder implements SpecHelper {
     this
   }
 
+  OutboxItemBuilder withRerunAfter() {
+    withRerunAfter(generateInstant())
+  }
+
   OutboxItemBuilder withoutRerunAfter() {
     withRerunAfter(null)
   }

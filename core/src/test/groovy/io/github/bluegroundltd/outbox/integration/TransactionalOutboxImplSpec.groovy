@@ -20,21 +20,23 @@ import java.time.ZoneId
 class TransactionalOutboxImplSpec extends Specification {
   private static final Duration DURATION_ONE_HOUR = Duration.ofHours(1)
   private static final Duration DURATION_ONE_NANO = Duration.ofNanos(1)
-  Clock clock = Clock.fixed(Instant.now(), ZoneId.systemDefault())
-  OutboxHandler handler = new DummyHandler()
-  OutboxType type = handler.getSupportedType()
-  Map<OutboxType, OutboxHandler> handlers = Map.of(type, handler)
+  private static final Clock CLOCK = Clock.fixed(Instant.now(), ZoneId.systemDefault())
 
-  OutboxLocksProvider monitorLocksProvider = Mock()
-  OutboxLocksProvider cleanupLocksProvider = Mock()
-  OutboxStore store = Mock()
-  InstantOutboxPublisher instantOutboxPublisher = Mock()
-  OutboxItemFactory outboxItemFactory = Mock()
-  TransactionalOutbox transactionalOutbox
+  private OutboxHandler handler = new DummyHandler()
+  private OutboxType type = handler.getSupportedType()
+  private Map<OutboxType, OutboxHandler> handlers = Map.of(type, handler)
+
+  private OutboxLocksProvider monitorLocksProvider = Mock()
+  private OutboxLocksProvider cleanupLocksProvider = Mock()
+  private OutboxStore store = Mock()
+  private InstantOutboxPublisher instantOutboxPublisher = Mock()
+  private OutboxItemFactory outboxItemFactory = Mock()
+
+  private TransactionalOutbox transactionalOutbox
 
   def setup() {
     transactionalOutbox = new TransactionalOutboxImpl(
-      clock,
+      CLOCK,
       handlers,
       monitorLocksProvider,
       cleanupLocksProvider,
@@ -50,7 +52,7 @@ class TransactionalOutboxImplSpec extends Specification {
 
   def "Should delegate to outbox store when `cleanup` is invoked"() {
     given:
-      def now = Instant.now(clock)
+      def now = Instant.now(CLOCK)
 
     when:
       transactionalOutbox.cleanup()
