@@ -100,22 +100,16 @@ class OutboxItemProcessorSpec extends Specification {
       0 * _
   }
 
-  def "Should stop processing and set item status to 'PENDING' when [reset] is invoked"() {
+  def "Should set item status to 'PENDING' when [reset] is invoked"() {
     when:
       processor.reset()
 
     then:
       1 * store.update(resetItem)
       0 * _
-
-    when:
-      processor.run()
-
-    then:
-      0 * _
   }
 
-  def "Should stop processing and do nothing else when [reset] is invoked and item status is #itemStatus"() {
+  def "Should do nothing when [reset] is invoked and item status is #itemStatus"() {
     given:
       def itemProcessor = new OutboxItemProcessor(
         itemBuilder.withStatus(itemStatus).build(),

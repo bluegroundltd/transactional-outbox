@@ -21,14 +21,7 @@ internal class OutboxItemProcessor(
     private val logger: Logger = LoggerFactory.getLogger(OutboxItemProcessor::class.java)
   }
 
-  private var isStopped = false
-
   override fun run() {
-    if (isStopped) {
-      logger.info("$LOGGER_PREFIX Skipping execution of outbox item with id: ${item.id} because processor is stopped.")
-      return
-    }
-
     if (!handler.supports(item.type)) {
       logger.error("$LOGGER_PREFIX Handler ${handler::class.java} does not support item of type: ${item.type}")
       return
@@ -73,8 +66,6 @@ internal class OutboxItemProcessor(
    * against the rarity of the occurrence and the limited nature of its effect.
    */
   fun reset() {
-    logger.debug("$LOGGER_PREFIX Stopping outbox item processor")
-    isStopped = true
     if (item.status == OutboxStatus.RUNNING) {
       logger.info("$LOGGER_PREFIX Resetting outbox item with id: ${item.id} to PENDING")
       item.status = OutboxStatus.PENDING
