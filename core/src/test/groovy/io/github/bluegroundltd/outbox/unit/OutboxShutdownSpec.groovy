@@ -1,8 +1,8 @@
 package io.github.bluegroundltd.outbox.unit
 
 import io.github.bluegroundltd.outbox.OutboxHandler
-import io.github.bluegroundltd.outbox.OutboxItemProcessor
 import io.github.bluegroundltd.outbox.OutboxLocksProvider
+import io.github.bluegroundltd.outbox.OutboxProcessingHost
 import io.github.bluegroundltd.outbox.TransactionalOutbox
 import io.github.bluegroundltd.outbox.TransactionalOutboxImpl
 import io.github.bluegroundltd.outbox.event.InstantOutboxPublisher
@@ -51,8 +51,8 @@ class OutboxShutdownSpec extends Specification {
 
   def "Should delegate to the outbox store when shutdown is called and the timeout elapsed before termination"() {
     given:
-      def processor = Mock(OutboxItemProcessor)
-      def expected = [processor]
+      def processingHost = Mock(OutboxProcessingHost)
+      def expected = [processingHost]
 
     when:
       transactionalOutbox.shutdown()
@@ -61,7 +61,7 @@ class OutboxShutdownSpec extends Specification {
       1 * executor.shutdown()
       1 * executor.awaitTermination(threadPoolTimeOut.toSeconds(), TimeUnit.SECONDS) >> false
       1 * executor.shutdownNow() >> expected
-      1 * processor.stop()
+      1 * processingHost.reset()
       0 * _
 
     and:
