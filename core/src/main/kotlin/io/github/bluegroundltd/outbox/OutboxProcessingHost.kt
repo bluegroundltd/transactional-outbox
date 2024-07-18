@@ -17,16 +17,25 @@ import io.github.bluegroundltd.outbox.annotation.TestableOpenClass
  * https://github.com/bluegroundltd/transactional-outbox/discussions/24), it will no longer be the case
  * and this component will be updated accordingly.
  */
+@Suppress("TooGenericExceptionCaught")
 @TestableOpenClass
 internal class OutboxProcessingHost(
   private val processor: OutboxItemProcessor,
   decorators: List<OutboxItemProcessorDecorator>
 ) : Runnable {
-  private val runnable: Runnable = decorators
-    .fold(processor as Runnable) { decorated, decorator -> decorator.decorate(decorated) }
+
+  private val processorRunnable = Runnable {
+    try {
+      processor.run()
+    } catch (e: Exception) {
+      processor.reset()
+    }
+  }
+  private val finalRunnable: Runnable = decorators
+    .fold(processorRunnable) { decorated, decorator -> decorator.decorate(decorated) }
 
   override fun run() {
-    runnable.run()
+    finalRunnable.run()
   }
 
   fun reset() {

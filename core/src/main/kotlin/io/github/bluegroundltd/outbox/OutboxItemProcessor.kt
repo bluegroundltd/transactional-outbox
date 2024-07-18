@@ -17,13 +17,13 @@ internal class OutboxItemProcessor(
   private val handler: OutboxHandler,
   private val store: OutboxStore,
   private val clock: Clock,
-) : Runnable {
+) {
   companion object {
     private const val LOGGER_PREFIX = "[OUTBOX-ITEM-PROCESSOR]"
     private val logger: Logger = LoggerFactory.getLogger(OutboxItemProcessor::class.java)
   }
 
-  override fun run() {
+  fun run() {
     if (!handler.supports(item.type)) {
       logger.error("$LOGGER_PREFIX Handler ${handler::class.java} does not support item of type: ${item.type}")
       return

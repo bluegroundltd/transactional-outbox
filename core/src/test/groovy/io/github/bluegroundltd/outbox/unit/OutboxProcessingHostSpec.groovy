@@ -24,7 +24,10 @@ class OutboxProcessingHostSpec extends Specification {
       def processingHostWithDecorator = new OutboxProcessingHost(processor, decorators)
 
     then:
-      1 * decorators[0].decorate(processor) >> runnables[0]
+      1 * decorators[0].decorate(_) >> {
+        assert it != null
+        return runnables[0]
+      }
       1 * decorators[1].decorate(runnables[0]) >> runnables[1]
       0 * _
 
@@ -39,6 +42,19 @@ class OutboxProcessingHostSpec extends Specification {
 
     then:
       1 * processor.run()
+      0 * _
+
+    and:
+      noExceptionThrown()
+  }
+
+  def "Should catch all exceptions and reset the processor when an exception occurs while processing"() {
+    when:
+      processingHost.run()
+
+    then:
+      1 * processor.run() >> { throw new Exception("Processing Exception") }
+      1 * processor.reset()
       0 * _
 
     and:
