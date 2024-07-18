@@ -6,11 +6,9 @@ import io.github.bluegroundltd.outbox.OutboxLocksProvider
 import io.github.bluegroundltd.outbox.TransactionalOutbox
 import io.github.bluegroundltd.outbox.TransactionalOutboxImpl
 import io.github.bluegroundltd.outbox.event.InstantOutboxPublisher
-import io.github.bluegroundltd.outbox.item.OutboxStatus
 import io.github.bluegroundltd.outbox.item.OutboxType
 import io.github.bluegroundltd.outbox.item.factory.OutboxItemFactory
 import io.github.bluegroundltd.outbox.store.OutboxStore
-import io.github.bluegroundltd.outbox.utils.OutboxItemBuilder
 import spock.lang.Specification
 
 import java.time.Clock
@@ -53,12 +51,7 @@ class OutboxShutdownSpec extends Specification {
 
   def "Should delegate to the outbox store when shutdown is called and the timeout elapsed before termination"() {
     given:
-      // Can't mock OutboxItemProcessor (because it's final) so we need an actual implementation.
-      def itemBuilder = OutboxItemBuilder.make()
-      def runningItem = itemBuilder.withStatus(OutboxStatus.RUNNING).withRerunAfter().build()
-      def resetItem = itemBuilder.withStatus(OutboxStatus.PENDING).withoutRerunAfter().build()
-      def handler = GroovyMock(OutboxHandler)
-      def processor = new OutboxItemProcessor(runningItem, handler, store, CLOCK)
+      def processor = Mock(OutboxItemProcessor)
       def expected = [processor]
 
     when:
@@ -68,8 +61,10 @@ class OutboxShutdownSpec extends Specification {
       1 * executor.shutdown()
       1 * executor.awaitTermination(threadPoolTimeOut.toSeconds(), TimeUnit.SECONDS) >> false
       1 * executor.shutdownNow() >> expected
-      1 * store.update(resetItem)
+      1 * processor.stop()
       0 * _
+
+    and:
       noExceptionThrown()
   }
 

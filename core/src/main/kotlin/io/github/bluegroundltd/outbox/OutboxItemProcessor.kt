@@ -1,5 +1,6 @@
 package io.github.bluegroundltd.outbox
 
+import io.github.bluegroundltd.outbox.annotation.TestableOpenClass
 import io.github.bluegroundltd.outbox.item.OutboxItem
 import io.github.bluegroundltd.outbox.item.OutboxStatus
 import io.github.bluegroundltd.outbox.item.OutboxType
@@ -10,6 +11,7 @@ import java.time.Clock
 import java.time.Instant
 
 @Suppress("TooGenericExceptionCaught")
+@TestableOpenClass
 internal class OutboxItemProcessor(
   private val item: OutboxItem,
   private val handler: OutboxHandler,
