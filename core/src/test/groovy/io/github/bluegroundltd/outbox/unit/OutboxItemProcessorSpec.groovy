@@ -17,11 +17,10 @@ import java.time.ZoneId
 class OutboxItemProcessorSpec extends Specification {
   private Clock clock = Clock.fixed(Instant.now(), ZoneId.systemDefault())
 
-  private itemBuilder = OutboxItemBuilder.make()
-  private runningItem = itemBuilder.withStatus(OutboxStatus.RUNNING).build()
-  private resetItem = itemBuilder.withStatus(OutboxStatus.PENDING).withoutRerunAfter().build()
+  private itemBuilder = OutboxItemBuilder.make().withStatus(OutboxStatus.RUNNING).withRerunAfter()
+  private processedItem = itemBuilder.build()
+  private originalItem = itemBuilder.build() // Create an identical second to use it for comparisons.
 
-  private unsupportedOutboxType = GroovyMock(OutboxType)
   private OutboxHandler handler = GroovyMock()
   private OutboxStore store = GroovyMock()
 
@@ -29,7 +28,7 @@ class OutboxItemProcessorSpec extends Specification {
 
   def setup() {
     processor = new OutboxItemProcessor(
-      runningItem,
+      processedItem,
       handler,
       store,
       clock
@@ -41,11 +40,11 @@ class OutboxItemProcessorSpec extends Specification {
       processor.run()
 
     then:
-      1 * handler.getSupportedType() >> unsupportedOutboxType
+      1 * handler.getSupportedType() >> Mock(OutboxType)
       0 * _
   }
 
-  def "Should handle an item and update its status to completion when run is called"() {
+  def "Should handle an item and update its status to 'COMPLETED' when [run] is called"() {
     given:
       def retentionDuration = Duration.ofDays(10)
 
@@ -53,32 +52,38 @@ class OutboxItemProcessorSpec extends Specification {
       processor.run()
 
     then:
-      1 * handler.getSupportedType() >> runningItem.type
-      1 * handler.handle(runningItem.payload)
+      1 * handler.getSupportedType() >> processedItem.type
+      1 * handler.handle(processedItem.payload)
       1 * handler.getRetentionDuration() >> retentionDuration
       1 * store.update(_) >> { OutboxItem item ->
-        assert item.status == OutboxStatus.COMPLETED
-        assert item.deleteAfter == Instant.now(clock) + retentionDuration
+        assert item == originalItem.with {
+          status = OutboxStatus.COMPLETED
+          deleteAfter = Instant.now(clock) + retentionDuration
+          it
+        }
       }
       0 * _
   }
 
-  def "Should gracefully handle a failure during handling with max retries"() {
+  def "Should gracefully handle a processing failure when it has reached the max number of retries"() {
     when:
       processor.run()
 
     then:
-      1 * handler.getSupportedType() >> runningItem.type
-      1 * handler.handle(runningItem.payload) >> { throw new Exception() }
-      1 * handler.hasReachedMaxRetries(_) >> true
-      1 * handler.handleFailure(runningItem.payload)
+      1 * handler.getSupportedType() >> processedItem.type
+      1 * handler.handle(processedItem.payload) >> { throw new Exception() }
+      1 * handler.hasReachedMaxRetries(processedItem.retries) >> true
+      1 * handler.handleFailure(processedItem.payload)
       1 * store.update(_) >> { OutboxItem item ->
-        assert item.status == OutboxStatus.FAILED
+        assert item == originalItem.with {
+          status = OutboxStatus.FAILED
+          it
+        }
       }
       0 * _
   }
 
-  def "Should gracefully handle a failure during handling with no max retries"() {
+  def "Should gracefully handle a processing failure when it hasn't reached the max number of retries"() {
     given:
       def expectedNextRun = Instant.now(clock)
 
@@ -86,15 +91,16 @@ class OutboxItemProcessorSpec extends Specification {
       processor.run()
 
     then:
-      1 * handler.getSupportedType() >> runningItem.type
-      1 * handler.handle(runningItem.payload) >> { throw new Exception() }
-      1 * handler.hasReachedMaxRetries(_) >> false
-      1 * handler.getNextExecutionTime(_) >> expectedNextRun
+      1 * handler.getSupportedType() >> processedItem.type
+      1 * handler.handle(processedItem.payload) >> { throw new Exception() }
+      1 * handler.hasReachedMaxRetries(processedItem.retries) >> false
+      1 * handler.getNextExecutionTime(processedItem.retries) >> expectedNextRun
       1 * store.update(_) >> { OutboxItem item ->
-        with(item) {
-          status == OutboxStatus.PENDING
-          retries == 1
-          nextRun == expectedNextRun
+        assert item == originalItem.with {
+          status = OutboxStatus.PENDING
+          retries = originalItem.retries + 1
+          nextRun = expectedNextRun
+          it
         }
       }
       0 * _
@@ -105,7 +111,13 @@ class OutboxItemProcessorSpec extends Specification {
       processor.reset()
 
     then:
-      1 * store.update(resetItem)
+      1 * store.update(_) >> { OutboxItem item ->
+        assert item == originalItem.with {
+          status = OutboxStatus.PENDING
+          rerunAfter = null
+          it
+        }
+      }
       0 * _
   }
 
