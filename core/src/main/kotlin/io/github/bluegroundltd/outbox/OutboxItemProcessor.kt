@@ -26,7 +26,7 @@ internal class OutboxItemProcessor(
   fun run() {
     if (!handler.supports(item.type)) {
       logger.error("$LOGGER_PREFIX Handler ${handler::class.java} does not support item of type: ${item.type}")
-      return
+      throw InvalidOutboxHandlerException(item)
     }
 
     try {
@@ -42,6 +42,7 @@ internal class OutboxItemProcessor(
       } else {
         handleRetryableFailure(exception)
       }
+      throw exception
     } finally {
       store.update(item)
     }
