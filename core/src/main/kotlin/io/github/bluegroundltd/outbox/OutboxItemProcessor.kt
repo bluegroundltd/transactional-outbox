@@ -14,7 +14,7 @@ import java.time.Instant
 @TestableOpenClass
 internal class OutboxItemProcessor(
   private val item: OutboxItem,
-  private val handler: OutboxHandler,
+  private val handlerResolver: (item: OutboxItem) -> OutboxHandler?,
   private val store: OutboxStore,
   private val clock: Clock,
 ) : OutboxProcessingAction {
@@ -24,10 +24,7 @@ internal class OutboxItemProcessor(
   }
 
   override fun run() {
-    if (!handler.supports(item.type)) {
-      logger.error("$LOGGER_PREFIX Handler ${handler::class.java} does not support item of type: ${item.type}")
-      throw InvalidOutboxHandlerException(item)
-    }
+    val handler = resolveHandler(item)
 
     try {
       logger.info("$LOGGER_PREFIX Handling item with id: ${item.id} and type: ${item.type}")
@@ -38,9 +35,9 @@ internal class OutboxItemProcessor(
       }
     } catch (exception: Exception) {
       if (handler.hasReachedMaxRetries(item.retries)) {
-        handleTerminalFailure(exception)
+        handleTerminalFailure(handler, exception)
       } else {
-        handleRetryableFailure(exception)
+        handleRetryableFailure(handler, exception)
       }
       throw exception
     } finally {
@@ -82,7 +79,22 @@ internal class OutboxItemProcessor(
     }
   }
 
-  private fun handleTerminalFailure(exception: Exception) {
+  private fun resolveHandler(item: OutboxItem): OutboxHandler {
+    val handler = handlerResolver(item)
+    if (handler == null) {
+      val message = "Handler could not be resolved for item with id: ${item.id} and type: ${item.type}"
+      logger.error("$LOGGER_PREFIX $message")
+      throw InvalidOutboxHandlerException(item, message)
+    }
+    if (!handler.supports(item.type)) {
+      val message = "Handler ${handler::class.java} does not support item of type: ${item.type}"
+      logger.error("$LOGGER_PREFIX $message")
+      throw InvalidOutboxHandlerException(item, message)
+    }
+    return handler
+  }
+
+  private fun handleTerminalFailure(handler: OutboxHandler, exception: Exception) {
     logger.info(
       "$LOGGER_PREFIX Failure handling outbox item with id: ${item.id} and type: ${item.type}. " +
         "Item reached max-retries (${item.retries}), delegating failure to handler.",
@@ -92,7 +104,7 @@ internal class OutboxItemProcessor(
     handler.handleFailure(item.payload)
   }
 
-  private fun handleRetryableFailure(exception: Exception) {
+  private fun handleRetryableFailure(handler: OutboxHandler, exception: Exception) {
     item.nextRun = handler.getNextExecutionTime(item.retries)
     item.retries += 1
     item.status = OutboxStatus.PENDING

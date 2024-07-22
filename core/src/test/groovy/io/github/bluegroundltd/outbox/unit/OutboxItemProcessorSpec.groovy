@@ -22,7 +22,8 @@ class OutboxItemProcessorSpec extends Specification {
   private processedItem = itemBuilder.build()
   private originalItem = itemBuilder.build() // Create an identical second to use it for comparisons.
 
-  private OutboxHandler handler = GroovyMock()
+  private OutboxHandler handler = Mock()
+  private def handlerResolver = { OutboxItem item -> handler }
   private OutboxStore store = GroovyMock()
 
   private OutboxItemProcessor processor
@@ -30,15 +31,44 @@ class OutboxItemProcessorSpec extends Specification {
   def setup() {
     processor = new OutboxItemProcessor(
       processedItem,
-      handler,
+      handlerResolver,
       store,
       clock
     )
   }
 
+  def "Should throw [InvalidOutboxHandlerException] when a handler cannot be resolved"() {
+    given:
+      def itemProcessor = new OutboxItemProcessor(
+        processedItem,
+        { null },
+        store,
+        clock
+      )
+
+    and:
+      def expectedException = new InvalidOutboxHandlerException(
+        processedItem,
+        "Handler could not be resolved for item with id: ${processedItem.id} and type: ${processedItem.type}"
+      )
+
+    when:
+      itemProcessor.run()
+
+    then:
+      0 * _
+
+    and:
+      def ex = thrown(InvalidOutboxHandlerException)
+      ex == expectedException
+  }
+
   def "Should throw [InvalidOutboxHandlerException] when an erroneous item type is provided"() {
     given:
-      def expectedException = new InvalidOutboxHandlerException(processedItem)
+      def expectedException = new InvalidOutboxHandlerException(
+        processedItem,
+        "Handler ${handler.class} does not support item of type: ${processedItem.type}"
+      )
 
     when:
       processor.run()
@@ -145,7 +175,7 @@ class OutboxItemProcessorSpec extends Specification {
     given:
       def itemProcessor = new OutboxItemProcessor(
         itemBuilder.withStatus(itemStatus).build(),
-        handler,
+        handlerResolver,
         store,
         clock
       )
