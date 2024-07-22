@@ -17,13 +17,13 @@ internal class OutboxItemProcessor(
   private val handler: OutboxHandler,
   private val store: OutboxStore,
   private val clock: Clock,
-) {
+) : OutboxProcessingAction {
   companion object {
     private const val LOGGER_PREFIX = "[OUTBOX-ITEM-PROCESSOR]"
     private val logger: Logger = LoggerFactory.getLogger(OutboxItemProcessor::class.java)
   }
 
-  fun run() {
+  override fun run() {
     if (!handler.supports(item.type)) {
       logger.error("$LOGGER_PREFIX Handler ${handler::class.java} does not support item of type: ${item.type}")
       throw InvalidOutboxHandlerException(item)
@@ -73,7 +73,7 @@ internal class OutboxItemProcessor(
    * that are unrelated to concurrency, but we should consider the cost of introducing such a mechanism
    * against the rarity of the occurrence and the limited nature of its effect.
    */
-  fun reset() {
+  override fun reset() {
     if (item.status == OutboxStatus.RUNNING) {
       logger.info("$LOGGER_PREFIX Resetting outbox item with id: ${item.id} to PENDING")
       item.status = OutboxStatus.PENDING
