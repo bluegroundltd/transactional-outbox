@@ -3,6 +3,7 @@ package io.github.bluegroundltd.outbox.unit
 import io.github.bluegroundltd.outbox.OutboxHandler
 import io.github.bluegroundltd.outbox.OutboxLocksProvider
 import io.github.bluegroundltd.outbox.OutboxProcessingHost
+import io.github.bluegroundltd.outbox.OutboxProcessingHostBuilder
 import io.github.bluegroundltd.outbox.TransactionalOutbox
 import io.github.bluegroundltd.outbox.TransactionalOutboxImpl
 import io.github.bluegroundltd.outbox.event.InstantOutboxPublisher
@@ -30,6 +31,7 @@ class OutboxShutdownSpec extends Specification {
   private OutboxItemFactory outboxItemFactory = Mock()
   private ExecutorService executor = Mock()
   private Duration threadPoolTimeOut = Duration.ofMillis(5000)
+  private OutboxProcessingHostBuilder processingHostBuilder = Mock()
 
   private TransactionalOutbox transactionalOutbox
 
@@ -45,7 +47,8 @@ class OutboxShutdownSpec extends Specification {
       DURATION_ONE_HOUR,
       executor,
       [],
-      threadPoolTimeOut
+      threadPoolTimeOut,
+      processingHostBuilder
     )
   }
 

@@ -1,20 +1,19 @@
 package io.github.bluegroundltd.outbox.unit
 
-import io.github.bluegroundltd.outbox.OutboxHandler
+import io.github.bluegroundltd.outbox.OutboxItemProcessor
 import io.github.bluegroundltd.outbox.OutboxItemProcessorDecorator
 import io.github.bluegroundltd.outbox.OutboxLocksProvider
+import io.github.bluegroundltd.outbox.OutboxProcessingAction
 import io.github.bluegroundltd.outbox.OutboxProcessingHost
+import io.github.bluegroundltd.outbox.OutboxProcessingHostBuilder
 import io.github.bluegroundltd.outbox.TransactionalOutbox
 import io.github.bluegroundltd.outbox.TransactionalOutboxImpl
 import io.github.bluegroundltd.outbox.event.InstantOutboxPublisher
 import io.github.bluegroundltd.outbox.item.OutboxItem
 import io.github.bluegroundltd.outbox.item.OutboxStatus
-import io.github.bluegroundltd.outbox.item.OutboxType
 import io.github.bluegroundltd.outbox.item.factory.OutboxItemFactory
 import io.github.bluegroundltd.outbox.store.OutboxFilter
 import io.github.bluegroundltd.outbox.store.OutboxStore
-import io.github.bluegroundltd.outbox.utils.DummyOutboxHandler
-import io.github.bluegroundltd.outbox.utils.DummyOutboxType
 import io.github.bluegroundltd.outbox.utils.OutboxItemBuilder
 import spock.lang.Specification
 
@@ -26,53 +25,52 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.RejectedExecutionException
 import java.util.concurrent.TimeUnit
 
-// The suite and the corresponding class are in heavy need of refactoring to allow for better testability.
-// Some of the tests (e.g. "Should reset the outbox item when monitor is called and the executor rejects the tasks")
-// do not work properly (i.e. they pass even when they should not).
-// This seems to be related to not being able to mock the objects that do some of the processing (e.g.
-// [OutboxItemProcessor], [OutboxProcessingHost]).
 class OutboxMonitorSpec extends Specification {
   private static final Duration DURATION_ONE_HOUR = Duration.ofHours(1)
-  Clock clock = Clock.fixed(Instant.now(), ZoneId.systemDefault())
-  Map<OutboxType, OutboxHandler> handlers = [(new DummyOutboxType()): new DummyOutboxHandler()]
-  OutboxLocksProvider monitorLocksProvider = Mock()
-  OutboxLocksProvider cleanupLocksProvider = Mock()
-  OutboxStore store = Mock()
-  InstantOutboxPublisher instantOutboxPublisher = Mock()
-  OutboxItemFactory outboxItemFactory = Mock()
-  ExecutorService executor = Mock()
-  Duration threadPoolTimeOut = Duration.ofMillis(5000)
-  TransactionalOutbox transactionalOutbox
+
+  private Clock clock = Clock.fixed(Instant.now(), ZoneId.systemDefault())
+  private OutboxLocksProvider monitorLocksProvider = Mock()
+  private OutboxStore store = Mock()
+  private ExecutorService executor = Mock()
+  private List<OutboxItemProcessorDecorator> decorators = (1..5).collect { Mock(OutboxItemProcessorDecorator) }
+  private Duration threadPoolTimeOut = Duration.ofMillis(5000)
+  private OutboxProcessingHostBuilder processingHostBuilder = Mock()
+
+  private TransactionalOutbox transactionalOutbox
 
   def setup() {
-    // For simplicity, we use no decorators since the decoration logic has been shifted to [OutboxProcessingHost].
-    // Check [OutboxProcessingHostSpec] for the decoration logic tests.
     transactionalOutbox = new TransactionalOutboxImpl(
       clock,
-      handlers,
+      [:],
       monitorLocksProvider,
-      cleanupLocksProvider,
+      Mock(OutboxLocksProvider),
       store,
-      instantOutboxPublisher,
-      outboxItemFactory,
+      Mock(InstantOutboxPublisher),
+      Mock(OutboxItemFactory),
       DURATION_ONE_HOUR,
       executor,
-      [],
-      threadPoolTimeOut
+      decorators,
+      threadPoolTimeOut,
+      processingHostBuilder
     )
   }
 
   def "Should delegate to the executor thread pool when an instant outbox is processed"() {
     given:
       def instantOutbox = OutboxItemBuilder.make().build()
+      def processingHost = Mock(OutboxProcessingHost)
 
     when:
       transactionalOutbox.processInstantOutbox(instantOutbox)
 
     then:
-      1 * executor.execute(_) >> { Runnable runnable ->
-        assert runnable instanceof OutboxProcessingHost
+      1 * processingHostBuilder.build(_, _) >> {
+        OutboxProcessingAction action, List<OutboxItemProcessorDecorator> decorators ->
+          assert action instanceof OutboxItemProcessor
+          assert decorators == this.decorators
+          return processingHost
       }
+      1 * executor.execute(processingHost)
       0 * _
   }
 
@@ -94,12 +92,19 @@ class OutboxMonitorSpec extends Specification {
   def "Should handle a failure while an instant outbox is being processed"() {
     given:
       def instantOutbox = OutboxItemBuilder.make().build()
+      def processingHost = Mock(OutboxProcessingHost)
 
     when:
       transactionalOutbox.processInstantOutbox(instantOutbox)
 
     then:
-      1 * executor.execute(_) >> { throw new RuntimeException() }
+      1 * processingHostBuilder.build(_, _) >> {
+        OutboxProcessingAction action, List<OutboxItemProcessorDecorator> decorators ->
+          assert action instanceof OutboxItemProcessor
+          assert decorators == this.decorators
+          return processingHost
+      }
+      1 * executor.execute(processingHost) >> { throw new RuntimeException() }
       0 * _
 
     and:
@@ -114,6 +119,7 @@ class OutboxMonitorSpec extends Specification {
 
     and:
       def now = Instant.now(clock)
+      def processingHosts = items.collect { Mock(OutboxProcessingHost) }
 
     when:
       transactionalOutbox.monitor()
@@ -135,8 +141,13 @@ class OutboxMonitorSpec extends Specification {
         }
         return item
       }
-      items.size() * executor.execute(_) >> { Runnable runnable ->
-        assert runnable instanceof OutboxProcessingHost
+      items.eachWithIndex { item, index ->
+        1 * processingHostBuilder.build(_, _) >> { OutboxProcessingAction action, List<OutboxItemProcessorDecorator> decorators ->
+          assert action instanceof OutboxItemProcessor
+          assert decorators == this.decorators
+          return processingHosts[index]
+        }
+        1 * executor.execute(processingHosts[index])
       }
       1 * monitorLocksProvider.release()
       0 * _
@@ -150,6 +161,9 @@ class OutboxMonitorSpec extends Specification {
       def itemBuilder = OutboxItemBuilder.make().withStatus(OutboxStatus.PENDING)
       def pendingItem = itemBuilder.build()
       def originalItem = itemBuilder.build() // Create a clone to use it for comparisons.
+
+    and:
+      def processingHost = Mock(OutboxProcessingHost)
 
     when:
       transactionalOutbox.monitor()
@@ -171,18 +185,13 @@ class OutboxMonitorSpec extends Specification {
         }
         return item
       }
-      1 * executor.execute(_) >> { throw new RejectedExecutionException() }
-      1 * store.update(_) >> { OutboxItem item ->
-        assert item == originalItem.with {
-          status = OutboxStatus.PENDING
-          // It seems that if the assertion fails (e.g. if the following line is uncommented), the test will still pass.
-          // This might be due to the `onFailure` block inside the `monitor` method.
-          // nextRun = now + DURATION_ONE_HOUR + DURATION_ONE_HOUR
-          rerunAfter = null
-          it
-        }
-        return item
+      1 * processingHostBuilder.build(_, _) >> { OutboxProcessingAction action, List<OutboxItemProcessorDecorator> decorators ->
+        assert action instanceof OutboxItemProcessor
+        assert decorators == this.decorators
+        return processingHost
       }
+      1 * executor.execute(processingHost) >> { throw new RejectedExecutionException() }
+      1 * processingHost.reset()
       1 * monitorLocksProvider.release()
       0 * _
   }

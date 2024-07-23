@@ -32,7 +32,8 @@ internal class TransactionalOutboxImpl(
   private val rerunAfterDuration: Duration,
   private val executor: ExecutorService,
   private val decorators: List<OutboxItemProcessorDecorator> = emptyList(),
-  private val threadPoolTimeOut: Duration
+  private val threadPoolTimeOut: Duration,
+  private val processingHostBuilder: OutboxProcessingHostBuilder
 ) : TransactionalOutbox {
 
   private var inShutdownMode = AtomicBoolean(false)
@@ -58,7 +59,7 @@ internal class TransactionalOutboxImpl(
     runCatching {
       logger.info("$LOGGER_PREFIX Instant processing of \"${outbox.type.getType()}\" outbox")
       val processor = OutboxItemProcessor(outbox, ::resolveOutboxHandler, outboxStore, clock)
-      val processingHost = OutboxProcessingHost(processor, decorators)
+      val processingHost = processingHostBuilder.build(processor, decorators)
       executor.execute(processingHost)
     }.onFailure {
       logger.error("$LOGGER_PREFIX Failure in instant handling", it)
@@ -121,7 +122,7 @@ internal class TransactionalOutboxImpl(
 
   private fun processItem(item: OutboxItem) {
     val processor = OutboxItemProcessor(item, ::resolveOutboxHandler, outboxStore, clock)
-    val processingHost = OutboxProcessingHost(processor, decorators)
+    val processingHost = processingHostBuilder.build(processor, decorators)
     try {
       executor.execute(processingHost)
     } catch (exception: RejectedExecutionException) {

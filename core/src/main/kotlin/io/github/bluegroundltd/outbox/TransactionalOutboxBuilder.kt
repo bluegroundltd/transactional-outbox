@@ -171,7 +171,8 @@ class TransactionalOutboxBuilder(
         rerunAfterDuration,
         executorServiceFactory.make(),
         decorators,
-        threadPoolTimeOut
+        threadPoolTimeOut,
+        OutboxProcessingHostBuilder()
     )
   }
 }

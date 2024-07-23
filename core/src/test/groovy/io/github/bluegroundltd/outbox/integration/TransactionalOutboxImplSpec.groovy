@@ -2,6 +2,7 @@ package io.github.bluegroundltd.outbox.integration
 
 import io.github.bluegroundltd.outbox.OutboxHandler
 import io.github.bluegroundltd.outbox.OutboxLocksProvider
+import io.github.bluegroundltd.outbox.OutboxProcessingHostBuilder
 import io.github.bluegroundltd.outbox.TransactionalOutbox
 import io.github.bluegroundltd.outbox.TransactionalOutboxImpl
 import io.github.bluegroundltd.outbox.event.InstantOutboxPublisher
@@ -31,6 +32,7 @@ class TransactionalOutboxImplSpec extends Specification {
   private OutboxStore store = Mock()
   private InstantOutboxPublisher instantOutboxPublisher = Mock()
   private OutboxItemFactory outboxItemFactory = Mock()
+  private OutboxProcessingHostBuilder processingHostBuilder = Mock()
 
   private TransactionalOutbox transactionalOutbox
 
@@ -46,7 +48,8 @@ class TransactionalOutboxImplSpec extends Specification {
       DURATION_ONE_HOUR,
       new FixedThreadPoolExecutorServiceFactory(1, "").make(),
       [],
-      DURATION_ONE_NANO
+      DURATION_ONE_NANO,
+      processingHostBuilder
     )
   }
 

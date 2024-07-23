@@ -2,6 +2,7 @@ package io.github.bluegroundltd.outbox.unit
 
 import io.github.bluegroundltd.outbox.OutboxHandler
 import io.github.bluegroundltd.outbox.OutboxLocksProvider
+import io.github.bluegroundltd.outbox.OutboxProcessingHostBuilder
 import io.github.bluegroundltd.outbox.TransactionalOutbox
 import io.github.bluegroundltd.outbox.TransactionalOutboxImpl
 import io.github.bluegroundltd.outbox.event.InstantOutboxPublisher
@@ -29,6 +30,7 @@ class OutboxAddSpec extends UnitTestSpecification {
   OutboxItemFactory outboxItemFactory = Mock()
   ExecutorService executor = Mock()
   Duration threadPoolTimeOut = Duration.ofMillis(5000)
+  OutboxProcessingHostBuilder processingHostBuilder = Mock()
   TransactionalOutbox transactionalOutbox
 
   def setup() {
@@ -43,7 +45,8 @@ class OutboxAddSpec extends UnitTestSpecification {
       DURATION_ONE_HOUR,
       executor,
       [],
-      threadPoolTimeOut
+      threadPoolTimeOut,
+      processingHostBuilder
     )
   }
 
