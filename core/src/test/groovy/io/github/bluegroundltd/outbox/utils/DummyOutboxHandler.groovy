@@ -12,12 +12,3 @@ class DummyOutboxHandler extends MockOutboxHandler {
   }
 }
 
-class DelayingOutboxHandler extends DummyOutboxHandler {
-
-  DelayingOutboxHandler(Clock clock = null) {
-    super(clock)
-  }
-
-  @Override
-  void handle(String payload) { sleep(50000) }
-}
