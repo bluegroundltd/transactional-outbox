@@ -10,7 +10,7 @@ import io.github.bluegroundltd.outbox.executor.FixedThreadPoolExecutorServiceFac
 import io.github.bluegroundltd.outbox.item.OutboxType
 import io.github.bluegroundltd.outbox.item.factory.OutboxItemFactory
 import io.github.bluegroundltd.outbox.store.OutboxStore
-import io.github.bluegroundltd.outbox.utils.DummyHandler
+import io.github.bluegroundltd.outbox.utils.DelayingOutboxHandler
 import spock.lang.Specification
 
 import java.time.Clock
@@ -23,7 +23,7 @@ class TransactionalOutboxImplSpec extends Specification {
   private static final Duration DURATION_ONE_NANO = Duration.ofNanos(1)
   private static final Clock CLOCK = Clock.fixed(Instant.now(), ZoneId.systemDefault())
 
-  private OutboxHandler handler = new DummyHandler()
+  private OutboxHandler handler = new DelayingOutboxHandler(CLOCK)
   private OutboxType type = handler.getSupportedType()
   private Map<OutboxType, OutboxHandler> handlers = Map.of(type, handler)
 

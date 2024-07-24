@@ -4,11 +4,18 @@ import io.github.bluegroundltd.outbox.OutboxHandler
 import io.github.bluegroundltd.outbox.item.OutboxPayload
 import io.github.bluegroundltd.outbox.item.OutboxType
 
+import java.time.Clock
 import java.time.Duration
 import java.time.Instant
 
 class DummyOutboxHandler implements OutboxHandler {
   private static OutboxType type = new DummyOutboxType()
+
+  private Clock clock
+
+  DummyOutboxHandler(Clock clock = null) {
+    this.clock = clock ?: Clock.systemUTC()
+  }
 
   @Override
   OutboxType getSupportedType() {
@@ -17,12 +24,12 @@ class DummyOutboxHandler implements OutboxHandler {
 
   @Override
   String serialize(OutboxPayload payload) {
-    return null
+    return "dummyPayload"
   }
 
   @Override
   Instant getNextExecutionTime(long currentRetries) {
-    return null
+    return Instant.now(clock) + Duration.ofHours(1)
   }
 
   @Override
@@ -37,25 +44,17 @@ class DummyOutboxHandler implements OutboxHandler {
   void handleFailure(String payload) {}
 
   @Override
-
-  @Override
   Duration getRetentionDuration() {
-    return null
+    return Duration.ofHours(1)
   }
 }
 
-class DummyHandler extends DummyOutboxHandler {
+class DelayingOutboxHandler extends DummyOutboxHandler {
 
-  @Override
-  String serialize(OutboxPayload payload) {
-    return "dummyPayload"
+  DelayingOutboxHandler(Clock clock = null) {
+    super(clock)
   }
 
   @Override
-  Instant getNextExecutionTime(long currentRetries) {
-    return Instant.now()
-  }
-
-  @Override
-  void handle(String payload) { sleep(50000); }
+  void handle(String payload) { sleep(50000) }
 }
