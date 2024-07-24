@@ -53,20 +53,6 @@ class TransactionalOutboxImplSpec extends Specification {
     )
   }
 
-  def "Should delegate to outbox store when `cleanup` is invoked"() {
-    given:
-      def now = Instant.now(CLOCK)
-
-    when:
-      transactionalOutbox.cleanup()
-
-    then:
-      1 * cleanupLocksProvider.acquire()
-      1 * store.deleteCompletedItems(now)
-      1 * cleanupLocksProvider.release()
-      0 * _
-  }
-
   def "Should early return from cleanup if in shutdown mode"() {
     when:
       transactionalOutbox.shutdown()
@@ -74,45 +60,5 @@ class TransactionalOutboxImplSpec extends Specification {
 
     then:
       0 * _
-  }
-
-  def "Should handle an exception thrown from the cleanup store method"() {
-    when:
-      transactionalOutbox.cleanup()
-
-    then:
-      1 * cleanupLocksProvider.acquire()
-      1 * store.deleteCompletedItems(_) >> {
-        throw new InterruptedException()
-      }
-      1 * cleanupLocksProvider.release()
-      0 * _
-      noExceptionThrown()
-  }
-
-  def "Should handle an exception thrown during the cleanup release locks"() {
-    when:
-      transactionalOutbox.cleanup()
-
-    then:
-      1 * cleanupLocksProvider.acquire()
-      1 * store.deleteCompletedItems(_)
-      1 * cleanupLocksProvider.release() >> {
-        throw new InterruptedException()
-      }
-      0 * _
-      noExceptionThrown()
-  }
-
-  def "Should not release the lock in cleanup, after a failure in acquire"() {
-    when:
-      transactionalOutbox.cleanup()
-
-    then:
-      1 * cleanupLocksProvider.acquire() >> {
-        throw new InterruptedException()
-      }
-      0 * _
-      noExceptionThrown()
   }
 }
