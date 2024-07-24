@@ -1,5 +1,6 @@
 package io.github.bluegroundltd.outbox.utils
 
+import groovy.transform.EqualsAndHashCode
 import io.github.bluegroundltd.outbox.item.OutboxItem
 import io.github.bluegroundltd.outbox.item.OutboxStatus
 import io.github.bluegroundltd.outbox.item.OutboxType
@@ -89,6 +90,7 @@ class OutboxItemBuilder implements SpecHelper {
   }
 }
 
+@EqualsAndHashCode(includeFields=true)
 class DummyOutboxType implements OutboxType {
   @Override
   String getType() {
