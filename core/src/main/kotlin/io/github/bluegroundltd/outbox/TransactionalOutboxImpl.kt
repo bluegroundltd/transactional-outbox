@@ -3,6 +3,7 @@ package io.github.bluegroundltd.outbox
 import io.github.bluegroundltd.outbox.event.InstantOutboxEvent
 import io.github.bluegroundltd.outbox.event.InstantOutboxPublisher
 import io.github.bluegroundltd.outbox.item.OutboxItem
+import io.github.bluegroundltd.outbox.item.OutboxItemGroup
 import io.github.bluegroundltd.outbox.item.OutboxPayload
 import io.github.bluegroundltd.outbox.item.OutboxStatus
 import io.github.bluegroundltd.outbox.item.OutboxType
@@ -132,7 +133,7 @@ internal class TransactionalOutboxImpl(
   }
 
   private fun makeOutboxProcessor(item: OutboxItem): OutboxProcessingAction =
-    OutboxItemProcessor(item, ::resolveOutboxHandler, outboxStore, clock)
+    OutboxGroupProcessor(OutboxItemGroup(listOf(item)), ::resolveOutboxHandler, outboxStore, clock)
 
   private fun resolveOutboxHandler(item: OutboxItem): OutboxHandler? = outboxHandlers[item.type]
 

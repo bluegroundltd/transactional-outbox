@@ -1,6 +1,6 @@
 package io.github.bluegroundltd.outbox.unit
 
-import io.github.bluegroundltd.outbox.OutboxItemProcessor
+import io.github.bluegroundltd.outbox.OutboxGroupProcessor
 import io.github.bluegroundltd.outbox.OutboxItemProcessorDecorator
 import io.github.bluegroundltd.outbox.OutboxLocksProvider
 import io.github.bluegroundltd.outbox.OutboxProcessingAction
@@ -66,7 +66,7 @@ class OutboxMonitorSpec extends Specification {
     then:
       1 * processingHostBuilder.build(_, _) >> {
         OutboxProcessingAction action, List<OutboxItemProcessorDecorator> decorators ->
-          assert action instanceof OutboxItemProcessor
+          assert action instanceof OutboxGroupProcessor
           assert decorators == this.decorators
           return processingHost
       }
@@ -100,7 +100,7 @@ class OutboxMonitorSpec extends Specification {
     then:
       1 * processingHostBuilder.build(_, _) >> {
         OutboxProcessingAction action, List<OutboxItemProcessorDecorator> decorators ->
-          assert action instanceof OutboxItemProcessor
+          assert action instanceof OutboxGroupProcessor
           assert decorators == this.decorators
           return processingHost
       }
@@ -143,7 +143,7 @@ class OutboxMonitorSpec extends Specification {
       }
       items.eachWithIndex { item, index ->
         1 * processingHostBuilder.build(_, _) >> { OutboxProcessingAction action, List<OutboxItemProcessorDecorator> decorators ->
-          assert action instanceof OutboxItemProcessor
+          assert action instanceof OutboxGroupProcessor
           assert decorators == this.decorators
           return processingHosts[index]
         }
@@ -186,7 +186,7 @@ class OutboxMonitorSpec extends Specification {
         return item
       }
       1 * processingHostBuilder.build(_, _) >> { OutboxProcessingAction action, List<OutboxItemProcessorDecorator> decorators ->
-        assert action instanceof OutboxItemProcessor
+        assert action instanceof OutboxGroupProcessor
         assert decorators == this.decorators
         return processingHost
       }
