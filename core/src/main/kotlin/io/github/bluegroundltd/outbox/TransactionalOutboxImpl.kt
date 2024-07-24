@@ -58,7 +58,7 @@ internal class TransactionalOutboxImpl(
   override fun processInstantOutbox(outbox: OutboxItem) {
     runCatching {
       logger.info("$LOGGER_PREFIX Instant processing of \"${outbox.type.getType()}\" outbox")
-      val processor = OutboxItemProcessor(outbox, ::resolveOutboxHandler, outboxStore, clock)
+      val processor = makeOutboxProcessor(outbox)
       val processingHost = processingHostBuilder.build(processor, decorators)
       executor.execute(processingHost)
     }.onFailure {
@@ -121,7 +121,7 @@ internal class TransactionalOutboxImpl(
   }
 
   private fun processItem(item: OutboxItem) {
-    val processor = OutboxItemProcessor(item, ::resolveOutboxHandler, outboxStore, clock)
+    val processor = makeOutboxProcessor(item)
     val processingHost = processingHostBuilder.build(processor, decorators)
     try {
       executor.execute(processingHost)
@@ -130,6 +130,9 @@ internal class TransactionalOutboxImpl(
       processingHost.reset()
     }
   }
+
+  private fun makeOutboxProcessor(item: OutboxItem): OutboxProcessingAction =
+    OutboxItemProcessor(item, ::resolveOutboxHandler, outboxStore, clock)
 
   private fun resolveOutboxHandler(item: OutboxItem): OutboxHandler? = outboxHandlers[item.type]
 
