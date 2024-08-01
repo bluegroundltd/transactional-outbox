@@ -1,13 +1,13 @@
 package io.github.bluegroundltd.outbox.unit
 
 import io.github.bluegroundltd.outbox.OutboxProcessingAction
-import io.github.bluegroundltd.outbox.OutboxProcessingHostBuilder
+import io.github.bluegroundltd.outbox.OutboxProcessingHostComposer
 import spock.lang.Specification
 
-class OutboxProcessingHostBuilderSpec extends Specification {
-  private OutboxProcessingHostBuilder builder = new OutboxProcessingHostBuilder()
+class OutboxProcessingHostComposerSpec extends Specification {
+  private OutboxProcessingHostComposer composer = new OutboxProcessingHostComposer()
 
-  def "Should build an [OutboxProcessingHost] when [build] is invoked"() {
+  def "Should build an [OutboxProcessingHost] when [compose] is invoked"() {
     given:
       def processingAction = Mock(OutboxProcessingAction)
       // We use an empty decorator list to simplify the test.
@@ -15,7 +15,7 @@ class OutboxProcessingHostBuilderSpec extends Specification {
       def decorators = []
 
     when:
-      def result = builder.build(processingAction, decorators)
+      def result = composer.compose(processingAction, decorators)
 
     then:
       0 * _

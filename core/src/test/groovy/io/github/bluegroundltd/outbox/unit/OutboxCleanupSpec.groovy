@@ -1,7 +1,7 @@
 package io.github.bluegroundltd.outbox.unit
 
 import io.github.bluegroundltd.outbox.OutboxLocksProvider
-import io.github.bluegroundltd.outbox.OutboxProcessingHostBuilder
+import io.github.bluegroundltd.outbox.OutboxProcessingHostComposer
 import io.github.bluegroundltd.outbox.TransactionalOutbox
 import io.github.bluegroundltd.outbox.TransactionalOutboxImpl
 import io.github.bluegroundltd.outbox.event.InstantOutboxPublisher
@@ -37,7 +37,7 @@ class OutboxCleanupSpec extends Specification {
     Mock(ExecutorService),
     [],
     Duration.ofMillis(5000),
-    Mock(OutboxProcessingHostBuilder)
+    Mock(OutboxProcessingHostComposer)
   )
 
   def "Should acquire the clean up lock, delete all completed items and release it"() {

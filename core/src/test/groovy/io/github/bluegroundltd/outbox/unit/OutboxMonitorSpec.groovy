@@ -5,7 +5,7 @@ import io.github.bluegroundltd.outbox.OutboxItemProcessorDecorator
 import io.github.bluegroundltd.outbox.OutboxLocksProvider
 import io.github.bluegroundltd.outbox.OutboxProcessingAction
 import io.github.bluegroundltd.outbox.OutboxProcessingHost
-import io.github.bluegroundltd.outbox.OutboxProcessingHostBuilder
+import io.github.bluegroundltd.outbox.OutboxProcessingHostComposer
 import io.github.bluegroundltd.outbox.TransactionalOutbox
 import io.github.bluegroundltd.outbox.TransactionalOutboxImpl
 import io.github.bluegroundltd.outbox.event.InstantOutboxPublisher
@@ -34,7 +34,7 @@ class OutboxMonitorSpec extends Specification {
   private ExecutorService executor = Mock()
   private List<OutboxItemProcessorDecorator> decorators = (1..5).collect { Mock(OutboxItemProcessorDecorator) }
   private Duration threadPoolTimeOut = Duration.ofMillis(5000)
-  private OutboxProcessingHostBuilder processingHostBuilder = Mock()
+  private OutboxProcessingHostComposer processingHostComposer = Mock()
 
   private TransactionalOutbox transactionalOutbox
 
@@ -51,7 +51,7 @@ class OutboxMonitorSpec extends Specification {
       executor,
       decorators,
       threadPoolTimeOut,
-      processingHostBuilder
+      processingHostComposer
     )
   }
 
@@ -64,7 +64,7 @@ class OutboxMonitorSpec extends Specification {
       transactionalOutbox.processInstantOutbox(instantOutbox)
 
     then:
-      1 * processingHostBuilder.build(_, _) >> {
+      1 * processingHostComposer.compose(_, _) >> {
         OutboxProcessingAction action, List<OutboxItemProcessorDecorator> decorators ->
           assert action instanceof OutboxGroupProcessor
           assert decorators == this.decorators
@@ -98,7 +98,7 @@ class OutboxMonitorSpec extends Specification {
       transactionalOutbox.processInstantOutbox(instantOutbox)
 
     then:
-      1 * processingHostBuilder.build(_, _) >> {
+      1 * processingHostComposer.compose(_, _) >> {
         OutboxProcessingAction action, List<OutboxItemProcessorDecorator> decorators ->
           assert action instanceof OutboxGroupProcessor
           assert decorators == this.decorators
@@ -142,7 +142,7 @@ class OutboxMonitorSpec extends Specification {
         return item
       }
       items.eachWithIndex { item, index ->
-        1 * processingHostBuilder.build(_, _) >> { OutboxProcessingAction action, List<OutboxItemProcessorDecorator> decorators ->
+        1 * processingHostComposer.compose(_, _) >> { OutboxProcessingAction action, List<OutboxItemProcessorDecorator> decorators ->
           assert action instanceof OutboxGroupProcessor
           assert decorators == this.decorators
           return processingHosts[index]
@@ -185,7 +185,7 @@ class OutboxMonitorSpec extends Specification {
         }
         return item
       }
-      1 * processingHostBuilder.build(_, _) >> { OutboxProcessingAction action, List<OutboxItemProcessorDecorator> decorators ->
+      1 * processingHostComposer.compose(_, _) >> { OutboxProcessingAction action, List<OutboxItemProcessorDecorator> decorators ->
         assert action instanceof OutboxGroupProcessor
         assert decorators == this.decorators
         return processingHost

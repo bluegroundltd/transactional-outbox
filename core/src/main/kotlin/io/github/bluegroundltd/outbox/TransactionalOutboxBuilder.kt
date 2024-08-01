@@ -172,7 +172,7 @@ class TransactionalOutboxBuilder(
         executorServiceFactory.make(),
         decorators,
         threadPoolTimeOut,
-        OutboxProcessingHostBuilder()
+        OutboxProcessingHostComposer()
     )
   }
 }
