@@ -24,4 +24,12 @@ trait SpecHelper {
   Boolean generateBoolean() {
     srng.nextBoolean()
   }
+
+  int generateInt(Integer bound = null) {
+    (bound != null) ? Math.abs(srng.nextInt(bound)) : Math.abs(srng.nextInt())
+  }
+
+  int generateIntNonZero(Integer bound = null) {
+    generateInt(bound) + 1
+  }
 }

@@ -57,9 +57,9 @@ internal class TransactionalOutboxImpl(
   override fun processInstantOutbox(outbox: OutboxItem) {
     runCatching {
       logger.info("$LOGGER_PREFIX Instant processing of \"${outbox.type.getType()}\" outbox")
-      executor.execute(
-        decorate(OutboxItemProcessor(outbox, outboxHandlers[outbox.type]!!, outboxStore, clock))
-      )
+      val processor = OutboxItemProcessor(outbox, outboxHandlers[outbox.type]!!, outboxStore, clock)
+      val processingHost = OutboxProcessingHost(processor, decorators)
+      executor.execute(processingHost)
     }.onFailure {
       logger.error("$LOGGER_PREFIX Failure in instant handling", it)
     }
@@ -121,19 +121,14 @@ internal class TransactionalOutboxImpl(
 
   private fun processItem(item: OutboxItem) {
     val processor = OutboxItemProcessor(item, outboxHandlers[item.type]!!, outboxStore, clock)
+    val processingHost = OutboxProcessingHost(processor, decorators)
     try {
-      val decoratedProcessor = decorate(processor)
-      executor.execute(decoratedProcessor)
+      executor.execute(processingHost)
     } catch (exception: RejectedExecutionException) {
       logger.info("$LOGGER_PREFIX Executor rejected processing of outbox item with id ${item.id}")
-      processor.reset()
+      processingHost.reset()
     }
   }
-
-  private fun decorate(processor: OutboxItemProcessor) =
-    decorators.fold(processor as Runnable) { decorated, decorator ->
-      decorator.decorate(decorated)
-    }
 
   override fun shutdown() {
     if (!inShutdownMode.compareAndSet(false, true)) {
@@ -157,7 +152,7 @@ internal class TransactionalOutboxImpl(
         throw exception
       }
 
-    notExecutedRunnables.filterIsInstance<OutboxItemProcessor>().forEach {
+    notExecutedRunnables.filterIsInstance<OutboxProcessingHost>().forEach {
       it.reset()
     }
     logger.info("$LOGGER_PREFIX Outbox shutdown completed")

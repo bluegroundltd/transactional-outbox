@@ -1,5 +1,6 @@
 package io.github.bluegroundltd.outbox
 
+import io.github.bluegroundltd.outbox.annotation.TestableOpenClass
 import io.github.bluegroundltd.outbox.item.OutboxItem
 import io.github.bluegroundltd.outbox.item.OutboxStatus
 import io.github.bluegroundltd.outbox.item.OutboxType
@@ -10,21 +11,22 @@ import java.time.Clock
 import java.time.Instant
 
 @Suppress("TooGenericExceptionCaught")
+@TestableOpenClass
 internal class OutboxItemProcessor(
   private val item: OutboxItem,
   private val handler: OutboxHandler,
   private val store: OutboxStore,
   private val clock: Clock,
-) : Runnable {
+) {
   companion object {
     private const val LOGGER_PREFIX = "[OUTBOX-ITEM-PROCESSOR]"
     private val logger: Logger = LoggerFactory.getLogger(OutboxItemProcessor::class.java)
   }
 
-  override fun run() {
+  fun run() {
     if (!handler.supports(item.type)) {
       logger.error("$LOGGER_PREFIX Handler ${handler::class.java} does not support item of type: ${item.type}")
-      return
+      throw InvalidOutboxHandlerException(item)
     }
 
     try {
@@ -40,6 +42,7 @@ internal class OutboxItemProcessor(
       } else {
         handleRetryableFailure(exception)
       }
+      throw exception
     } finally {
       store.update(item)
     }

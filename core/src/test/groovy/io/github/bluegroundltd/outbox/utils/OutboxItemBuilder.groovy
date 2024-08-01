@@ -23,7 +23,7 @@ class OutboxItemBuilder implements SpecHelper {
       type = new DummyOutboxType()
       status = OutboxStatus.PENDING
       payload = "dummyPayload"
-      retries = 0
+      retries = generateInt(10)
       nextRun = generateInstant()
       lastExecution = null
       rerunAfter = null
