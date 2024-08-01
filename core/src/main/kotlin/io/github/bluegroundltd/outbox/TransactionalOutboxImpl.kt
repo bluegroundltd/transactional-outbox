@@ -120,12 +120,13 @@ internal class TransactionalOutboxImpl(
   }
 
   private fun processItem(item: OutboxItem) {
-    val processor = decorate(OutboxItemProcessor(item, outboxHandlers[item.type]!!, outboxStore, clock))
+    val processor = OutboxItemProcessor(item, outboxHandlers[item.type]!!, outboxStore, clock)
     try {
-      executor.execute(processor)
+      val decoratedProcessor = decorate(processor)
+      executor.execute(decoratedProcessor)
     } catch (exception: RejectedExecutionException) {
-      revertToPending(item)
-      outboxStore.update(item)
+      logger.info("$LOGGER_PREFIX Executor rejected processing of outbox item with id ${item.id}")
+      processor.reset()
     }
   }
 
@@ -133,14 +134,6 @@ internal class TransactionalOutboxImpl(
     decorators.fold(processor as Runnable) { decorated, decorator ->
       decorator.decorate(decorated)
     }
-
-  private fun revertToPending(item: OutboxItem) {
-    logger.info("$LOGGER_PREFIX Outbox item with id ${item.id} is reverting to PENDING")
-
-    item.status = OutboxStatus.PENDING
-    item.nextRun = Instant.now(clock)
-    item.rerunAfter = null
-  }
 
   override fun shutdown() {
     if (!inShutdownMode.compareAndSet(false, true)) {
@@ -165,9 +158,7 @@ internal class TransactionalOutboxImpl(
       }
 
     notExecutedRunnables.filterIsInstance<OutboxItemProcessor>().forEach {
-      val item = it.getItem()
-      revertToPending(item)
-      outboxStore.update(item)
+      it.reset()
     }
     logger.info("$LOGGER_PREFIX Outbox shutdown completed")
   }
