@@ -1,16 +1,16 @@
 package io.github.bluegroundltd.outbox.unit
 
-import io.github.bluegroundltd.outbox.OutboxItemProcessor
 import io.github.bluegroundltd.outbox.OutboxItemProcessorDecorator
+import io.github.bluegroundltd.outbox.OutboxProcessingAction
 import io.github.bluegroundltd.outbox.OutboxProcessingHost
 import spock.lang.Specification
 
 class OutboxProcessingHostSpec extends Specification {
-  private OutboxItemProcessor processor = Mock()
+  private OutboxProcessingAction processingAction = Mock()
 
   // By default use a no-decorators host to simplify the tests.
   // There is a stand-alone test for the decorator logic.
-  private OutboxProcessingHost processingHost = new OutboxProcessingHost(processor, [])
+  private OutboxProcessingHost processingHost = new OutboxProcessingHost(processingAction, [])
 
   def "Should decorate the processor with the decorators when being instantiated"() {
     given:
@@ -21,7 +21,7 @@ class OutboxProcessingHostSpec extends Specification {
       def runnables = decorators.collect { Mock(Runnable) }
 
     when:
-      def processingHostWithDecorator = new OutboxProcessingHost(processor, decorators)
+      def processingHostWithDecorator = new OutboxProcessingHost(processingAction, decorators)
 
     then:
       1 * decorators[0].decorate(_) >> {
@@ -41,7 +41,7 @@ class OutboxProcessingHostSpec extends Specification {
       processingHost.run()
 
     then:
-      1 * processor.run()
+      1 * processingAction.run()
       0 * _
 
     and:
@@ -53,8 +53,8 @@ class OutboxProcessingHostSpec extends Specification {
       processingHost.run()
 
     then:
-      1 * processor.run() >> { throw new Exception("Processing Exception") }
-      1 * processor.reset()
+      1 * processingAction.run() >> { throw new Exception("Processing Exception") }
+      1 * processingAction.reset()
       0 * _
 
     and:
@@ -66,7 +66,7 @@ class OutboxProcessingHostSpec extends Specification {
       processingHost.reset()
 
     then:
-      1 * processor.reset()
+      1 * processingAction.reset()
       0 * _
 
     and:

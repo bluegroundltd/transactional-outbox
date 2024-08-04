@@ -5,7 +5,7 @@ import io.github.bluegroundltd.outbox.annotation.TestableOpenClass
 /**
  * Serves as a host inside which outbox items will be processed.
  *
- * @param processor the processor that will be used to process the outbox items
+ * @param processingAction the processing action that will be run to process the outbox items
  * @param decorators a list of decorators that will be used to decorate the processor
  *
  * This component allows for separating the responsibilities of processing the items and being scheduled
@@ -20,15 +20,15 @@ import io.github.bluegroundltd.outbox.annotation.TestableOpenClass
 @Suppress("TooGenericExceptionCaught")
 @TestableOpenClass
 internal class OutboxProcessingHost(
-  private val processor: OutboxItemProcessor,
+  private val processingAction: OutboxProcessingAction,
   decorators: List<OutboxItemProcessorDecorator>
 ) : Runnable {
 
   private val processorRunnable = Runnable {
     try {
-      processor.run()
+      processingAction.run()
     } catch (e: Exception) {
-      processor.reset()
+      processingAction.reset()
     }
   }
   private val finalRunnable: Runnable = decorators
@@ -39,6 +39,6 @@ internal class OutboxProcessingHost(
   }
 
   fun reset() {
-    processor.reset()
+    processingAction.reset()
   }
 }

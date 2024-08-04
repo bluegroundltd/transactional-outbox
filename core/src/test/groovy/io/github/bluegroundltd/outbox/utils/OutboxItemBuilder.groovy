@@ -88,10 +88,3 @@ class OutboxItemBuilder implements SpecHelper {
     )
   }
 }
-
-class DummyOutboxType implements OutboxType {
-  @Override
-  String getType() {
-    return "dummyOutboxType"
-  }
-}

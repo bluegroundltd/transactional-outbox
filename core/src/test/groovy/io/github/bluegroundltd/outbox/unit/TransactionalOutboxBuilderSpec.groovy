@@ -28,7 +28,7 @@ class TransactionalOutboxBuilderSpec extends UnitTestSpecification {
       def builder = TransactionalOutboxBuilder.make(clock)
 
     and:
-      def handlerA = new DummyOutboxHandler()
+      def handlerA = new DummyOutboxHandler(clock)
       def handlerB = GroovyMock(OutboxHandler)
       def mockedBType = GroovyMock(OutboxType)
       def handlers = Set.of(handlerA, handlerB)
@@ -77,8 +77,8 @@ class TransactionalOutboxBuilderSpec extends UnitTestSpecification {
       def builder = TransactionalOutboxBuilder.make(clock)
 
     and:
-      def handlerA = new DummyOutboxHandler()
-      def handlerB = new DummyOutboxHandler()
+      def handlerA = new DummyOutboxHandler(clock)
+      def handlerB = new DummyOutboxHandler(clock)
       def handlers = Set.of(handlerA, handlerB)
 
     when:

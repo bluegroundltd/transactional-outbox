@@ -1,20 +1,21 @@
 package io.github.bluegroundltd.outbox.unit
 
-import io.github.bluegroundltd.outbox.OutboxHandler
+import io.github.bluegroundltd.outbox.OutboxGroupProcessor
 import io.github.bluegroundltd.outbox.OutboxItemProcessorDecorator
 import io.github.bluegroundltd.outbox.OutboxLocksProvider
+import io.github.bluegroundltd.outbox.OutboxProcessingAction
+import io.github.bluegroundltd.outbox.OutboxProcessingHost
+import io.github.bluegroundltd.outbox.OutboxProcessingHostComposer
 import io.github.bluegroundltd.outbox.TransactionalOutbox
 import io.github.bluegroundltd.outbox.TransactionalOutboxImpl
 import io.github.bluegroundltd.outbox.event.InstantOutboxPublisher
 import io.github.bluegroundltd.outbox.item.OutboxItem
 import io.github.bluegroundltd.outbox.item.OutboxStatus
-import io.github.bluegroundltd.outbox.item.OutboxType
 import io.github.bluegroundltd.outbox.item.factory.OutboxItemFactory
 import io.github.bluegroundltd.outbox.store.OutboxFilter
 import io.github.bluegroundltd.outbox.store.OutboxStore
 import io.github.bluegroundltd.outbox.utils.OutboxItemBuilder
 import spock.lang.Specification
-import spock.lang.Unroll
 
 import java.time.Clock
 import java.time.Duration
@@ -26,50 +27,50 @@ import java.util.concurrent.TimeUnit
 
 class OutboxMonitorSpec extends Specification {
   private static final Duration DURATION_ONE_HOUR = Duration.ofHours(1)
-  Clock clock = Clock.fixed(Instant.now(), ZoneId.systemDefault())
-  Map<OutboxType, OutboxHandler> handlers = Mock()
-  OutboxLocksProvider monitorLocksProvider = Mock()
-  OutboxLocksProvider cleanupLocksProvider = Mock()
-  OutboxStore store = Mock()
-  InstantOutboxPublisher instantOutboxPublisher = Mock()
-  OutboxItemFactory outboxItemFactory = Mock()
-  ExecutorService executor = Mock()
-  Duration threadPoolTimeOut = Duration.ofMillis(5000)
-  TransactionalOutbox transactionalOutbox
+
+  private Clock clock = Clock.fixed(Instant.now(), ZoneId.systemDefault())
+  private OutboxLocksProvider monitorLocksProvider = Mock()
+  private OutboxStore store = Mock()
+  private ExecutorService executor = Mock()
+  private List<OutboxItemProcessorDecorator> decorators = (1..5).collect { Mock(OutboxItemProcessorDecorator) }
+  private Duration threadPoolTimeOut = Duration.ofMillis(5000)
+  private OutboxProcessingHostComposer processingHostComposer = Mock()
+
+  private TransactionalOutbox transactionalOutbox
 
   def setup() {
-    transactionalOutbox = makeTransactionalOutbox()
-  }
-
-  private TransactionalOutboxImpl makeTransactionalOutbox(List<OutboxItemProcessorDecorator> decorators = []) {
-    new TransactionalOutboxImpl(
+    transactionalOutbox = new TransactionalOutboxImpl(
       clock,
-      handlers,
+      [:],
       monitorLocksProvider,
-      cleanupLocksProvider,
+      Mock(OutboxLocksProvider),
       store,
-      instantOutboxPublisher,
-      outboxItemFactory,
+      Mock(InstantOutboxPublisher),
+      Mock(OutboxItemFactory),
       DURATION_ONE_HOUR,
       executor,
       decorators,
-      threadPoolTimeOut
+      threadPoolTimeOut,
+      processingHostComposer
     )
   }
 
-  def "Should delegate to the executor thread pool when an instant outbox is processed"(){
+  def "Should delegate to the executor thread pool when an instant outbox is processed"() {
     given:
       def instantOutbox = OutboxItemBuilder.make().build()
-
-    and:
-      def expectedHandler = GroovyMock(OutboxHandler)
+      def processingHost = Mock(OutboxProcessingHost)
 
     when:
       transactionalOutbox.processInstantOutbox(instantOutbox)
 
     then:
-      1 * handlers.get(_) >> expectedHandler
-      1 * executor.execute(_)
+      1 * processingHostComposer.compose(_, _) >> {
+        OutboxProcessingAction action, List<OutboxItemProcessorDecorator> decorators ->
+          assert action instanceof OutboxGroupProcessor
+          assert decorators == this.decorators
+          return processingHost
+      }
+      1 * executor.execute(processingHost)
       0 * _
   }
 
@@ -91,47 +92,34 @@ class OutboxMonitorSpec extends Specification {
   def "Should handle a failure while an instant outbox is being processed"() {
     given:
       def instantOutbox = OutboxItemBuilder.make().build()
-
-    and:
-      def expectedHandler = GroovyMock(OutboxHandler)
+      def processingHost = Mock(OutboxProcessingHost)
 
     when:
       transactionalOutbox.processInstantOutbox(instantOutbox)
 
     then:
-      1 * handlers.get(_) >> expectedHandler
-      1 * executor.execute(_) >> { throw new RuntimeException() }
+      1 * processingHostComposer.compose(_, _) >> {
+        OutboxProcessingAction action, List<OutboxItemProcessorDecorator> decorators ->
+          assert action instanceof OutboxGroupProcessor
+          assert decorators == this.decorators
+          return processingHost
+      }
+      1 * executor.execute(processingHost) >> { throw new RuntimeException() }
       0 * _
 
     and:
       noExceptionThrown()
   }
 
-  @Unroll
   def "Should delegate to the executor thread pool when monitor is called"() {
     given:
-      def firstDecorator = null
-      def secondDecorator = null
-      def processorDecoratedByFirstDecorator = Mock(Runnable)
-      List<OutboxItemProcessorDecorator> decorators = []
-      if (hasDecorators) {
-        firstDecorator = Mock(OutboxItemProcessorDecorator)
-        secondDecorator = Mock(OutboxItemProcessorDecorator)
-        decorators = [firstDecorator, secondDecorator]
-      }
-      transactionalOutbox = makeTransactionalOutbox(decorators)
-
-    and:
       def pendingItem = OutboxItemBuilder.makePending()
       def runningItem = OutboxItemBuilder.make().withStatus(OutboxStatus.RUNNING).build()
       def items = [pendingItem, runningItem]
 
     and:
-      def decoratorCalls = hasDecorators ? items.size() : 0
-
-    and:
-      def expectedHandler = GroovyMock(OutboxHandler)
       def now = Instant.now(clock)
+      def processingHosts = items.collect { Mock(OutboxProcessingHost) }
 
     when:
       transactionalOutbox.monitor()
@@ -153,24 +141,29 @@ class OutboxMonitorSpec extends Specification {
         }
         return item
       }
+      items.eachWithIndex { item, index ->
+        1 * processingHostComposer.compose(_, _) >> { OutboxProcessingAction action, List<OutboxItemProcessorDecorator> decorators ->
+          assert action instanceof OutboxGroupProcessor
+          assert decorators == this.decorators
+          return processingHosts[index]
+        }
+        1 * executor.execute(processingHosts[index])
+      }
       1 * monitorLocksProvider.release()
-      items.size() * handlers.get(_) >> expectedHandler
-      decoratorCalls * firstDecorator.decorate(_) >> processorDecoratedByFirstDecorator
-      decoratorCalls * secondDecorator.decorate(processorDecoratedByFirstDecorator) >> Mock(Runnable)
-      items.size() * executor.execute(_)
       0 * _
-
-    where:
-      hasDecorators << [false, true]
   }
 
-  def "Should delegate to the outbox store when monitor is called and the executor rejects the tasks"() {
+  def "Should reset the outbox item when monitor is called and the executor rejects the tasks"() {
     given:
-      def pendingItem = OutboxItemBuilder.makePending()
+      def now = Instant.now(clock)
 
     and:
-      def expectedHandler = GroovyMock(OutboxHandler)
-      def now = Instant.now(clock)
+      def itemBuilder = OutboxItemBuilder.make().withStatus(OutboxStatus.PENDING)
+      def pendingItem = itemBuilder.build()
+      def originalItem = itemBuilder.build() // Create a clone to use it for comparisons.
+
+    and:
+      def processingHost = Mock(OutboxProcessingHost)
 
     when:
       transactionalOutbox.monitor()
@@ -184,24 +177,22 @@ class OutboxMonitorSpec extends Specification {
         [pendingItem]
       }
       1 * store.update(_) >> { OutboxItem item ->
-        with(item) {
-          it.status == OutboxStatus.RUNNING
-          it.lastExecution == now
-          it.rerunAfter == item.lastExecution + DURATION_ONE_HOUR
+        assert item == originalItem.with {
+          status = OutboxStatus.RUNNING
+          lastExecution = now
+          rerunAfter = now + DURATION_ONE_HOUR
+          it
         }
         return item
       }
+      1 * processingHostComposer.compose(_, _) >> { OutboxProcessingAction action, List<OutboxItemProcessorDecorator> decorators ->
+        assert action instanceof OutboxGroupProcessor
+        assert decorators == this.decorators
+        return processingHost
+      }
+      1 * executor.execute(processingHost) >> { throw new RejectedExecutionException() }
+      1 * processingHost.reset()
       1 * monitorLocksProvider.release()
-      1 * handlers.get(_) >> expectedHandler
-      1 * executor.execute(_) >> { throw new RejectedExecutionException() }
-      1 * store.update(_) >> { OutboxItem item ->
-        with(item) {
-          it.status == OutboxStatus.PENDING
-          it.nextRun == now
-          it.rerunAfter == null
-        }
-        return item
-      }
       0 * _
   }
 

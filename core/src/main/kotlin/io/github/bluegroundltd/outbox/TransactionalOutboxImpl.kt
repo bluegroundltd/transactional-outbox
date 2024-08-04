@@ -3,6 +3,7 @@ package io.github.bluegroundltd.outbox
 import io.github.bluegroundltd.outbox.event.InstantOutboxEvent
 import io.github.bluegroundltd.outbox.event.InstantOutboxPublisher
 import io.github.bluegroundltd.outbox.item.OutboxItem
+import io.github.bluegroundltd.outbox.item.OutboxItemGroup
 import io.github.bluegroundltd.outbox.item.OutboxPayload
 import io.github.bluegroundltd.outbox.item.OutboxStatus
 import io.github.bluegroundltd.outbox.item.OutboxType
@@ -32,7 +33,8 @@ internal class TransactionalOutboxImpl(
   private val rerunAfterDuration: Duration,
   private val executor: ExecutorService,
   private val decorators: List<OutboxItemProcessorDecorator> = emptyList(),
-  private val threadPoolTimeOut: Duration
+  private val threadPoolTimeOut: Duration,
+  private val processingHostComposer: OutboxProcessingHostComposer
 ) : TransactionalOutbox {
 
   private var inShutdownMode = AtomicBoolean(false)
@@ -57,8 +59,8 @@ internal class TransactionalOutboxImpl(
   override fun processInstantOutbox(outbox: OutboxItem) {
     runCatching {
       logger.info("$LOGGER_PREFIX Instant processing of \"${outbox.type.getType()}\" outbox")
-      val processor = OutboxItemProcessor(outbox, outboxHandlers[outbox.type]!!, outboxStore, clock)
-      val processingHost = OutboxProcessingHost(processor, decorators)
+      val processor = makeOutboxProcessor(outbox)
+      val processingHost = processingHostComposer.compose(processor, decorators)
       executor.execute(processingHost)
     }.onFailure {
       logger.error("$LOGGER_PREFIX Failure in instant handling", it)
@@ -120,8 +122,8 @@ internal class TransactionalOutboxImpl(
   }
 
   private fun processItem(item: OutboxItem) {
-    val processor = OutboxItemProcessor(item, outboxHandlers[item.type]!!, outboxStore, clock)
-    val processingHost = OutboxProcessingHost(processor, decorators)
+    val processor = makeOutboxProcessor(item)
+    val processingHost = processingHostComposer.compose(processor, decorators)
     try {
       executor.execute(processingHost)
     } catch (exception: RejectedExecutionException) {
@@ -129,6 +131,11 @@ internal class TransactionalOutboxImpl(
       processingHost.reset()
     }
   }
+
+  private fun makeOutboxProcessor(item: OutboxItem): OutboxProcessingAction =
+    OutboxGroupProcessor(OutboxItemGroup(listOf(item)), ::resolveOutboxHandler, outboxStore, clock)
+
+  private fun resolveOutboxHandler(item: OutboxItem): OutboxHandler? = outboxHandlers[item.type]
 
   override fun shutdown() {
     if (!inShutdownMode.compareAndSet(false, true)) {
