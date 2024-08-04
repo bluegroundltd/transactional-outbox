@@ -21,6 +21,9 @@ $dokka.location:io.github.bluegroundltd.outbox.item/OutboxItem/rerunAfter/#/Poin
 $dokka.location:io.github.bluegroundltd.outbox.item/OutboxItem/retries/#/PointingToDeclaration/core/io.github.bluegroundltd.outbox.item/-outbox-item/retries.html
 $dokka.location:io.github.bluegroundltd.outbox.item/OutboxItem/status/#/PointingToDeclaration/core/io.github.bluegroundltd.outbox.item/-outbox-item/status.html
 $dokka.location:io.github.bluegroundltd.outbox.item/OutboxItem/type/#/PointingToDeclaration/core/io.github.bluegroundltd.outbox.item/-outbox-item/type.html
+$dokka.location:io.github.bluegroundltd.outbox.item/OutboxItemGroup///PointingToDeclaration/core/io.github.bluegroundltd.outbox.item/-outbox-item-group/index.html
+$dokka.location:io.github.bluegroundltd.outbox.item/OutboxItemGroup/OutboxItemGroup/#kotlin.collections.List[io.github.bluegroundltd.outbox.item.OutboxItem]/PointingToDeclaration/core/io.github.bluegroundltd.outbox.item/-outbox-item-group/-outbox-item-group.html
+$dokka.location:io.github.bluegroundltd.outbox.item/OutboxItemGroup/items/#/PointingToDeclaration/core/io.github.bluegroundltd.outbox.item/-outbox-item-group/items.html
 $dokka.location:io.github.bluegroundltd.outbox.item/OutboxPayload///PointingToDeclaration/core/io.github.bluegroundltd.outbox.item/-outbox-payload/index.html
 $dokka.location:io.github.bluegroundltd.outbox.item/OutboxStatus.COMPLETED///PointingToDeclaration/core/io.github.bluegroundltd.outbox.item/-outbox-status/-c-o-m-p-l-e-t-e-d/index.html
 $dokka.location:io.github.bluegroundltd.outbox.item/OutboxStatus.FAILED///PointingToDeclaration/core/io.github.bluegroundltd.outbox.item/-outbox-status/-f-a-i-l-e-d/index.html
