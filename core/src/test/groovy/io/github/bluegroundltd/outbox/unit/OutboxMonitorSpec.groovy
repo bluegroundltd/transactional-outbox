@@ -1,11 +1,11 @@
 package io.github.bluegroundltd.outbox.unit
 
-import io.github.bluegroundltd.outbox.OutboxGroupProcessor
-import io.github.bluegroundltd.outbox.OutboxItemProcessorDecorator
+import io.github.bluegroundltd.outbox.processing.OutboxGroupProcessor
+import io.github.bluegroundltd.outbox.processing.OutboxItemProcessorDecorator
 import io.github.bluegroundltd.outbox.OutboxLocksProvider
-import io.github.bluegroundltd.outbox.OutboxProcessingAction
-import io.github.bluegroundltd.outbox.OutboxProcessingHost
-import io.github.bluegroundltd.outbox.OutboxProcessingHostComposer
+import io.github.bluegroundltd.outbox.processing.OutboxProcessingAction
+import io.github.bluegroundltd.outbox.processing.OutboxProcessingHost
+import io.github.bluegroundltd.outbox.processing.OutboxProcessingHostComposer
 import io.github.bluegroundltd.outbox.TransactionalOutbox
 import io.github.bluegroundltd.outbox.TransactionalOutboxImpl
 import io.github.bluegroundltd.outbox.event.InstantOutboxPublisher
