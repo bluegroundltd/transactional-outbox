@@ -35,6 +35,33 @@ class OutboxItemProcessorSpec extends Specification {
     )
   }
 
+  def "Should throw [InvalidOutboxStatusException] when a outbox status is #status"() {
+    given:
+      def outboxItem = itemBuilder.withStatus(status as OutboxStatus).build()
+      def itemProcessor = new OutboxItemProcessor(
+        outboxItem,
+        { null },
+        store,
+        clock
+      )
+
+    and:
+      def expectedException = new InvalidOutboxStatusException(outboxItem, [OutboxStatus.RUNNING].toSet())
+
+    when:
+      itemProcessor.run()
+
+    then:
+      0 * _
+
+    and:
+      def ex = thrown(InvalidOutboxStatusException)
+      ex == expectedException
+
+    where:
+      status << OutboxStatus.values() - OutboxStatus.RUNNING
+  }
+
   def "Should throw [InvalidOutboxHandlerException] when a handler cannot be resolved"() {
     given:
       def itemProcessor = new OutboxItemProcessor(

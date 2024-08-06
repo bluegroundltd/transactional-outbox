@@ -25,6 +25,10 @@ internal class OutboxItemProcessor(
   }
 
   override fun run() {
+    if (item.status != OutboxStatus.RUNNING) {
+      throw InvalidOutboxStatusException(item, setOf(OutboxStatus.RUNNING))
+    }
+
     val handler = resolveHandler(item)
 
     try {
