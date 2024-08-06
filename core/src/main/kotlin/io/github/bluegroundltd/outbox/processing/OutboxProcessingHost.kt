@@ -1,6 +1,8 @@
 package io.github.bluegroundltd.outbox.processing
 
 import io.github.bluegroundltd.outbox.annotation.TestableOpenClass
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 /**
  * Serves as a host inside which outbox items will be processed.
@@ -23,11 +25,16 @@ internal class OutboxProcessingHost(
   private val processingAction: OutboxProcessingAction,
   decorators: List<OutboxItemProcessorDecorator>
 ) : Runnable {
+  companion object {
+    private const val LOGGER_PREFIX = "[OUTBOX-PROCESSING-HOST]"
+    private val logger: Logger = LoggerFactory.getLogger(OutboxGroupProcessor::class.java)
+  }
 
   private val processorRunnable = Runnable {
     try {
       processingAction.run()
     } catch (e: Exception) {
+      logger.error("$LOGGER_PREFIX ${e.message}")
       processingAction.reset()
     }
   }
