@@ -2,8 +2,8 @@ package io.github.bluegroundltd.outbox.unit
 
 import io.github.bluegroundltd.outbox.OutboxHandler
 import io.github.bluegroundltd.outbox.OutboxLocksProvider
-import io.github.bluegroundltd.outbox.OutboxProcessingHost
-import io.github.bluegroundltd.outbox.OutboxProcessingHostComposer
+import io.github.bluegroundltd.outbox.processing.OutboxProcessingHost
+import io.github.bluegroundltd.outbox.processing.OutboxProcessingHostComposer
 import io.github.bluegroundltd.outbox.TransactionalOutbox
 import io.github.bluegroundltd.outbox.TransactionalOutboxImpl
 import io.github.bluegroundltd.outbox.event.InstantOutboxPublisher

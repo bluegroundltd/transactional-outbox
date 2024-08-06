@@ -1,8 +1,6 @@
-package io.github.bluegroundltd.outbox.unit
+package io.github.bluegroundltd.outbox.processing
 
-import io.github.bluegroundltd.outbox.InvalidOutboxHandlerException
 import io.github.bluegroundltd.outbox.OutboxHandler
-import io.github.bluegroundltd.outbox.OutboxItemProcessor
 import io.github.bluegroundltd.outbox.item.OutboxItem
 import io.github.bluegroundltd.outbox.item.OutboxStatus
 import io.github.bluegroundltd.outbox.item.OutboxType

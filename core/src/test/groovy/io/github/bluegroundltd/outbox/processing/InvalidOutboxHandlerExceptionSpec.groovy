@@ -1,6 +1,5 @@
-package io.github.bluegroundltd.outbox.unit
+package io.github.bluegroundltd.outbox.processing
 
-import io.github.bluegroundltd.outbox.InvalidOutboxHandlerException
 import io.github.bluegroundltd.outbox.item.OutboxItem
 import io.github.bluegroundltd.outbox.utils.OutboxItemBuilder
 import spock.lang.Specification

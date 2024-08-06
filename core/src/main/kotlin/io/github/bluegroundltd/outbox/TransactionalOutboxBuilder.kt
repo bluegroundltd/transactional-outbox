@@ -4,6 +4,8 @@ import io.github.bluegroundltd.outbox.event.InstantOutboxPublisher
 import io.github.bluegroundltd.outbox.executor.FixedThreadPoolExecutorServiceFactory
 import io.github.bluegroundltd.outbox.item.OutboxType
 import io.github.bluegroundltd.outbox.item.factory.OutboxItemFactory
+import io.github.bluegroundltd.outbox.processing.OutboxItemProcessorDecorator
+import io.github.bluegroundltd.outbox.processing.OutboxProcessingHostComposer
 import io.github.bluegroundltd.outbox.store.OutboxStore
 import java.time.Clock
 import java.time.Duration

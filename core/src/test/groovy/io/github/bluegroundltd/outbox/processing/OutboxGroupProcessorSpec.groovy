@@ -1,6 +1,5 @@
-package io.github.bluegroundltd.outbox.unit
+package io.github.bluegroundltd.outbox.processing
 
-import io.github.bluegroundltd.outbox.OutboxGroupProcessor
 import io.github.bluegroundltd.outbox.OutboxHandler
 import io.github.bluegroundltd.outbox.item.OutboxItem
 import io.github.bluegroundltd.outbox.item.OutboxItemGroup

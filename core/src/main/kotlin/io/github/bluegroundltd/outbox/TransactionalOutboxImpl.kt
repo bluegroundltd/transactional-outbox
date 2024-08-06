@@ -8,6 +8,11 @@ import io.github.bluegroundltd.outbox.item.OutboxPayload
 import io.github.bluegroundltd.outbox.item.OutboxStatus
 import io.github.bluegroundltd.outbox.item.OutboxType
 import io.github.bluegroundltd.outbox.item.factory.OutboxItemFactory
+import io.github.bluegroundltd.outbox.processing.OutboxGroupProcessor
+import io.github.bluegroundltd.outbox.processing.OutboxItemProcessorDecorator
+import io.github.bluegroundltd.outbox.processing.OutboxProcessingAction
+import io.github.bluegroundltd.outbox.processing.OutboxProcessingHost
+import io.github.bluegroundltd.outbox.processing.OutboxProcessingHostComposer
 import io.github.bluegroundltd.outbox.store.OutboxFilter
 import io.github.bluegroundltd.outbox.store.OutboxStore
 import org.slf4j.Logger

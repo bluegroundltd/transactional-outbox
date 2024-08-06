@@ -1,5 +1,6 @@
-package io.github.bluegroundltd.outbox
+package io.github.bluegroundltd.outbox.processing
 
+import io.github.bluegroundltd.outbox.OutboxHandler
 import io.github.bluegroundltd.outbox.annotation.TestableOpenClass
 import io.github.bluegroundltd.outbox.item.OutboxItem
 import io.github.bluegroundltd.outbox.item.OutboxStatus
