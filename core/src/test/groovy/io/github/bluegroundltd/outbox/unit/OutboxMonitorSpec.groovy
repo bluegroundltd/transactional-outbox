@@ -1,11 +1,11 @@
 package io.github.bluegroundltd.outbox.unit
 
-import io.github.bluegroundltd.outbox.OutboxGroupProcessor
-import io.github.bluegroundltd.outbox.OutboxItemProcessorDecorator
+import io.github.bluegroundltd.outbox.processing.OutboxGroupProcessor
+import io.github.bluegroundltd.outbox.processing.OutboxItemProcessorDecorator
 import io.github.bluegroundltd.outbox.OutboxLocksProvider
-import io.github.bluegroundltd.outbox.OutboxProcessingAction
-import io.github.bluegroundltd.outbox.OutboxProcessingHost
-import io.github.bluegroundltd.outbox.OutboxProcessingHostComposer
+import io.github.bluegroundltd.outbox.processing.OutboxProcessingAction
+import io.github.bluegroundltd.outbox.processing.OutboxProcessingHost
+import io.github.bluegroundltd.outbox.processing.OutboxProcessingHostComposer
 import io.github.bluegroundltd.outbox.TransactionalOutbox
 import io.github.bluegroundltd.outbox.TransactionalOutboxImpl
 import io.github.bluegroundltd.outbox.event.InstantOutboxPublisher
@@ -115,11 +115,15 @@ class OutboxMonitorSpec extends Specification {
     given:
       def pendingItem = OutboxItemBuilder.makePending()
       def runningItem = OutboxItemBuilder.make().withStatus(OutboxStatus.RUNNING).build()
-      def items = [pendingItem, runningItem]
+      def failedItem = OutboxItemBuilder.make().withStatus(OutboxStatus.FAILED).build()
+      def completedItem = OutboxItemBuilder.make().withStatus(OutboxStatus.COMPLETED).build()
+      def fetchedItems = [pendingItem, runningItem, failedItem, completedItem]
+      def toBeProcessedItems = [pendingItem, runningItem, failedItem]
+      def markedForProcessing = [pendingItem, runningItem]
 
     and:
       def now = Instant.now(clock)
-      def processingHosts = items.collect { Mock(OutboxProcessingHost) }
+      def processingHosts = toBeProcessedItems.collect { Mock(OutboxProcessingHost) }
 
     when:
       transactionalOutbox.monitor()
@@ -131,9 +135,11 @@ class OutboxMonitorSpec extends Specification {
           outboxPendingFilter.nextRunLessThan == now
           outboxRunningFilter.rerunAfterLessThan == now
         }
-        items
+        fetchedItems
       }
-      items.size() * store.update(_) >> { OutboxItem item ->
+
+    and: "The pending and running items are marked for processing while the failed item is stored as-is"
+      markedForProcessing.size() * store.update(_) >> { OutboxItem item ->
         with(item) {
           it.status == OutboxStatus.RUNNING
           it.lastExecution == now
@@ -141,7 +147,18 @@ class OutboxMonitorSpec extends Specification {
         }
         return item
       }
-      items.eachWithIndex { item, index ->
+      1 * store.update(_) >> { OutboxItem item ->
+        with(item) {
+          it.id == failedItem.id
+          it.status == OutboxStatus.FAILED
+          it.lastExecution == failedItem.lastExecution
+          it.rerunAfter == failedItem.rerunAfter
+        }
+        return item
+      }
+
+    and: "A processor is created for each item and submitted for execution"
+      toBeProcessedItems.eachWithIndex { item, index ->
         1 * processingHostComposer.compose(_, _) >> { OutboxProcessingAction action, List<OutboxItemProcessorDecorator> decorators ->
           assert action instanceof OutboxGroupProcessor
           assert decorators == this.decorators
@@ -149,6 +166,8 @@ class OutboxMonitorSpec extends Specification {
         }
         1 * executor.execute(processingHosts[index])
       }
+
+    and:
       1 * monitorLocksProvider.release()
       0 * _
   }

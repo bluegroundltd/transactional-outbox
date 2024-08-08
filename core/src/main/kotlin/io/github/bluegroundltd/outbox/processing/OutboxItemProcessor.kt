@@ -1,5 +1,6 @@
-package io.github.bluegroundltd.outbox
+package io.github.bluegroundltd.outbox.processing
 
+import io.github.bluegroundltd.outbox.OutboxHandler
 import io.github.bluegroundltd.outbox.annotation.TestableOpenClass
 import io.github.bluegroundltd.outbox.item.OutboxItem
 import io.github.bluegroundltd.outbox.item.OutboxStatus
@@ -24,6 +25,10 @@ internal class OutboxItemProcessor(
   }
 
   override fun run() {
+    if (item.status != OutboxStatus.RUNNING) {
+      throw InvalidOutboxStatusException(item, setOf(OutboxStatus.RUNNING))
+    }
+
     val handler = resolveHandler(item)
 
     try {
@@ -80,16 +85,15 @@ internal class OutboxItemProcessor(
   }
 
   private fun resolveHandler(item: OutboxItem): OutboxHandler {
-    val handler = handlerResolver(item)
-    if (handler == null) {
-      val message = "Handler could not be resolved for item with id: ${item.id} and type: ${item.type}"
-      logger.error("$LOGGER_PREFIX $message")
-      throw InvalidOutboxHandlerException(item, message)
-    }
+    val handler = handlerResolver(item) ?: throw InvalidOutboxHandlerException(
+      item,
+      "Handler could not be resolved for item with id: ${item.id} and type: ${item.type}"
+    )
     if (!handler.supports(item.type)) {
-      val message = "Handler ${handler::class.java} does not support item of type: ${item.type}"
-      logger.error("$LOGGER_PREFIX $message")
-      throw InvalidOutboxHandlerException(item, message)
+      throw InvalidOutboxHandlerException(
+        item,
+        "Handler ${handler::class.java} does not support item of type: ${item.type}"
+      )
     }
     return handler
   }

@@ -15,6 +15,10 @@ class OutboxRunningFilter(
   val rerunAfterLessThan: Instant
 ) : AbstractOutboxFilter(OutboxStatus.RUNNING)
 
+class OutboxFailedFilter(
+  val deleteAfterLessThan: Instant
+) : AbstractOutboxFilter(OutboxStatus.COMPLETED)
+
 class OutboxFilter(
   nextRunLessThan: Instant,
   rerunAfterLessThan: Instant = nextRunLessThan

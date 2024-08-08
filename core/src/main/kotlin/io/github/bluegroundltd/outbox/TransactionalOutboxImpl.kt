@@ -8,6 +8,11 @@ import io.github.bluegroundltd.outbox.item.OutboxPayload
 import io.github.bluegroundltd.outbox.item.OutboxStatus
 import io.github.bluegroundltd.outbox.item.OutboxType
 import io.github.bluegroundltd.outbox.item.factory.OutboxItemFactory
+import io.github.bluegroundltd.outbox.processing.OutboxGroupProcessor
+import io.github.bluegroundltd.outbox.processing.OutboxItemProcessorDecorator
+import io.github.bluegroundltd.outbox.processing.OutboxProcessingAction
+import io.github.bluegroundltd.outbox.processing.OutboxProcessingHost
+import io.github.bluegroundltd.outbox.processing.OutboxProcessingHostComposer
 import io.github.bluegroundltd.outbox.store.OutboxFilter
 import io.github.bluegroundltd.outbox.store.OutboxStore
 import org.slf4j.Logger
@@ -42,7 +47,12 @@ internal class TransactionalOutboxImpl(
   companion object {
     private const val LOGGER_PREFIX = "[OUTBOX]"
     private val logger: Logger = LoggerFactory.getLogger(TransactionalOutboxImpl::class.java)
-    private val STATUSES_ELIGIBLE_FOR_PROCESSING = EnumSet.of(OutboxStatus.PENDING, OutboxStatus.RUNNING)
+    private val STATUSES_RETRIEVED_FOR_PROCESSING = EnumSet.of(
+      OutboxStatus.PENDING,
+      OutboxStatus.RUNNING,
+      OutboxStatus.FAILED // Required for in-order processing in groups (i.e. they might precede other items).
+    )
+    private val STATUSES_TO_UPDATE_FOR_PROCESSING = EnumSet.of(OutboxStatus.PENDING, OutboxStatus.RUNNING)
   }
 
   override fun add(type: OutboxType, payload: OutboxPayload, shouldPublishAfterInsertion: Boolean) {
@@ -98,12 +108,12 @@ internal class TransactionalOutboxImpl(
   private fun fetchEligibleItems(): List<OutboxItem> {
     val (eligibleItems, erroneouslyFetchedItems) = outboxStore
       .fetch(OutboxFilter(Instant.now(clock)))
-      .partition { it.status in STATUSES_ELIGIBLE_FOR_PROCESSING }
+      .partition { it.status in STATUSES_RETRIEVED_FOR_PROCESSING }
 
     erroneouslyFetchedItems.forEach {
       logger.warn(
         "$LOGGER_PREFIX Outbox item with id ${it.id} erroneously fetched, as its status is ${it.status}. " +
-          "Expected status to be one of $STATUSES_ELIGIBLE_FOR_PROCESSING"
+          "Expected status to be one of $STATUSES_RETRIEVED_FOR_PROCESSING"
       )
     }
 
@@ -112,14 +122,19 @@ internal class TransactionalOutboxImpl(
 
   private fun markForProcessing(items: List<OutboxItem>): List<OutboxItem> {
     val now = Instant.now(clock)
-    return items.map {
-      it.copy(
+    return items.map { markForProcessing(it, now) }
+  }
+
+  private fun markForProcessing(item: OutboxItem, now: Instant): OutboxItem =
+    if (item.status in STATUSES_TO_UPDATE_FOR_PROCESSING) {
+      item.copy(
         status = OutboxStatus.RUNNING,
         lastExecution = now,
         rerunAfter = now.plus(rerunAfterDuration)
       )
+    } else {
+      item.copy()
     }
-  }
 
   private fun processItem(item: OutboxItem) {
     val processor = makeOutboxProcessor(item)

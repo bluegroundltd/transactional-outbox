@@ -1,8 +1,6 @@
-package io.github.bluegroundltd.outbox.unit
+package io.github.bluegroundltd.outbox.processing
 
-import io.github.bluegroundltd.outbox.InvalidOutboxHandlerException
 import io.github.bluegroundltd.outbox.OutboxHandler
-import io.github.bluegroundltd.outbox.OutboxItemProcessor
 import io.github.bluegroundltd.outbox.item.OutboxItem
 import io.github.bluegroundltd.outbox.item.OutboxStatus
 import io.github.bluegroundltd.outbox.item.OutboxType
@@ -35,6 +33,33 @@ class OutboxItemProcessorSpec extends Specification {
       store,
       clock
     )
+  }
+
+  def "Should throw [InvalidOutboxStatusException] when a outbox status is #status"() {
+    given:
+      def outboxItem = itemBuilder.withStatus(status as OutboxStatus).build()
+      def itemProcessor = new OutboxItemProcessor(
+        outboxItem,
+        { null },
+        store,
+        clock
+      )
+
+    and:
+      def expectedException = new InvalidOutboxStatusException(outboxItem, [OutboxStatus.RUNNING].toSet())
+
+    when:
+      itemProcessor.run()
+
+    then:
+      0 * _
+
+    and:
+      def ex = thrown(InvalidOutboxStatusException)
+      ex == expectedException
+
+    where:
+      status << OutboxStatus.values() - OutboxStatus.RUNNING
   }
 
   def "Should throw [InvalidOutboxHandlerException] when a handler cannot be resolved"() {
