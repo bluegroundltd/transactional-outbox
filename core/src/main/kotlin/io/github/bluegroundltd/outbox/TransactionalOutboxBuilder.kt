@@ -7,7 +7,6 @@ import io.github.bluegroundltd.outbox.item.factory.OutboxItemFactory
 import io.github.bluegroundltd.outbox.store.OutboxStore
 import java.time.Clock
 import java.time.Duration
-import kotlin.properties.Delegates
 
 /**
  * Builder for [TransactionalOutbox].
@@ -36,7 +35,7 @@ class TransactionalOutboxBuilder(
   InstantOutboxPublisherStep,
   BuildStep {
   private val handlers: MutableMap<OutboxType, OutboxHandler> = mutableMapOf()
-  private var threadPoolSize by Delegates.notNull<Int>()
+  private var threadPoolSize: Int? = null
   private var threadPoolTimeOut: Duration = DEFAULT_THREAD_POOL_TIMEOUT
   private var decorators: MutableList<OutboxItemProcessorDecorator> = mutableListOf()
   private lateinit var monitorLocksProvider: OutboxLocksProvider
@@ -157,7 +156,7 @@ class TransactionalOutboxBuilder(
    * Builds the outbox.
    */
   override fun build(): TransactionalOutbox {
-    val executorServiceFactory = FixedThreadPoolExecutorServiceFactory()
+    val executorServiceFactory = FixedThreadPoolExecutorServiceFactory(threadPoolSize)
     val outboxItemFactory = OutboxItemFactory(clock, handlers.toMap(), rerunAfterDuration)
 
     return TransactionalOutboxImpl(
