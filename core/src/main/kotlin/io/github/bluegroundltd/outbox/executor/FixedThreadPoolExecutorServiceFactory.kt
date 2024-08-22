@@ -10,9 +10,10 @@ import java.util.concurrent.Executors
  * Creates a fixed thread pool executor service, using a default pool size and name format for threads.
  */
 internal class FixedThreadPoolExecutorServiceFactory(
-  private val threadPoolSize: Int = DEFAULT_THREAD_POOL_SIZE,
+  threadPoolSize: Int? = null,
   private val threadNameFormat: String = DEFAULT_THREAD_NAME_FORMAT
 ) {
+  private val threadPoolSize = threadPoolSize ?: DEFAULT_THREAD_POOL_SIZE
 
   companion object {
     private const val DEFAULT_THREAD_POOL_SIZE = 10
