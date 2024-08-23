@@ -27,9 +27,10 @@ class FixedThreadPoolExecutorServiceFactorySpec extends UnitTestSpecification {
   def "Should create a FixedThreadPool ExecutorService with custom configuration"() {
     given:
       def expectedThreadPoolSize = 5
+      def expectedThreadPriority = Thread.MIN_PRIORITY
 
     when:
-      def factory = new FixedThreadPoolExecutorServiceFactory(5, "")
+      def factory = new FixedThreadPoolExecutorServiceFactory(5, Thread.MIN_PRIORITY, "")
 
     then:
       def executorService = factory.make()
@@ -43,5 +44,6 @@ class FixedThreadPoolExecutorServiceFactorySpec extends UnitTestSpecification {
     and:
       threadPoolExecutorService.getCorePoolSize() == expectedThreadPoolSize
       threadPoolExecutorService.getMaximumPoolSize() == expectedThreadPoolSize
+      threadPoolExecutorService.getThreadFactory().newThread({}).getPriority() == expectedThreadPriority
   }
 }

@@ -60,7 +60,7 @@ class TransactionalOutboxImplSpec extends Specification {
     instantOutboxPublisher,
     outboxItemFactory,
     DURATION_ONE_HOUR,
-    new FixedThreadPoolExecutorServiceFactory(1, "").make(),
+    new FixedThreadPoolExecutorServiceFactory(1, null, "").make(),
     [],
     DURATION_ONE_NANO,
     processingHostComposer

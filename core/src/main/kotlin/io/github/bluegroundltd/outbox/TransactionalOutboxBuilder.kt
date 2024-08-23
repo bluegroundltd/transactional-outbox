@@ -36,6 +36,7 @@ class TransactionalOutboxBuilder(
   BuildStep {
   private val handlers: MutableMap<OutboxType, OutboxHandler> = mutableMapOf()
   private var threadPoolSize: Int? = null
+  private var threadPriority: Int? = null
   private var threadPoolTimeOut: Duration = DEFAULT_THREAD_POOL_TIMEOUT
   private var decorators: MutableList<OutboxItemProcessorDecorator> = mutableListOf()
   private lateinit var monitorLocksProvider: OutboxLocksProvider
@@ -133,6 +134,14 @@ class TransactionalOutboxBuilder(
   }
 
   /**
+   * Sets the priority for the threads in the thread pool.
+   */
+  override fun withThreadPriority(threadPriority: Int): BuildStep {
+    this.threadPriority = threadPriority
+    return this
+  }
+
+  /**
    * Sets the thread pool timeout upon shutdown for the outbox.
    */
   override fun withThreadPoolTimeOut(threadPoolTimeOut: Duration): BuildStep {
@@ -156,7 +165,7 @@ class TransactionalOutboxBuilder(
    * Builds the outbox.
    */
   override fun build(): TransactionalOutbox {
-    val executorServiceFactory = FixedThreadPoolExecutorServiceFactory(threadPoolSize)
+    val executorServiceFactory = FixedThreadPoolExecutorServiceFactory(threadPoolSize, threadPriority)
     val outboxItemFactory = OutboxItemFactory(clock, handlers.toMap(), rerunAfterDuration)
 
     return TransactionalOutboxImpl(
@@ -198,6 +207,7 @@ interface InstantOutboxPublisherStep {
 
 interface BuildStep {
   fun withThreadPoolSize(threadPoolSize: Int): BuildStep
+  fun withThreadPriority(threadPriority: Int): BuildStep
   fun withThreadPoolTimeOut(threadPoolTimeOut: Duration): BuildStep
   fun addProcessorDecorator(decorator: OutboxItemProcessorDecorator): BuildStep
   fun build(): TransactionalOutbox

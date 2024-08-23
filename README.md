@@ -55,6 +55,12 @@ class OutboxConfiguration(
     return TransactionalOutboxBuilder
       .make(clock)
       .withHandlers(outboxHandlers)
+      // Ideally you want your thread pool < db connection pool size or similar
+      .withThreadPoolSize(5) 
+      // Override the default Thread priority with caution
+      // If you are facing performance issues, you should
+      // adjust the thread pool size first.
+      // .withThreadPriority(Thread.NORM_PRIORITY)
       .withMonitorLocksProvider(monitorLocksProvider)
       .withCleanupLocksProvider(cleanupLocksProvider)
       .withStore(outboxStore)
