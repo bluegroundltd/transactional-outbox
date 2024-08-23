@@ -56,6 +56,7 @@ $dokka.location:io.github.bluegroundltd.outbox/BuildStep/addProcessorDecorator/#
 $dokka.location:io.github.bluegroundltd.outbox/BuildStep/build/#/PointingToDeclaration/core/io.github.bluegroundltd.outbox/-build-step/build.html
 $dokka.location:io.github.bluegroundltd.outbox/BuildStep/withThreadPoolSize/#kotlin.Int/PointingToDeclaration/core/io.github.bluegroundltd.outbox/-build-step/with-thread-pool-size.html
 $dokka.location:io.github.bluegroundltd.outbox/BuildStep/withThreadPoolTimeOut/#java.time.Duration/PointingToDeclaration/core/io.github.bluegroundltd.outbox/-build-step/with-thread-pool-time-out.html
+$dokka.location:io.github.bluegroundltd.outbox/BuildStep/withThreadPriority/#kotlin.Int/PointingToDeclaration/core/io.github.bluegroundltd.outbox/-build-step/with-thread-priority.html
 $dokka.location:io.github.bluegroundltd.outbox/CleanupLocksProviderStep///PointingToDeclaration/core/io.github.bluegroundltd.outbox/-cleanup-locks-provider-step/index.html
 $dokka.location:io.github.bluegroundltd.outbox/CleanupLocksProviderStep/withCleanupLocksProvider/#io.github.bluegroundltd.outbox.OutboxLocksProvider/PointingToDeclaration/core/io.github.bluegroundltd.outbox/-cleanup-locks-provider-step/with-cleanup-locks-provider.html
 $dokka.location:io.github.bluegroundltd.outbox/InstantOutboxPublisherStep///PointingToDeclaration/core/io.github.bluegroundltd.outbox/-instant-outbox-publisher-step/index.html
@@ -108,6 +109,7 @@ $dokka.location:io.github.bluegroundltd.outbox/TransactionalOutboxBuilder/withMo
 $dokka.location:io.github.bluegroundltd.outbox/TransactionalOutboxBuilder/withStore/#io.github.bluegroundltd.outbox.store.OutboxStore/PointingToDeclaration/core/io.github.bluegroundltd.outbox/-transactional-outbox-builder/with-store.html
 $dokka.location:io.github.bluegroundltd.outbox/TransactionalOutboxBuilder/withThreadPoolSize/#kotlin.Int/PointingToDeclaration/core/io.github.bluegroundltd.outbox/-transactional-outbox-builder/with-thread-pool-size.html
 $dokka.location:io.github.bluegroundltd.outbox/TransactionalOutboxBuilder/withThreadPoolTimeOut/#java.time.Duration/PointingToDeclaration/core/io.github.bluegroundltd.outbox/-transactional-outbox-builder/with-thread-pool-time-out.html
+$dokka.location:io.github.bluegroundltd.outbox/TransactionalOutboxBuilder/withThreadPriority/#kotlin.Int/PointingToDeclaration/core/io.github.bluegroundltd.outbox/-transactional-outbox-builder/with-thread-priority.html
 io.github.bluegroundltd.outbox
 io.github.bluegroundltd.outbox.annotation
 io.github.bluegroundltd.outbox.event
