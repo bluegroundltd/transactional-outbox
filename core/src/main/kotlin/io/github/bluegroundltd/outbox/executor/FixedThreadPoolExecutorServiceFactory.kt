@@ -11,9 +11,11 @@ import java.util.concurrent.Executors
  */
 internal class FixedThreadPoolExecutorServiceFactory(
   threadPoolSize: Int? = null,
+  threadPriority: Int? = null,
   private val threadNameFormat: String = DEFAULT_THREAD_NAME_FORMAT
 ) {
   private val threadPoolSize = threadPoolSize ?: DEFAULT_THREAD_POOL_SIZE
+  private val threadPriority = threadPriority ?: Thread.NORM_PRIORITY
 
   companion object {
     private const val DEFAULT_THREAD_POOL_SIZE = 10
@@ -25,7 +27,7 @@ internal class FixedThreadPoolExecutorServiceFactory(
     logger.debug("Creating fixed thread pool with size: $threadPoolSize and name format \"$threadNameFormat\"")
     return Executors.newFixedThreadPool(
       threadPoolSize,
-      ThreadFactoryBuilder().setNameFormat(threadNameFormat).build()
+      ThreadFactoryBuilder().setNameFormat(threadNameFormat).setPriority(threadPriority).build()
     )
   }
 }

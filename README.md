@@ -27,7 +27,7 @@ Transactional Outbox is published on `mavenCentral`. In order to use it just add
 
 ```gradle
 
-implementation("io.github.bluegroundltd:transactional-outbox-core:2.0.4")
+implementation("io.github.bluegroundltd:transactional-outbox-core:2.1.0")
 
 ```
 
@@ -55,6 +55,12 @@ class OutboxConfiguration(
     return TransactionalOutboxBuilder
       .make(clock)
       .withHandlers(outboxHandlers)
+      // Ideally you want your thread pool < db connection pool size or similar
+      .withThreadPoolSize(5) 
+      // Override the default Thread priority with caution
+      // If you are facing performance issues, you should
+      // adjust the thread pool size first.
+      // .withThreadPriority(Thread.NORM_PRIORITY)
       .withMonitorLocksProvider(monitorLocksProvider)
       .withCleanupLocksProvider(cleanupLocksProvider)
       .withStore(outboxStore)
