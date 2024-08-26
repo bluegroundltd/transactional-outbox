@@ -27,7 +27,7 @@ Transactional Outbox is published on `mavenCentral`. In order to use it just add
 
 ```gradle
 
-implementation("io.github.bluegroundltd:transactional-outbox-core:2.1.0")
+implementation("io.github.bluegroundltd:transactional-outbox-core:2.1.1")
 
 ```
 
