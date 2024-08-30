@@ -32,6 +32,9 @@ $dokka.location:io.github.bluegroundltd.outbox.item/OutboxStatus.RUNNING///Point
 $dokka.location:io.github.bluegroundltd.outbox.item/OutboxStatus///PointingToDeclaration/core/io.github.bluegroundltd.outbox.item/-outbox-status/index.html
 $dokka.location:io.github.bluegroundltd.outbox.item/OutboxType///PointingToDeclaration/core/io.github.bluegroundltd.outbox.item/-outbox-type/index.html
 $dokka.location:io.github.bluegroundltd.outbox.item/OutboxType/getType/#/PointingToDeclaration/core/io.github.bluegroundltd.outbox.item/-outbox-type/get-type.html
+$dokka.location:io.github.bluegroundltd.outbox.processing////PointingToDeclaration/core/io.github.bluegroundltd.outbox.processing/index.html
+$dokka.location:io.github.bluegroundltd.outbox.processing/OutboxItemProcessorDecorator///PointingToDeclaration/core/io.github.bluegroundltd.outbox.processing/-outbox-item-processor-decorator/index.html
+$dokka.location:io.github.bluegroundltd.outbox.processing/OutboxItemProcessorDecorator/decorate/#java.lang.Runnable/PointingToDeclaration/core/io.github.bluegroundltd.outbox.processing/-outbox-item-processor-decorator/decorate.html
 $dokka.location:io.github.bluegroundltd.outbox.store////PointingToDeclaration/core/io.github.bluegroundltd.outbox.store/index.html
 $dokka.location:io.github.bluegroundltd.outbox.store/AbstractOutboxFilter///PointingToDeclaration/core/io.github.bluegroundltd.outbox.store/-abstract-outbox-filter/index.html
 $dokka.location:io.github.bluegroundltd.outbox.store/AbstractOutboxFilter/status/#/PointingToDeclaration/core/io.github.bluegroundltd.outbox.store/-abstract-outbox-filter/status.html
@@ -52,7 +55,7 @@ $dokka.location:io.github.bluegroundltd.outbox.store/OutboxStore/insert/#io.gith
 $dokka.location:io.github.bluegroundltd.outbox.store/OutboxStore/update/#io.github.bluegroundltd.outbox.item.OutboxItem/PointingToDeclaration/core/io.github.bluegroundltd.outbox.store/-outbox-store/update.html
 $dokka.location:io.github.bluegroundltd.outbox////PointingToDeclaration/core/io.github.bluegroundltd.outbox/index.html
 $dokka.location:io.github.bluegroundltd.outbox/BuildStep///PointingToDeclaration/core/io.github.bluegroundltd.outbox/-build-step/index.html
-$dokka.location:io.github.bluegroundltd.outbox/BuildStep/addProcessorDecorator/#io.github.bluegroundltd.outbox.OutboxItemProcessorDecorator/PointingToDeclaration/core/io.github.bluegroundltd.outbox/-build-step/add-processor-decorator.html
+$dokka.location:io.github.bluegroundltd.outbox/BuildStep/addProcessorDecorator/#io.github.bluegroundltd.outbox.processing.OutboxItemProcessorDecorator/PointingToDeclaration/core/io.github.bluegroundltd.outbox/-build-step/add-processor-decorator.html
 $dokka.location:io.github.bluegroundltd.outbox/BuildStep/build/#/PointingToDeclaration/core/io.github.bluegroundltd.outbox/-build-step/build.html
 $dokka.location:io.github.bluegroundltd.outbox/BuildStep/withThreadPoolSize/#kotlin.Int/PointingToDeclaration/core/io.github.bluegroundltd.outbox/-build-step/with-thread-pool-size.html
 $dokka.location:io.github.bluegroundltd.outbox/BuildStep/withThreadPoolTimeOut/#java.time.Duration/PointingToDeclaration/core/io.github.bluegroundltd.outbox/-build-step/with-thread-pool-time-out.html
@@ -73,8 +76,6 @@ $dokka.location:io.github.bluegroundltd.outbox/OutboxHandler/hasReachedMaxRetrie
 $dokka.location:io.github.bluegroundltd.outbox/OutboxHandler/serialize/#io.github.bluegroundltd.outbox.item.OutboxPayload/PointingToDeclaration/core/io.github.bluegroundltd.outbox/-outbox-handler/serialize.html
 $dokka.location:io.github.bluegroundltd.outbox/OutboxHandlersStep///PointingToDeclaration/core/io.github.bluegroundltd.outbox/-outbox-handlers-step/index.html
 $dokka.location:io.github.bluegroundltd.outbox/OutboxHandlersStep/withHandlers/#kotlin.collections.Set[io.github.bluegroundltd.outbox.OutboxHandler]/PointingToDeclaration/core/io.github.bluegroundltd.outbox/-outbox-handlers-step/with-handlers.html
-$dokka.location:io.github.bluegroundltd.outbox/OutboxItemProcessorDecorator///PointingToDeclaration/core/io.github.bluegroundltd.outbox/-outbox-item-processor-decorator/index.html
-$dokka.location:io.github.bluegroundltd.outbox/OutboxItemProcessorDecorator/decorate/#java.lang.Runnable/PointingToDeclaration/core/io.github.bluegroundltd.outbox/-outbox-item-processor-decorator/decorate.html
 $dokka.location:io.github.bluegroundltd.outbox/OutboxLocksProvider///PointingToDeclaration/core/io.github.bluegroundltd.outbox/-outbox-locks-provider/index.html
 $dokka.location:io.github.bluegroundltd.outbox/OutboxLocksProvider/acquire/#/PointingToDeclaration/core/io.github.bluegroundltd.outbox/-outbox-locks-provider/acquire.html
 $dokka.location:io.github.bluegroundltd.outbox/OutboxLocksProvider/release/#/PointingToDeclaration/core/io.github.bluegroundltd.outbox/-outbox-locks-provider/release.html
@@ -100,7 +101,7 @@ $dokka.location:io.github.bluegroundltd.outbox/TransactionalOutboxBuilder.Compan
 $dokka.location:io.github.bluegroundltd.outbox/TransactionalOutboxBuilder.Companion/make/#java.time.Clock/PointingToDeclaration/core/io.github.bluegroundltd.outbox/-transactional-outbox-builder/-companion/make.html
 $dokka.location:io.github.bluegroundltd.outbox/TransactionalOutboxBuilder///PointingToDeclaration/core/io.github.bluegroundltd.outbox/-transactional-outbox-builder/index.html
 $dokka.location:io.github.bluegroundltd.outbox/TransactionalOutboxBuilder/TransactionalOutboxBuilder/#java.time.Clock#java.time.Duration/PointingToDeclaration/core/io.github.bluegroundltd.outbox/-transactional-outbox-builder/-transactional-outbox-builder.html
-$dokka.location:io.github.bluegroundltd.outbox/TransactionalOutboxBuilder/addProcessorDecorator/#io.github.bluegroundltd.outbox.OutboxItemProcessorDecorator/PointingToDeclaration/core/io.github.bluegroundltd.outbox/-transactional-outbox-builder/add-processor-decorator.html
+$dokka.location:io.github.bluegroundltd.outbox/TransactionalOutboxBuilder/addProcessorDecorator/#io.github.bluegroundltd.outbox.processing.OutboxItemProcessorDecorator/PointingToDeclaration/core/io.github.bluegroundltd.outbox/-transactional-outbox-builder/add-processor-decorator.html
 $dokka.location:io.github.bluegroundltd.outbox/TransactionalOutboxBuilder/build/#/PointingToDeclaration/core/io.github.bluegroundltd.outbox/-transactional-outbox-builder/build.html
 $dokka.location:io.github.bluegroundltd.outbox/TransactionalOutboxBuilder/withCleanupLocksProvider/#io.github.bluegroundltd.outbox.OutboxLocksProvider/PointingToDeclaration/core/io.github.bluegroundltd.outbox/-transactional-outbox-builder/with-cleanup-locks-provider.html
 $dokka.location:io.github.bluegroundltd.outbox/TransactionalOutboxBuilder/withHandlers/#kotlin.collections.Set[io.github.bluegroundltd.outbox.OutboxHandler]/PointingToDeclaration/core/io.github.bluegroundltd.outbox/-transactional-outbox-builder/with-handlers.html
@@ -114,5 +115,6 @@ io.github.bluegroundltd.outbox
 io.github.bluegroundltd.outbox.annotation
 io.github.bluegroundltd.outbox.event
 io.github.bluegroundltd.outbox.item
+io.github.bluegroundltd.outbox.processing
 io.github.bluegroundltd.outbox.store
 
