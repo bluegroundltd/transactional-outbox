@@ -1,8 +1,5 @@
-package io.github.bluegroundltd.outbox.unit
+package io.github.bluegroundltd.outbox.processing
 
-import io.github.bluegroundltd.outbox.OutboxItemProcessorDecorator
-import io.github.bluegroundltd.outbox.OutboxProcessingAction
-import io.github.bluegroundltd.outbox.OutboxProcessingHost
 import spock.lang.Specification
 
 class OutboxProcessingHostSpec extends Specification {

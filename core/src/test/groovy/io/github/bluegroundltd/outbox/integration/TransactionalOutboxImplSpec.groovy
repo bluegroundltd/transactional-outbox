@@ -2,7 +2,6 @@ package io.github.bluegroundltd.outbox.integration
 
 import io.github.bluegroundltd.outbox.OutboxHandler
 import io.github.bluegroundltd.outbox.OutboxLocksProvider
-import io.github.bluegroundltd.outbox.OutboxProcessingHostComposer
 import io.github.bluegroundltd.outbox.TransactionalOutbox
 import io.github.bluegroundltd.outbox.TransactionalOutboxImpl
 import io.github.bluegroundltd.outbox.event.InstantOutboxPublisher
@@ -11,8 +10,8 @@ import io.github.bluegroundltd.outbox.item.OutboxItem
 import io.github.bluegroundltd.outbox.item.OutboxStatus
 import io.github.bluegroundltd.outbox.item.OutboxType
 import io.github.bluegroundltd.outbox.item.factory.OutboxItemFactory
+import io.github.bluegroundltd.outbox.processing.OutboxProcessingHostComposer
 import io.github.bluegroundltd.outbox.utils.DummyOutboxHandler
-import io.github.bluegroundltd.outbox.utils.DummyOutboxType
 import io.github.bluegroundltd.outbox.utils.FailingOutboxHandler
 import io.github.bluegroundltd.outbox.utils.InMemoryOutboxStore
 import io.github.bluegroundltd.outbox.utils.MockOutboxHandler
@@ -29,7 +28,8 @@ import java.time.ZoneId
 class TransactionalOutboxImplSpec extends Specification {
   private final static Duration DURATION_ONE_HOUR = Duration.ofHours(1)
   private final static Duration DURATION_ONE_NANO = Duration.ofNanos(1)
-  private final static Clock CLOCK = Clock.fixed(Instant.now(), ZoneId.systemDefault())
+  private final static Instant NOW = Instant.now()
+  private final static Clock CLOCK = Clock.fixed(NOW, ZoneId.systemDefault())
 
   private final static OutboxHandler DUMMY_HANDLER =
     new DummyOutboxHandler(CLOCK)
@@ -68,8 +68,12 @@ class TransactionalOutboxImplSpec extends Specification {
 
   def "Should process all eligible items when [monitor] is invoked and set their statuses to 'COMPLETED'"() {
     given:
-      def items = (1..5).collect { makePendingOutboxItem() }
-      items.forEach { store.insert(it) }
+      def pendingItems = (1..5).collect { OutboxItemBuilder.makePending() }
+      def runningItems = (1..2).collect { OutboxItemBuilder.makeRunning() }
+      def failedItems = (1..2).collect { OutboxItemBuilder.makeFailed() }
+      def completedItems = (1..2).collect { OutboxItemBuilder.makeCompleted() }
+      def fetchedItems = pendingItems + runningItems + failedItems + completedItems
+      fetchedItems.forEach { store.insert(it) }
 
     when:
       transactionalOutbox.monitor()
@@ -79,12 +83,24 @@ class TransactionalOutboxImplSpec extends Specification {
       1 * monitorLocksProvider.release()
       0 * _
 
-    and:
+    and: "Pending, running and failed items will be submitted for processing but only pending and running will be processed"
       new PollingConditions(timeout: 10, delay: 0.5).eventually {
-        def updatedItems = store.get(items.collect { it.id })
+        def updatedItems = store.get((pendingItems + runningItems).collect { it.id })
         updatedItems.each {
           assert it.status == OutboxStatus.COMPLETED
+          assert it.lastExecution == NOW
+          assert it.rerunAfter == NOW + DURATION_ONE_HOUR
+          assert it.deleteAfter == NOW + DUMMY_HANDLER.retentionDuration
         }
+
+        store.get(failedItems.collect { it.id }).each {
+          verifyMatchingOutboxItem(failedItems, it)
+        }
+      }
+
+    and: "Completed items will remain intact"
+      store.get(completedItems.collect { it.id }).each {
+        verifyMatchingOutboxItem(completedItems, it)
       }
   }
 
@@ -122,8 +138,13 @@ class TransactionalOutboxImplSpec extends Specification {
       0 * _
   }
 
-  private final static OutboxItem makePendingOutboxItem(OutboxType type = null) {
-    OutboxItemBuilder.make().withType(type ?: new DummyOutboxType()).withStatus(OutboxStatus.PENDING).build()
+  private final static OutboxItem makePendingOutboxItem(OutboxType type) {
+    OutboxItemBuilder.make().withType(type).withStatus(OutboxStatus.PENDING).build()
+  }
+
+  private final static void verifyMatchingOutboxItem(List<OutboxItem> originalItems, OutboxItem item) {
+    def originalItem = originalItems.find { it.id == item.id }
+    assert item == originalItem
   }
 
   private final static OutboxStatus expectedStatus(OutboxItem item) {

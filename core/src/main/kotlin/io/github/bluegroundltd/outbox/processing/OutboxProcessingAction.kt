@@ -1,4 +1,4 @@
-package io.github.bluegroundltd.outbox
+package io.github.bluegroundltd.outbox.processing
 
 /**
  * A 'runnable' action that will be executed in order to process outbox item(s).

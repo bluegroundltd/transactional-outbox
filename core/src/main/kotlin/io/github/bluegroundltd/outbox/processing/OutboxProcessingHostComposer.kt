@@ -1,4 +1,4 @@
-package io.github.bluegroundltd.outbox
+package io.github.bluegroundltd.outbox.processing
 
 import io.github.bluegroundltd.outbox.annotation.TestableOpenClass
 
