@@ -53,12 +53,21 @@ sealed interface TransactionalOutbox {
    * Handles a specific instant outbox
    * @param outbox
    */
+  @Deprecated(
+    message = "Deprecated in favor of using monitor with a hint (outbox item id)",
+    replaceWith = ReplaceWith("monitor(outbox.id)")
+  )
   fun processInstantOutbox(outbox: OutboxItem)
 
   /**
    * Monitors the outbox for new items and processes them
+   *
+   * @param id processes only the outbox item with this id instead of an eligible batch of items.
+   *
    */
-  fun monitor()
+  fun monitor(id: Long? = null)
+
+  fun monitor() = monitor(null)
 
   /**
    * Blocks new tasks and waits up to a specified period of time for all tasks to be completed.

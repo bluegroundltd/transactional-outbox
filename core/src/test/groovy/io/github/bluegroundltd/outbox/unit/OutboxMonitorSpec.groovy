@@ -1,17 +1,17 @@
 package io.github.bluegroundltd.outbox.unit
 
-import io.github.bluegroundltd.outbox.processing.OutboxGroupProcessor
-import io.github.bluegroundltd.outbox.processing.OutboxItemProcessorDecorator
 import io.github.bluegroundltd.outbox.OutboxLocksProvider
-import io.github.bluegroundltd.outbox.processing.OutboxProcessingAction
-import io.github.bluegroundltd.outbox.processing.OutboxProcessingHost
-import io.github.bluegroundltd.outbox.processing.OutboxProcessingHostComposer
 import io.github.bluegroundltd.outbox.TransactionalOutbox
 import io.github.bluegroundltd.outbox.TransactionalOutboxImpl
 import io.github.bluegroundltd.outbox.event.InstantOutboxPublisher
 import io.github.bluegroundltd.outbox.item.OutboxItem
 import io.github.bluegroundltd.outbox.item.OutboxStatus
 import io.github.bluegroundltd.outbox.item.factory.OutboxItemFactory
+import io.github.bluegroundltd.outbox.processing.OutboxGroupProcessor
+import io.github.bluegroundltd.outbox.processing.OutboxItemProcessorDecorator
+import io.github.bluegroundltd.outbox.processing.OutboxProcessingAction
+import io.github.bluegroundltd.outbox.processing.OutboxProcessingHost
+import io.github.bluegroundltd.outbox.processing.OutboxProcessingHostComposer
 import io.github.bluegroundltd.outbox.store.OutboxFilter
 import io.github.bluegroundltd.outbox.store.OutboxStore
 import io.github.bluegroundltd.outbox.utils.OutboxItemBuilder
@@ -42,7 +42,7 @@ class OutboxMonitorSpec extends Specification {
     transactionalOutbox = makeTransactionalOutbox(false)
   }
 
-  def "Should delegate to the executor thread pool when an instant outbox is processed"() {
+  def "Should delegate to the executor thread pool when an instant outbox is processed and `instantProcessingEnabled` is false"() {
     given:
       def instantOutbox = OutboxItemBuilder.make().build()
       def processingHost = Mock(OutboxProcessingHost)
@@ -238,6 +238,50 @@ class OutboxMonitorSpec extends Specification {
       1 * monitorLocksProvider.release() >> { throw new RuntimeException() }
       0 * _
       noExceptionThrown()
+  }
+
+  def "Should process instant outbox items using monitor but filter fetched items by instant outbox id (hint) and `instantProcessingEnabled` is true"() {
+    given:
+      transactionalOutbox = makeTransactionalOutbox(true)
+
+    and:
+      def instantOutbox = OutboxItemBuilder.make().build()
+      def irrelevantOutbox = OutboxItemBuilder.make().build()
+      def fetchedItems = [irrelevantOutbox, instantOutbox]
+      def processingHost = Mock(OutboxProcessingHost)
+      def now = Instant.now(clock)
+
+    when:
+      transactionalOutbox.processInstantOutbox(instantOutbox)
+
+    then:
+      1 * monitorLocksProvider.acquire()
+      1 * store.fetch(_) >> { OutboxFilter filter ->
+        with(filter) {
+          outboxPendingFilter.nextRunLessThan == now
+          outboxRunningFilter.rerunAfterLessThan == now
+          id == instantOutbox.id
+        }
+        fetchedItems
+      }
+      1 * store.update(_) >> { OutboxItem item ->
+        with(item) {
+          it.id == instantOutbox.id
+          it.status == OutboxStatus.RUNNING
+          it.lastExecution == now
+          it.rerunAfter == item.lastExecution + DURATION_ONE_HOUR
+        }
+        item
+      }
+      1 * processingHostComposer.compose(_, _) >> {
+        OutboxProcessingAction action, List<OutboxItemProcessorDecorator> decorators ->
+          assert action instanceof OutboxGroupProcessor
+          assert decorators == this.decorators
+          processingHost
+      }
+      1 * executor.execute(processingHost)
+      1 * monitorLocksProvider.release()
+      0 * _
   }
 
   private TransactionalOutboxImpl makeTransactionalOutbox(Boolean instantProcessingEnabled) {

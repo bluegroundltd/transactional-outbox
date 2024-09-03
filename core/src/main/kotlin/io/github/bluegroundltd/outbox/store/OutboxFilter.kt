@@ -17,7 +17,8 @@ class OutboxRunningFilter(
 
 class OutboxFilter(
   nextRunLessThan: Instant,
-  rerunAfterLessThan: Instant = nextRunLessThan
+  rerunAfterLessThan: Instant = nextRunLessThan,
+  val id: Long? = null // if set, it should fetch the item with this id instead of batch of items
 ) {
   val outboxPendingFilter: OutboxPendingFilter = OutboxPendingFilter(nextRunLessThan)
   val outboxRunningFilter: OutboxRunningFilter = OutboxRunningFilter(rerunAfterLessThan)

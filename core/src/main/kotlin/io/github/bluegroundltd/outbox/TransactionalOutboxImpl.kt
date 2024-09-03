@@ -15,8 +15,6 @@ import io.github.bluegroundltd.outbox.processing.OutboxProcessingHost
 import io.github.bluegroundltd.outbox.processing.OutboxProcessingHostComposer
 import io.github.bluegroundltd.outbox.store.OutboxFilter
 import io.github.bluegroundltd.outbox.store.OutboxStore
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 import java.time.Clock
 import java.time.Duration
 import java.time.Instant
@@ -25,6 +23,8 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.RejectedExecutionException
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 @SuppressWarnings("LongParameterList", "TooGenericExceptionCaught")
 internal class TransactionalOutboxImpl(
@@ -60,25 +60,33 @@ internal class TransactionalOutboxImpl(
     logger.info("$LOGGER_PREFIX Adding item of type: ${type.getType()} and payload: $payload")
 
     when {
-      shouldPublishAfterInsertion -> outboxItemFactory.makeInstantOutbox(type, payload)
+      shouldPublishAfterInsertion && !instantOrderingEnabled -> outboxItemFactory.makeInstantOutbox(type, payload)
       else -> outboxItemFactory.makeScheduledOutboxItem(type, payload)
     }.run { outboxStore.insert(this) }
       .takeIf { shouldPublishAfterInsertion }
       ?.let { instantOutboxPublisher.publish(InstantOutboxEvent(outbox = it)) }
   }
 
+  @Deprecated(
+    message = "Deprecated in favor of using monitor with a hint (outbox item id)",
+    replaceWith = ReplaceWith("monitor(outbox.id)")
+  )
   override fun processInstantOutbox(outbox: OutboxItem) {
-    runCatching {
-      logger.info("$LOGGER_PREFIX Instant processing of \"${outbox.type.getType()}\" outbox")
-      val processor = makeOutboxProcessor(outbox)
-      val processingHost = processingHostComposer.compose(processor, decorators)
-      executor.execute(processingHost)
-    }.onFailure {
-      logger.error("$LOGGER_PREFIX Failure in instant handling", it)
+    logger.info("$LOGGER_PREFIX Instant processing of \"${outbox.type.getType()}\" outbox")
+    if (instantOrderingEnabled) {
+      monitor(outbox.id)
+    } else {
+      runCatching {
+        val processor = makeOutboxProcessor(outbox)
+        val processingHost = processingHostComposer.compose(processor, decorators)
+        executor.execute(processingHost)
+      }.onFailure {
+        logger.error("$LOGGER_PREFIX Failure in instant handling", it)
+      }
     }
   }
 
-  override fun monitor() {
+  override fun monitor(id: Long?) {
     if (inShutdownMode.get()) {
       logger.info("$LOGGER_PREFIX Shutdown in process, no longer accepting items for processing")
       return
@@ -87,7 +95,7 @@ internal class TransactionalOutboxImpl(
     runCatching {
       monitorLocksProvider.acquire()
 
-      val items = fetchEligibleItems()
+      val items = fetchEligibleItems(id).filterByIdIfExists(id) // ensures item filtering regardless of client's `fetch`
       if (items.isEmpty()) {
         logger.info("$LOGGER_PREFIX No outbox items to process")
       } else {
@@ -106,9 +114,14 @@ internal class TransactionalOutboxImpl(
     }
   }
 
-  private fun fetchEligibleItems(): List<OutboxItem> {
+  private fun fetchEligibleItems(id: Long?): List<OutboxItem> {
     val (eligibleItems, erroneouslyFetchedItems) = outboxStore
-      .fetch(OutboxFilter(Instant.now(clock)))
+      .fetch(
+        OutboxFilter(
+          nextRunLessThan = Instant.now(clock),
+          id = id
+        )
+      )
       .partition { it.status in STATUSES_RETRIEVED_FOR_PROCESSING }
 
     erroneouslyFetchedItems.forEach {
@@ -207,4 +220,7 @@ internal class TransactionalOutboxImpl(
       }
     }
   }
+
+  private fun List<OutboxItem>.filterByIdIfExists(id: Long?): List<OutboxItem> =
+    id?.let { this.filter { it.id == id } } ?: this
 }

@@ -2,13 +2,13 @@ package io.github.bluegroundltd.outbox.unit
 
 import io.github.bluegroundltd.outbox.OutboxHandler
 import io.github.bluegroundltd.outbox.OutboxLocksProvider
-import io.github.bluegroundltd.outbox.processing.OutboxProcessingHostComposer
 import io.github.bluegroundltd.outbox.TransactionalOutbox
 import io.github.bluegroundltd.outbox.TransactionalOutboxImpl
 import io.github.bluegroundltd.outbox.event.InstantOutboxPublisher
 import io.github.bluegroundltd.outbox.item.OutboxPayload
 import io.github.bluegroundltd.outbox.item.OutboxType
 import io.github.bluegroundltd.outbox.item.factory.OutboxItemFactory
+import io.github.bluegroundltd.outbox.processing.OutboxProcessingHostComposer
 import io.github.bluegroundltd.outbox.store.OutboxStore
 import io.github.bluegroundltd.outbox.utils.OutboxItemBuilder
 import io.github.bluegroundltd.outbox.utils.UnitTestSpecification
@@ -55,8 +55,11 @@ class OutboxAddSpec extends UnitTestSpecification {
       0 * _
   }
 
-  def "Should delegate to outbox store and publisher when add is called with the shouldPublishAfterInsertion flag"() {
+  def "Should delegate to outbox store and publisher when add is called with the shouldPublishAfterInsertion flag and instantProcessingEnabled is #instantProcessingEnabled"() {
     given:
+      transactionalOutbox = makeTransactionalOutbox(instantProcessingEnabled)
+
+    and:
       def payload = GroovyMock(OutboxPayload)
       def type = GroovyMock(OutboxType)
 
@@ -69,12 +72,16 @@ class OutboxAddSpec extends UnitTestSpecification {
 
     then:
       1 * type.getType() >> "type"
-      1 * outboxItemFactory.makeInstantOutbox(type, payload) >> outboxItem
+      (instantProcessingEnabled ? 1 : 0) * outboxItemFactory.makeScheduledOutboxItem(type, payload) >> outboxItem
+      (instantProcessingEnabled ? 0 : 1) * outboxItemFactory.makeInstantOutbox(type, payload) >> outboxItem
       1 * store.insert(outboxItem) >> savedOutbox
       1 * instantOutboxPublisher.publish({
         assert it.outbox == savedOutbox
       })
       0 * _
+
+    where:
+      instantProcessingEnabled << [true, false]
   }
 
   private TransactionalOutboxImpl makeTransactionalOutbox(Boolean instantProcessingEnabled) {
