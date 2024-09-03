@@ -10,7 +10,6 @@ import io.github.bluegroundltd.outbox.grouping.OutboxGroupIdProvider
 import java.time.Clock
 import java.time.Duration
 import java.time.Instant
-import java.util.UUID
 
 @TestableOpenClass
 internal class OutboxItemFactory(
@@ -28,7 +27,7 @@ internal class OutboxItemFactory(
       payload = handler.serialize(payload),
       // ensures that instant outbox items are picked up by monitor's fetching
       nextRun = handler.getNextExecutionTime(0).minusMillis(1),
-      groupId = UUID.randomUUID().toString()
+      groupId = groupIdProvider.execute(type, payload)
     )
   }
 
@@ -42,7 +41,7 @@ internal class OutboxItemFactory(
       nextRun = handler.getNextExecutionTime(0),
       lastExecution = now,
       rerunAfter = now.plus(rerunAfterDuration),
-      groupId = UUID.randomUUID().toString()
+      groupId = groupIdProvider.execute(type, payload)
     )
   }
 
