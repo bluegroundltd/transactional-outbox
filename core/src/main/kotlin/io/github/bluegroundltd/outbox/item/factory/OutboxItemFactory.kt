@@ -6,6 +6,7 @@ import io.github.bluegroundltd.outbox.item.OutboxItem
 import io.github.bluegroundltd.outbox.item.OutboxPayload
 import io.github.bluegroundltd.outbox.item.OutboxStatus
 import io.github.bluegroundltd.outbox.item.OutboxType
+import io.github.bluegroundltd.outbox.grouping.OutboxGroupIdProvider
 import java.time.Clock
 import java.time.Duration
 import java.time.Instant
@@ -16,6 +17,7 @@ internal class OutboxItemFactory(
   private val clock: Clock,
   private val outboxHandlers: Map<OutboxType, OutboxHandler>,
   private val rerunAfterDuration: Duration,
+  private val groupIdProvider: OutboxGroupIdProvider
 ) {
 
   fun makeScheduledOutboxItem(type: OutboxType, payload: OutboxPayload): OutboxItem {

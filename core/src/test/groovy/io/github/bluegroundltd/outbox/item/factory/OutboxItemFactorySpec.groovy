@@ -5,6 +5,7 @@ import io.github.bluegroundltd.outbox.item.OutboxItem
 import io.github.bluegroundltd.outbox.item.OutboxPayload
 import io.github.bluegroundltd.outbox.item.OutboxStatus
 import io.github.bluegroundltd.outbox.item.OutboxType
+import io.github.bluegroundltd.outbox.grouping.OutboxGroupIdProvider
 import spock.lang.Specification
 
 import java.time.Clock
@@ -25,7 +26,8 @@ class OutboxItemFactorySpec extends Specification {
     outboxItemFactory = new OutboxItemFactory(
       clock,
       handlers,
-      duration
+      duration,
+      Mock(OutboxGroupIdProvider)
     )
   }
 

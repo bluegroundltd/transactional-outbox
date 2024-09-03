@@ -4,8 +4,10 @@ import io.github.bluegroundltd.outbox.event.InstantOutboxPublisher
 import io.github.bluegroundltd.outbox.executor.FixedThreadPoolExecutorServiceFactory
 import io.github.bluegroundltd.outbox.item.OutboxType
 import io.github.bluegroundltd.outbox.item.factory.OutboxItemFactory
+import io.github.bluegroundltd.outbox.grouping.OutboxGroupIdProvider
 import io.github.bluegroundltd.outbox.processing.OutboxItemProcessorDecorator
 import io.github.bluegroundltd.outbox.processing.OutboxProcessingHostComposer
+import io.github.bluegroundltd.outbox.grouping.RandomGroupIdProvider
 import io.github.bluegroundltd.outbox.store.OutboxStore
 import java.time.Clock
 import java.time.Duration
@@ -23,6 +25,11 @@ import java.time.Duration
  *       .withCleanupLocksProvider(cleanupLocksProvider)
  *       .withStore(outboxStore)
  *       .withInstantOutboxPublisher(instantOutboxPublisher)
+ *       .withThreadPoolSize(threadPoolSize)
+ *       .withThreadPriority(threadPriority)
+ *       .withThreadPoolTimeOut(threadPoolTimeOut)
+ *       .addProcessorDecorator(outboxItemProcessorDecorator)
+ *       .withGroupIdProvider(outboxGroupIdProvider)
  *       .build()
  *   }
  *   ```
@@ -46,6 +53,7 @@ class TransactionalOutboxBuilder(
   private lateinit var cleanupLocksProvider: OutboxLocksProvider
   private lateinit var store: OutboxStore
   private lateinit var instantOutboxPublisher: InstantOutboxPublisher
+  private var groupIdProvider: OutboxGroupIdProvider = RandomGroupIdProvider()
 
   companion object {
     private val DEFAULT_RERUN_AFTER_DURATION: Duration = Duration.ofHours(1)
@@ -183,11 +191,22 @@ class TransactionalOutboxBuilder(
   }
 
   /**
+   * Sets the group id provider for the outbox that will be used to set corresponding field when an item is added.
+   *
+   * If not set, a default [OutboxGroupIdProvider] is used that provides a random value, effectively ensuring that
+   * no groups will be formed.
+   */
+  override fun withGroupIdProvider(groupIdProvider: OutboxGroupIdProvider): BuildStep {
+    this.groupIdProvider = groupIdProvider
+    return this
+  }
+
+  /**
    * Builds the outbox.
    */
   override fun build(): TransactionalOutbox {
     val executorServiceFactory = FixedThreadPoolExecutorServiceFactory(threadPoolSize, threadPriority)
-    val outboxItemFactory = OutboxItemFactory(clock, handlers.toMap(), rerunAfterDuration)
+    val outboxItemFactory = OutboxItemFactory(clock, handlers.toMap(), rerunAfterDuration, groupIdProvider)
 
     return TransactionalOutboxImpl(
         clock,
@@ -233,5 +252,6 @@ interface BuildStep {
   fun withThreadPoolTimeOut(threadPoolTimeOut: Duration): BuildStep
   fun withInstantOrderingEnabled(instantOrderingEnabled: Boolean): BuildStep
   fun addProcessorDecorator(decorator: OutboxItemProcessorDecorator): BuildStep
+  fun withGroupIdProvider(groupIdProvider: OutboxGroupIdProvider): BuildStep
   fun build(): TransactionalOutbox
 }
