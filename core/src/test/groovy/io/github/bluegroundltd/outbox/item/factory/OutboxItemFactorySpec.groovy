@@ -73,6 +73,8 @@ class OutboxItemFactorySpec extends Specification {
       result.nextRun == nextRun.minusMillis(1)
       !result.lastExecution
       !result.rerunAfter
+      !result.deleteAfter
+      result.groupId
   }
 
   def "Should make an outbox to be processed instantly"(){
@@ -102,6 +104,8 @@ class OutboxItemFactorySpec extends Specification {
       result.nextRun == nextRun
       result.lastExecution == Instant.now(clock)
       result.rerunAfter == Instant.now(clock).plus(duration)
+      !result.deleteAfter
+      result.groupId
   }
 
 }

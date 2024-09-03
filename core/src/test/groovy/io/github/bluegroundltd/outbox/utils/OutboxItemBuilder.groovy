@@ -16,6 +16,7 @@ class OutboxItemBuilder implements SpecHelper {
   Instant lastExecution
   Instant rerunAfter
   Instant deleteAfter
+  String groupId
 
   static OutboxItemBuilder make() {
     new OutboxItemBuilder().with {
@@ -28,6 +29,7 @@ class OutboxItemBuilder implements SpecHelper {
       lastExecution = null
       rerunAfter = null
       deleteAfter = null
+      groupId = generateString()
 
       it
     }
@@ -66,6 +68,11 @@ class OutboxItemBuilder implements SpecHelper {
     withRerunAfter(null)
   }
 
+  OutboxItemBuilder withGroupId(String groupId) {
+    this.groupId = groupId
+    this
+  }
+
   static OutboxItem makePending() {
     make().withStatus(OutboxStatus.PENDING).build()
   }
@@ -92,7 +99,8 @@ class OutboxItemBuilder implements SpecHelper {
       nextRun,
       lastExecution,
       rerunAfter,
-      deleteAfter
+      deleteAfter,
+      groupId
     )
   }
 }
