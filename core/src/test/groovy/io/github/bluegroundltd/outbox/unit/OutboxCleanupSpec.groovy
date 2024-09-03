@@ -37,7 +37,8 @@ class OutboxCleanupSpec extends Specification {
     Mock(ExecutorService),
     [],
     Duration.ofMillis(5000),
-    Mock(OutboxProcessingHostComposer)
+    Mock(OutboxProcessingHostComposer),
+    false
   )
 
   def "Should acquire the clean up lock, delete all completed items and release it"() {

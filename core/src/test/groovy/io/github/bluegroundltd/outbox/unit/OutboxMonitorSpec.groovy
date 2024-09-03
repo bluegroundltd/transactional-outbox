@@ -39,20 +39,7 @@ class OutboxMonitorSpec extends Specification {
   private TransactionalOutbox transactionalOutbox
 
   def setup() {
-    transactionalOutbox = new TransactionalOutboxImpl(
-      clock,
-      [:],
-      monitorLocksProvider,
-      Mock(OutboxLocksProvider),
-      store,
-      Mock(InstantOutboxPublisher),
-      Mock(OutboxItemFactory),
-      DURATION_ONE_HOUR,
-      executor,
-      decorators,
-      threadPoolTimeOut,
-      processingHostComposer
-    )
+    transactionalOutbox = makeTransactionalOutbox(false)
   }
 
   def "Should delegate to the executor thread pool when an instant outbox is processed"() {
@@ -251,5 +238,23 @@ class OutboxMonitorSpec extends Specification {
       1 * monitorLocksProvider.release() >> { throw new RuntimeException() }
       0 * _
       noExceptionThrown()
+  }
+
+  private TransactionalOutboxImpl makeTransactionalOutbox(Boolean instantProcessingEnabled) {
+    new TransactionalOutboxImpl(
+      clock,
+      [:],
+      monitorLocksProvider,
+      Mock(OutboxLocksProvider),
+      store,
+      Mock(InstantOutboxPublisher),
+      Mock(OutboxItemFactory),
+      DURATION_ONE_HOUR,
+      executor,
+      decorators,
+      threadPoolTimeOut,
+      processingHostComposer,
+      instantProcessingEnabled
+    )
   }
 }

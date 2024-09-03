@@ -7,6 +7,7 @@ import io.github.bluegroundltd.outbox.TransactionalOutboxBuilder
 import io.github.bluegroundltd.outbox.TransactionalOutboxImpl
 import io.github.bluegroundltd.outbox.event.InstantOutboxPublisher
 import io.github.bluegroundltd.outbox.item.OutboxType
+import io.github.bluegroundltd.outbox.processing.OutboxItemProcessorDecorator
 import io.github.bluegroundltd.outbox.store.OutboxStore
 import io.github.bluegroundltd.outbox.utils.DummyOutboxHandler
 import io.github.bluegroundltd.outbox.utils.UnitTestSpecification
@@ -33,7 +34,7 @@ class TransactionalOutboxBuilderSpec extends UnitTestSpecification {
       def mockedBType = GroovyMock(OutboxType)
       def handlers = Set.of(handlerA, handlerB)
       def expectedOutboxTypes = Set.of(handlerA.getSupportedType(), mockedBType)
-
+      def decorator = GroovyMock(OutboxItemProcessorDecorator)
 
     when:
       def transactionalOutboxBuilder = builder
@@ -42,6 +43,9 @@ class TransactionalOutboxBuilderSpec extends UnitTestSpecification {
         .withCleanupLocksProvider(cleanupLocksProvider)
         .withStore(store)
         .withInstantOutboxPublisher(instantOutboxPublisher)
+        .withInstantOrderingEnabled(generateBoolean())
+        .withThreadPriority(generateIntNonZero(10))
+        .addProcessorDecorator(decorator)
 
     and:
       TransactionalOutbox transactionalOutbox

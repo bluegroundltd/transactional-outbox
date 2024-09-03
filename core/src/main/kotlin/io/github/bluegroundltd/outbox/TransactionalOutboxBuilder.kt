@@ -41,6 +41,7 @@ class TransactionalOutboxBuilder(
   private var threadPriority: Int? = null
   private var threadPoolTimeOut: Duration = DEFAULT_THREAD_POOL_TIMEOUT
   private var decorators: MutableList<OutboxItemProcessorDecorator> = mutableListOf()
+  private var instantOrderingEnabled: Boolean = false
   private lateinit var monitorLocksProvider: OutboxLocksProvider
   private lateinit var cleanupLocksProvider: OutboxLocksProvider
   private lateinit var store: OutboxStore
@@ -164,6 +165,24 @@ class TransactionalOutboxBuilder(
   }
 
   /**
+   * Flag which indicates whether new instant processing mechanism should be used or not.
+   *
+   * The new mechanism uses monitor to fetch the item along with its group sibling items and support ordering.
+   * The old mechanism processes the instant outbox item directly without fetching it from store.
+   *
+   * - true:  Use the new mechanism for instant processing and allow ordering of grouped items.
+   * - false: Use the old mechanism for instant processing.
+   *
+   * If not explicitly set, the value defaults to `false`. This minimizes unexpected disruption to applications
+   * already using the transactional outbox. However, in the coming versions this will change and the value
+   * will default to `true`. So, any applications that wish to have this feature disabled, should explicitly set it.
+   */
+  override fun withInstantOrderingEnabled(instantOrderingEnabled: Boolean): BuildStep {
+    this.instantOrderingEnabled = instantOrderingEnabled
+    return this
+  }
+
+  /**
    * Builds the outbox.
    */
   override fun build(): TransactionalOutbox {
@@ -182,7 +201,8 @@ class TransactionalOutboxBuilder(
         executorServiceFactory.make(),
         decorators,
         threadPoolTimeOut,
-        OutboxProcessingHostComposer()
+        OutboxProcessingHostComposer(),
+        instantOrderingEnabled
     )
   }
 }
@@ -211,6 +231,7 @@ interface BuildStep {
   fun withThreadPoolSize(threadPoolSize: Int): BuildStep
   fun withThreadPriority(threadPriority: Int): BuildStep
   fun withThreadPoolTimeOut(threadPoolTimeOut: Duration): BuildStep
+  fun withInstantOrderingEnabled(instantOrderingEnabled: Boolean): BuildStep
   fun addProcessorDecorator(decorator: OutboxItemProcessorDecorator): BuildStep
   fun build(): TransactionalOutbox
 }

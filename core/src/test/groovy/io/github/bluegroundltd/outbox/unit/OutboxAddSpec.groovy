@@ -34,20 +34,7 @@ class OutboxAddSpec extends UnitTestSpecification {
   TransactionalOutbox transactionalOutbox
 
   def setup() {
-    transactionalOutbox = new TransactionalOutboxImpl(
-      clock,
-      handlers,
-      monitorLocksProvider,
-      cleanupLocksProvider,
-      store,
-      instantOutboxPublisher,
-      outboxItemFactory,
-      DURATION_ONE_HOUR,
-      executor,
-      [],
-      threadPoolTimeOut,
-      processingHostComposer
-    )
+    transactionalOutbox = makeTransactionalOutbox(false)
   }
 
   def "Should delegate to outbox store when add is called"() {
@@ -88,5 +75,23 @@ class OutboxAddSpec extends UnitTestSpecification {
         assert it.outbox == savedOutbox
       })
       0 * _
+  }
+
+  private TransactionalOutboxImpl makeTransactionalOutbox(Boolean instantProcessingEnabled) {
+    new TransactionalOutboxImpl(
+      clock,
+      handlers,
+      monitorLocksProvider,
+      cleanupLocksProvider,
+      store,
+      instantOutboxPublisher,
+      outboxItemFactory,
+      DURATION_ONE_HOUR,
+      executor,
+      [],
+      threadPoolTimeOut,
+      processingHostComposer,
+      instantProcessingEnabled
+    )
   }
 }

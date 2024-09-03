@@ -63,7 +63,8 @@ class TransactionalOutboxImplSpec extends Specification {
     new FixedThreadPoolExecutorServiceFactory(1, null, "").make(),
     [],
     DURATION_ONE_NANO,
-    processingHostComposer
+    processingHostComposer,
+    false
   )
 
   def "Should process all eligible items when [monitor] is invoked and set their statuses to 'COMPLETED'"() {

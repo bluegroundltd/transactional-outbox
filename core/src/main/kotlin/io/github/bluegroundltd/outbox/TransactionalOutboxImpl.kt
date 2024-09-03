@@ -39,7 +39,8 @@ internal class TransactionalOutboxImpl(
   private val executor: ExecutorService,
   private val decorators: List<OutboxItemProcessorDecorator> = emptyList(),
   private val threadPoolTimeOut: Duration,
-  private val processingHostComposer: OutboxProcessingHostComposer
+  private val processingHostComposer: OutboxProcessingHostComposer,
+  private val instantOrderingEnabled: Boolean
 ) : TransactionalOutbox {
 
   private var inShutdownMode = AtomicBoolean(false)
