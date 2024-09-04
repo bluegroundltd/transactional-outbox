@@ -100,7 +100,7 @@ class OutboxMonitorSpec extends Specification {
 
   def "Should delegate to the executor thread pool when monitor is called"() {
     given:
-      def pendingItem = OutboxItemBuilder.makePending()
+      def pendingItem = OutboxItemBuilder.makePending().build()
       def runningItem = OutboxItemBuilder.make().withStatus(OutboxStatus.RUNNING).build()
       def failedItem = OutboxItemBuilder.make().withStatus(OutboxStatus.FAILED).build()
       def completedItem = OutboxItemBuilder.make().withStatus(OutboxStatus.COMPLETED).build()

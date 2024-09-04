@@ -73,20 +73,20 @@ class OutboxItemBuilder implements SpecHelper {
     this
   }
 
-  static OutboxItem makePending() {
-    make().withStatus(OutboxStatus.PENDING).build()
+  static OutboxItemBuilder makePending() {
+    make().withStatus(OutboxStatus.PENDING)
   }
 
-  static OutboxItem makeRunning() {
-    make().withStatus(OutboxStatus.RUNNING).build()
+  static OutboxItemBuilder makeRunning() {
+    make().withStatus(OutboxStatus.RUNNING)
   }
 
-  static OutboxItem makeCompleted() {
-    make().withStatus(OutboxStatus.COMPLETED).build()
+  static OutboxItemBuilder makeCompleted() {
+    make().withStatus(OutboxStatus.COMPLETED)
   }
 
-  static OutboxItem makeFailed() {
-    make().withStatus(OutboxStatus.FAILED).build()
+  static OutboxItemBuilder makeFailed() {
+    make().withStatus(OutboxStatus.FAILED)
   }
 
   OutboxItem build() {
