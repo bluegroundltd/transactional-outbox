@@ -53,7 +53,6 @@ internal class TransactionalOutboxImpl(
       OutboxStatus.RUNNING,
       OutboxStatus.FAILED // Required for in-order processing in groups (i.e. they might precede other items).
     )
-    private val STATUSES_TO_UPDATE_FOR_PROCESSING = EnumSet.of(OutboxStatus.PENDING, OutboxStatus.RUNNING)
   }
 
   override fun add(type: OutboxType, payload: OutboxPayload, shouldPublishAfterInsertion: Boolean) {
@@ -136,19 +135,11 @@ internal class TransactionalOutboxImpl(
 
   private fun markForProcessing(items: List<OutboxItem>): List<OutboxItem> {
     val now = Instant.now(clock)
-    return items.map { markForProcessing(it, now) }
+    val rerunAfter = now.plus(rerunAfterDuration)
+    return items
+      .map { it.copy() } // create a copy to ensure that no external code updates the item
+      .onEach { it.prepareForProcessing(now, rerunAfter) }
   }
-
-  private fun markForProcessing(item: OutboxItem, now: Instant): OutboxItem =
-    if (item.status in STATUSES_TO_UPDATE_FOR_PROCESSING) {
-      item.copy(
-        status = OutboxStatus.RUNNING,
-        lastExecution = now,
-        rerunAfter = now.plus(rerunAfterDuration)
-      )
-    } else {
-      item.copy()
-    }
 
   private fun processItem(item: OutboxItem) {
     val processor = makeOutboxProcessor(item)

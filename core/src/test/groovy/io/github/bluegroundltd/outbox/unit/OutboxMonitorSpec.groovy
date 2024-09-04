@@ -44,7 +44,7 @@ class OutboxMonitorSpec extends Specification {
 
   def "Should delegate to the executor thread pool when an instant outbox is processed and `instantProcessingEnabled` is false"() {
     given:
-      def instantOutbox = OutboxItemBuilder.make().build()
+      def instantOutbox = OutboxItemBuilder.makePending().build()
       def processingHost = Mock(OutboxProcessingHost)
 
     when:
@@ -78,7 +78,7 @@ class OutboxMonitorSpec extends Specification {
 
   def "Should handle a failure while an instant outbox is being processed"() {
     given:
-      def instantOutbox = OutboxItemBuilder.make().build()
+      def instantOutbox = OutboxItemBuilder.makePending().build()
       def processingHost = Mock(OutboxProcessingHost)
 
     when:
@@ -100,16 +100,18 @@ class OutboxMonitorSpec extends Specification {
 
   def "Should delegate to the executor thread pool when monitor is called"() {
     given:
-      def pendingItem = OutboxItemBuilder.makePending().build()
-      def runningItem = OutboxItemBuilder.make().withStatus(OutboxStatus.RUNNING).build()
-      def failedItem = OutboxItemBuilder.make().withStatus(OutboxStatus.FAILED).build()
-      def completedItem = OutboxItemBuilder.make().withStatus(OutboxStatus.COMPLETED).build()
-      def fetchedItems = [pendingItem, runningItem, failedItem, completedItem]
-      def toBeProcessedItems = [pendingItem, runningItem, failedItem]
-      def markedForProcessing = [pendingItem, runningItem]
+      def now = Instant.now(clock)
+      def pendingItem = OutboxItemBuilder.makePending(now).build()
+      def runningItem = OutboxItemBuilder.makeRunning(now).build()
+      def failedItem = OutboxItemBuilder.makeFailed().build()
+      def completedItem = OutboxItemBuilder.makeCompleted().build()
 
     and:
-      def now = Instant.now(clock)
+      def fetchedItems = [pendingItem, runningItem, failedItem, completedItem]
+      def eligibleItems = [pendingItem, runningItem]
+      def toBeProcessedItems = [pendingItem, runningItem, failedItem]
+
+    and:
       def processingHosts = toBeProcessedItems.collect { Mock(OutboxProcessingHost) }
 
     when:
@@ -126,7 +128,7 @@ class OutboxMonitorSpec extends Specification {
       }
 
     and: "The pending and running items are marked for processing while the failed item is stored as-is"
-      markedForProcessing.size() * store.update(_) >> { OutboxItem item ->
+      eligibleItems.size() * store.update(_) >> { OutboxItem item ->
         with(item) {
           it.status == OutboxStatus.RUNNING
           it.lastExecution == now
@@ -164,7 +166,7 @@ class OutboxMonitorSpec extends Specification {
       def now = Instant.now(clock)
 
     and:
-      def itemBuilder = OutboxItemBuilder.make().withStatus(OutboxStatus.PENDING)
+      def itemBuilder = OutboxItemBuilder.makePending(now)
       def pendingItem = itemBuilder.build()
       def originalItem = itemBuilder.build() // Create a clone to use it for comparisons.
 
@@ -245,8 +247,8 @@ class OutboxMonitorSpec extends Specification {
       transactionalOutbox = makeTransactionalOutbox(true)
 
     and:
-      def instantOutbox = OutboxItemBuilder.make().build()
-      def irrelevantOutbox = OutboxItemBuilder.make().build()
+      def instantOutbox = OutboxItemBuilder.makePending().build()
+      def irrelevantOutbox = OutboxItemBuilder.makePending().build()
       def fetchedItems = [irrelevantOutbox, instantOutbox]
       def processingHost = Mock(OutboxProcessingHost)
       def now = Instant.now(clock)

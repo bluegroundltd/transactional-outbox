@@ -69,8 +69,8 @@ class TransactionalOutboxImplSpec extends Specification {
 
   def "Should process all eligible items when [monitor] is invoked and set their statuses to 'COMPLETED'"() {
     given:
-      def pendingItems = (1..5).collect { OutboxItemBuilder.makePending().build() }
-      def runningItems = (1..2).collect { OutboxItemBuilder.makeRunning().build() }
+      def pendingItems = (1..5).collect { OutboxItemBuilder.makePending(NOW).build() }
+      def runningItems = (1..2).collect { OutboxItemBuilder.makeRunning(NOW).build() }
       def failedItems = (1..2).collect { OutboxItemBuilder.makeFailed().build() }
       def completedItems = (1..2).collect { OutboxItemBuilder.makeCompleted().build() }
       def fetchedItems = pendingItems + runningItems + failedItems + completedItems
@@ -140,7 +140,7 @@ class TransactionalOutboxImplSpec extends Specification {
   }
 
   private final static OutboxItem makePendingOutboxItem(OutboxType type) {
-    OutboxItemBuilder.make().withType(type).withStatus(OutboxStatus.PENDING).build()
+    OutboxItemBuilder.makePending(NOW).withType(type).build()
   }
 
   private final static void verifyMatchingOutboxItem(List<OutboxItem> originalItems, OutboxItem item) {

@@ -9,6 +9,10 @@ import java.time.Instant
  * to allow for backward compatibility with existing outbox items. However, for all intents and purposes, the library
  * expects this value to be non-null. At a later stage, the value will be made non-nullable which would introduce a
  * breaking change.
+ *
+ * @property markedForProcessing is an internal flag that is used to determine if the item should be processed in the
+ * current monitor cycle. It is set by [prepareForProcessing] based on the item status and current time.
+ * Clients could (and should) ignore the value. Even if set earlier, its value be reset during the monitor cycle.
  */
 data class OutboxItem(
   val id: Long? = null,
@@ -21,4 +25,35 @@ data class OutboxItem(
   var rerunAfter: Instant? = null,
   var deleteAfter: Instant? = null,
   val groupId: String? = null
-)
+) {
+
+  var markedForProcessing: Boolean = false
+    private set
+
+  /**
+   * Resolves whether the item is eligible for processing based on its state (i.e. status, timestamps, etc.) and
+   * the current time (supplied as a parameter). If the item is eligible for processing, it is marked as such
+   * and its status and run timestamps are updated accordingly.
+   *
+   * @param now the current time
+   * @param rerunAfter the timestamp to which the `rerunAfter` property should be set if the item is indeed
+   * eligible for processing and is marked as such.
+   */
+  fun prepareForProcessing(now: Instant, rerunAfter: Instant) {
+    markedForProcessing = isEligibleForProcessing(now)
+    if (markedForProcessing) {
+      status = OutboxStatus.RUNNING
+      lastExecution = now
+      this.rerunAfter = rerunAfter
+    }
+  }
+
+  private fun isEligibleForProcessing(now: Instant): Boolean =
+    isPendingEligibleForProcessing(now) || isRunningEligibleForProcessing(now)
+
+  private fun isPendingEligibleForProcessing(now: Instant): Boolean =
+    status == OutboxStatus.PENDING && nextRun.isBefore(now)
+
+  private fun isRunningEligibleForProcessing(now: Instant): Boolean =
+    status == OutboxStatus.RUNNING && rerunAfter != null && rerunAfter!!.isBefore(now)
+}

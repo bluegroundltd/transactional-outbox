@@ -68,17 +68,22 @@ class OutboxItemBuilder implements SpecHelper {
     withRerunAfter(null)
   }
 
+  OutboxItemBuilder withLastExecution(Instant lastExecution) {
+    this.lastExecution = lastExecution
+    this
+  }
+
   OutboxItemBuilder withGroupId(String groupId) {
     this.groupId = groupId
     this
   }
 
-  static OutboxItemBuilder makePending() {
-    make().withStatus(OutboxStatus.PENDING)
+  static OutboxItemBuilder makePending(Instant now = Instant.now()) {
+    make().withStatus(OutboxStatus.PENDING).withNextRun(now.minusSeconds(1))
   }
 
-  static OutboxItemBuilder makeRunning() {
-    make().withStatus(OutboxStatus.RUNNING)
+  static OutboxItemBuilder makeRunning(Instant now = Instant.now()) {
+    make().withStatus(OutboxStatus.RUNNING).withRerunAfter(now.minusSeconds(1))
   }
 
   static OutboxItemBuilder makeCompleted() {
