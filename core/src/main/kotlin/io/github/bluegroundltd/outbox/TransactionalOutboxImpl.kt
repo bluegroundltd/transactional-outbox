@@ -153,7 +153,7 @@ internal class TransactionalOutboxImpl(
   }
 
   private fun makeOutboxProcessor(item: OutboxItem): OutboxProcessingAction =
-    OutboxGroupProcessor(OutboxItemGroup(listOf(item)), ::resolveOutboxHandler, outboxStore, clock)
+    OutboxGroupProcessor(OutboxItemGroup.of(item), ::resolveOutboxHandler, outboxStore, clock)
 
   private fun resolveOutboxHandler(item: OutboxItem): OutboxHandler? = outboxHandlers[item.type]
 

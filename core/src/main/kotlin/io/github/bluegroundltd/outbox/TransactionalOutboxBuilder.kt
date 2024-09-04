@@ -5,9 +5,11 @@ import io.github.bluegroundltd.outbox.executor.FixedThreadPoolExecutorServiceFac
 import io.github.bluegroundltd.outbox.item.OutboxType
 import io.github.bluegroundltd.outbox.item.factory.OutboxItemFactory
 import io.github.bluegroundltd.outbox.grouping.OutboxGroupIdProvider
+import io.github.bluegroundltd.outbox.grouping.OutboxGroupingProvider
 import io.github.bluegroundltd.outbox.processing.OutboxItemProcessorDecorator
 import io.github.bluegroundltd.outbox.processing.OutboxProcessingHostComposer
 import io.github.bluegroundltd.outbox.grouping.RandomGroupIdProvider
+import io.github.bluegroundltd.outbox.grouping.SingleItemGroupingProvider
 import io.github.bluegroundltd.outbox.store.OutboxStore
 import java.time.Clock
 import java.time.Duration
@@ -30,6 +32,7 @@ import java.time.Duration
  *       .withThreadPoolTimeOut(threadPoolTimeOut)
  *       .addProcessorDecorator(outboxItemProcessorDecorator)
  *       .withGroupIdProvider(outboxGroupIdProvider)
+ *       .withGroupingProvider(outboxGroupingProvider)
  *       .build()
  *   }
  *   ```
@@ -54,6 +57,7 @@ class TransactionalOutboxBuilder(
   private lateinit var store: OutboxStore
   private lateinit var instantOutboxPublisher: InstantOutboxPublisher
   private var groupIdProvider: OutboxGroupIdProvider = RandomGroupIdProvider()
+  private var groupingProvider: OutboxGroupingProvider = SingleItemGroupingProvider()
 
   companion object {
     private val DEFAULT_RERUN_AFTER_DURATION: Duration = Duration.ofHours(1)
@@ -202,6 +206,17 @@ class TransactionalOutboxBuilder(
   }
 
   /**
+   * Sets the grouping provider for the outbox that will be used to set corresponding field when an item is added.
+   *
+   * If not set, a default [OutboxGroupingProvider] is used that provides a single item grouping, i.e. each item forms
+   * a separate group.
+   */
+  override fun withGroupingProvider(groupingProvider: OutboxGroupingProvider): BuildStep {
+    this.groupingProvider = groupingProvider
+    return this
+  }
+
+  /**
    * Builds the outbox.
    */
   override fun build(): TransactionalOutbox {
@@ -253,5 +268,6 @@ interface BuildStep {
   fun withInstantOrderingEnabled(instantOrderingEnabled: Boolean): BuildStep
   fun addProcessorDecorator(decorator: OutboxItemProcessorDecorator): BuildStep
   fun withGroupIdProvider(groupIdProvider: OutboxGroupIdProvider): BuildStep
+  fun withGroupingProvider(groupingProvider: OutboxGroupingProvider): BuildStep
   fun build(): TransactionalOutbox
 }
