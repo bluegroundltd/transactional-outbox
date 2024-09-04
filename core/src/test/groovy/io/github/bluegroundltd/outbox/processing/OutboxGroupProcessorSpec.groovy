@@ -18,7 +18,7 @@ class OutboxGroupProcessorSpec extends Specification {
   private final Instant now = Instant.now(clock)
 
   private final outboxItems = (1..5).collect {
-    OutboxItemBuilder.make().withStatus(OutboxStatus.RUNNING).build()
+    OutboxItemBuilder.buildProcessable(now)
   }
   private final Map<Long, OutboxHandler> outboxHandlers = outboxItems.collectEntries {
     [(it.id): Mock(OutboxHandler)]

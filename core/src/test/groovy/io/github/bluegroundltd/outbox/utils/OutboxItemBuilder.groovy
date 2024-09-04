@@ -94,6 +94,10 @@ class OutboxItemBuilder implements SpecHelper {
     make().withStatus(OutboxStatus.FAILED)
   }
 
+  static OutboxItem buildProcessable(Instant now = Instant.now()) {
+    makePending(now).buildAndPrepareForProcessing(now)
+  }
+
   OutboxItem build() {
     new OutboxItem(
       id,
@@ -107,5 +111,12 @@ class OutboxItemBuilder implements SpecHelper {
       deleteAfter,
       groupId
     )
+  }
+
+  OutboxItem buildAndPrepareForProcessing(Instant now = Instant.now()) {
+    build().with {
+      it.prepareForProcessing(now, now.plusSeconds(1000))
+      it
+    }
   }
 }
