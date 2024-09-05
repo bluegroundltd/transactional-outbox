@@ -2,10 +2,11 @@ package io.github.bluegroundltd.outbox
 
 import io.github.bluegroundltd.outbox.event.InstantOutboxPublisher
 import io.github.bluegroundltd.outbox.executor.FixedThreadPoolExecutorServiceFactory
-import io.github.bluegroundltd.outbox.grouping.GroupIdGroupingProvider
+import io.github.bluegroundltd.outbox.grouping.DefaultGroupingConfiguration
+import io.github.bluegroundltd.outbox.grouping.OutboxGroupingConfiguration
 import io.github.bluegroundltd.outbox.grouping.OutboxGroupIdProvider
-import io.github.bluegroundltd.outbox.grouping.OutboxGroupingProvider
 import io.github.bluegroundltd.outbox.grouping.RandomGroupIdProvider
+import io.github.bluegroundltd.outbox.grouping.SingleItemGroupingConfiguration
 import io.github.bluegroundltd.outbox.item.OutboxType
 import io.github.bluegroundltd.outbox.item.factory.OutboxItemFactory
 import io.github.bluegroundltd.outbox.processing.OutboxItemProcessorDecorator
@@ -32,7 +33,7 @@ import java.time.Duration
  *       .withThreadPoolTimeOut(threadPoolTimeOut)
  *       .addProcessorDecorator(outboxItemProcessorDecorator)
  *       .withGroupIdProvider(outboxGroupIdProvider)
- *       .withGroupingProvider(outboxGroupingProvider)
+ *       .withGroupingConfiguration(outboxGroupingConfiguration)
  *       .build()
  *   }
  *   ```
@@ -57,7 +58,7 @@ class TransactionalOutboxBuilder(
   private lateinit var store: OutboxStore
   private lateinit var instantOutboxPublisher: InstantOutboxPublisher
   private var groupIdProvider: OutboxGroupIdProvider = RandomGroupIdProvider()
-  private var groupingProvider: OutboxGroupingProvider = GroupIdGroupingProvider()
+  private var groupingConfiguration: OutboxGroupingConfiguration = DefaultGroupingConfiguration
 
   companion object {
     private val DEFAULT_RERUN_AFTER_DURATION: Duration = Duration.ofHours(1)
@@ -206,13 +207,13 @@ class TransactionalOutboxBuilder(
   }
 
   /**
-   * Sets the grouping provider for the outbox that will be used to set corresponding field when an item is added.
+   * Sets the grouping configuration for the outbox.
    *
-   * If not set, a default [OutboxGroupingProvider] is used that provides a single item grouping, i.e. each item forms
-   * a separate group.
+   * If not set, a default [OutboxGroupingConfiguration] is used which provides grouping based on the `groupId`
+   * field and FIFO ordering.
    */
-  override fun withGroupingProvider(groupingProvider: OutboxGroupingProvider): BuildStep {
-    this.groupingProvider = groupingProvider
+  override fun withGroupingConfiguration(outboxGroupingConfiguration: OutboxGroupingConfiguration): BuildStep {
+    this.groupingConfiguration = outboxGroupingConfiguration
     return this
   }
 
@@ -237,7 +238,7 @@ class TransactionalOutboxBuilder(
       threadPoolTimeOut,
       OutboxProcessingHostComposer(),
       instantOrderingEnabled,
-        groupingProvider
+      groupingConfiguration.groupingProvider
     )
   }
 }
@@ -268,7 +269,11 @@ interface BuildStep {
   fun withThreadPoolTimeOut(threadPoolTimeOut: Duration): BuildStep
   fun withInstantOrderingEnabled(instantOrderingEnabled: Boolean): BuildStep
   fun addProcessorDecorator(decorator: OutboxItemProcessorDecorator): BuildStep
+
   fun withGroupIdProvider(groupIdProvider: OutboxGroupIdProvider): BuildStep
-  fun withGroupingProvider(groupingProvider: OutboxGroupingProvider): BuildStep
+  fun withGroupingConfiguration(outboxGroupingConfiguration: OutboxGroupingConfiguration): BuildStep
+  fun withGrouping() = withGroupingConfiguration(DefaultGroupingConfiguration)
+  fun withoutGrouping() = withGroupingConfiguration(SingleItemGroupingConfiguration)
+
   fun build(): TransactionalOutbox
 }

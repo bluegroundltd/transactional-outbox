@@ -6,10 +6,14 @@ import io.github.bluegroundltd.outbox.TransactionalOutbox
 import io.github.bluegroundltd.outbox.TransactionalOutboxBuilder
 import io.github.bluegroundltd.outbox.TransactionalOutboxImpl
 import io.github.bluegroundltd.outbox.event.InstantOutboxPublisher
+import io.github.bluegroundltd.outbox.grouping.DefaultGroupingConfiguration
 import io.github.bluegroundltd.outbox.grouping.GroupIdGroupingProvider
 import io.github.bluegroundltd.outbox.grouping.OutboxGroupIdProvider
+import io.github.bluegroundltd.outbox.grouping.OutboxGroupingConfiguration
 import io.github.bluegroundltd.outbox.grouping.OutboxGroupingProvider
 import io.github.bluegroundltd.outbox.grouping.RandomGroupIdProvider
+import io.github.bluegroundltd.outbox.grouping.SingleItemGroupingConfiguration
+import io.github.bluegroundltd.outbox.grouping.SingleItemGroupingProvider
 import io.github.bluegroundltd.outbox.item.OutboxType
 import io.github.bluegroundltd.outbox.item.factory.OutboxItemFactory
 import io.github.bluegroundltd.outbox.processing.OutboxItemProcessorDecorator
@@ -85,7 +89,8 @@ class TransactionalOutboxBuilderSpec extends UnitTestSpecification {
 
     and:
       def groupingProvider = transactionalOutbox.groupingProvider
-      groupingProvider == builder.groupingProvider
+      groupingProvider == builder.groupingConfiguration.groupingProvider
+      groupingProvider == DefaultGroupingConfiguration.INSTANCE.groupingProvider
       groupingProvider instanceof GroupIdGroupingProvider
 
     where:
@@ -143,10 +148,11 @@ class TransactionalOutboxBuilderSpec extends UnitTestSpecification {
       itemFactory.groupIdProvider == groupIdProvider
   }
 
-  def "Should set the grouping provider to the one supplied"() {
+  def "Should set the grouping provider to the one specified in the supplied grouping configuration"() {
     given:
       def builder = TransactionalOutboxBuilder.make(clock)
-      def suppliedGroupingProvider = Mock(OutboxGroupingProvider)
+      def groupingProvider = Mock(OutboxGroupingProvider)
+      def groupingConfiguration = Mock(OutboxGroupingConfiguration)
 
     when:
       def transactionalOutbox = builder
@@ -155,14 +161,61 @@ class TransactionalOutboxBuilderSpec extends UnitTestSpecification {
         .withCleanupLocksProvider(cleanupLocksProvider)
         .withStore(store)
         .withInstantOutboxPublisher(instantOutboxPublisher)
-        .withGroupingProvider(suppliedGroupingProvider)
+        .withGroupingConfiguration(groupingConfiguration)
+        .build()
+
+    then:
+      1 * groupingConfiguration.groupingProvider >> groupingProvider
+      0 * _
+
+    and:
+      def outboxGroupingProvider = transactionalOutbox.groupingProvider
+      outboxGroupingProvider == groupingProvider
+  }
+
+  def "Should use the default grouping provider when 'withGrouping' in applied"() {
+    given:
+      def builder = TransactionalOutboxBuilder.make(clock)
+
+    when:
+      def transactionalOutbox = builder
+        .withHandlers(Set.of(new DummyOutboxHandler()))
+        .withMonitorLocksProvider(monitorLocksProvider)
+        .withCleanupLocksProvider(cleanupLocksProvider)
+        .withStore(store)
+        .withInstantOutboxPublisher(instantOutboxPublisher)
+        .withGrouping()
         .build()
 
     then:
       0 * _
 
     and:
-      def groupingProvider = transactionalOutbox.groupingProvider
-      groupingProvider == suppliedGroupingProvider
+      def outboxGroupingProvider = transactionalOutbox.groupingProvider
+      outboxGroupingProvider == DefaultGroupingConfiguration.INSTANCE.groupingProvider
+      outboxGroupingProvider instanceof GroupIdGroupingProvider
+  }
+
+  def "Should use single item groping provider when 'withoutGrouping' is applied"() {
+    given:
+      def builder = TransactionalOutboxBuilder.make(clock)
+
+    when:
+      def transactionalOutbox = builder
+        .withHandlers(Set.of(new DummyOutboxHandler()))
+        .withMonitorLocksProvider(monitorLocksProvider)
+        .withCleanupLocksProvider(cleanupLocksProvider)
+        .withStore(store)
+        .withInstantOutboxPublisher(instantOutboxPublisher)
+        .withoutGrouping()
+        .build()
+
+    then:
+      0 * _
+
+    and:
+      def outboxGroupingProvider = transactionalOutbox.groupingProvider
+      outboxGroupingProvider == SingleItemGroupingConfiguration.INSTANCE.groupingProvider
+      outboxGroupingProvider instanceof SingleItemGroupingProvider
   }
 }
