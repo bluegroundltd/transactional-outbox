@@ -23,7 +23,8 @@ internal class OutboxItemFactory(
       type = type,
       status = OutboxStatus.PENDING,
       payload = handler.serialize(payload),
-      nextRun = handler.getNextExecutionTime(0),
+      // ensures that instant outbox items are picked up by monitor's fetching
+      nextRun = handler.getNextExecutionTime(0).minusMillis(1)
     )
   }
 

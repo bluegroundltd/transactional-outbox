@@ -54,7 +54,7 @@ class OutboxItemFactorySpec extends Specification {
     and:
       def handler = GroovyMock(OutboxHandler)
       def serializedPayload = "serializedPayload"
-      def nextRun = GroovyMock(Instant)
+      def nextRun = Instant.now()
 
     when:
       OutboxItem result = outboxItemFactory.makeScheduledOutboxItem(type, payload)
@@ -70,7 +70,7 @@ class OutboxItemFactorySpec extends Specification {
       result.status == OutboxStatus.PENDING
       result.payload == serializedPayload
       result.retries == 0
-      result.nextRun == nextRun
+      result.nextRun == nextRun.minusMillis(1)
       !result.lastExecution
       !result.rerunAfter
   }
