@@ -84,8 +84,8 @@ class TransactionalOutboxBuilderSpec extends UnitTestSpecification {
       groupIdProvider instanceof RandomGroupIdProvider
 
     and:
-      def groupingProvider = builder.groupingProvider
-      groupingProvider != null
+      def groupingProvider = transactionalOutbox.groupingProvider
+      groupingProvider == builder.groupingProvider
       groupingProvider instanceof SingleItemGroupingProvider
 
     where:
@@ -149,19 +149,20 @@ class TransactionalOutboxBuilderSpec extends UnitTestSpecification {
       def suppliedGroupingProvider = Mock(OutboxGroupingProvider)
 
     when:
-      builder
+      def transactionalOutbox = builder
         .withHandlers(Set.of(new DummyOutboxHandler()))
         .withMonitorLocksProvider(monitorLocksProvider)
         .withCleanupLocksProvider(cleanupLocksProvider)
         .withStore(store)
         .withInstantOutboxPublisher(instantOutboxPublisher)
         .withGroupingProvider(suppliedGroupingProvider)
+        .build()
 
     then:
       0 * _
 
     and:
-      def groupingProvider = builder.groupingProvider
+      def groupingProvider = transactionalOutbox.groupingProvider
       groupingProvider == suppliedGroupingProvider
   }
 }

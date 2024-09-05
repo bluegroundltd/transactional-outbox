@@ -6,6 +6,8 @@ import io.github.bluegroundltd.outbox.TransactionalOutbox
 import io.github.bluegroundltd.outbox.TransactionalOutboxImpl
 import io.github.bluegroundltd.outbox.event.InstantOutboxPublisher
 import io.github.bluegroundltd.outbox.executor.FixedThreadPoolExecutorServiceFactory
+import io.github.bluegroundltd.outbox.grouping.OutboxGroupingProvider
+import io.github.bluegroundltd.outbox.grouping.SingleItemGroupingProvider
 import io.github.bluegroundltd.outbox.item.OutboxItem
 import io.github.bluegroundltd.outbox.item.OutboxStatus
 import io.github.bluegroundltd.outbox.item.OutboxType
@@ -50,6 +52,7 @@ class TransactionalOutboxImplSpec extends Specification {
   private final InstantOutboxPublisher instantOutboxPublisher = Mock()
   private final OutboxItemFactory outboxItemFactory = Mock()
   private final OutboxProcessingHostComposer processingHostComposer = new OutboxProcessingHostComposer()
+  private final OutboxGroupingProvider groupingProvider = new SingleItemGroupingProvider()
 
   private final TransactionalOutbox transactionalOutbox = new TransactionalOutboxImpl(
     CLOCK,
@@ -64,7 +67,8 @@ class TransactionalOutboxImplSpec extends Specification {
     [],
     DURATION_ONE_NANO,
     processingHostComposer,
-    false
+    false,
+    groupingProvider
   )
 
   def "Should process all eligible items when [monitor] is invoked and set their statuses to 'COMPLETED'"() {

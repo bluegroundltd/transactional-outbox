@@ -4,7 +4,9 @@ import io.github.bluegroundltd.outbox.OutboxLocksProvider
 import io.github.bluegroundltd.outbox.TransactionalOutbox
 import io.github.bluegroundltd.outbox.TransactionalOutboxImpl
 import io.github.bluegroundltd.outbox.event.InstantOutboxPublisher
+import io.github.bluegroundltd.outbox.grouping.OutboxGroupingProvider
 import io.github.bluegroundltd.outbox.item.OutboxItem
+import io.github.bluegroundltd.outbox.item.OutboxItemGroup
 import io.github.bluegroundltd.outbox.item.OutboxStatus
 import io.github.bluegroundltd.outbox.item.factory.OutboxItemFactory
 import io.github.bluegroundltd.outbox.processing.OutboxGroupProcessor
@@ -35,6 +37,7 @@ class OutboxMonitorSpec extends Specification {
   private List<OutboxItemProcessorDecorator> decorators = (1..5).collect { Mock(OutboxItemProcessorDecorator) }
   private Duration threadPoolTimeOut = Duration.ofMillis(5000)
   private OutboxProcessingHostComposer processingHostComposer = Mock()
+  private final OutboxGroupingProvider groupingProvider = Mock()
 
   private TransactionalOutbox transactionalOutbox
 
@@ -98,7 +101,7 @@ class OutboxMonitorSpec extends Specification {
       noExceptionThrown()
   }
 
-  def "Should delegate to the executor thread pool when monitor is called"() {
+  def "Should group items and delegate to the executor thread pool when monitor is called"() {
     given:
       def now = Instant.now(clock)
       def pendingItem = OutboxItemBuilder.makePending(now).build()
@@ -112,7 +115,13 @@ class OutboxMonitorSpec extends Specification {
       def toBeProcessedItems = [pendingItem, runningItem, failedItem]
 
     and:
-      def processingHosts = toBeProcessedItems.collect { Mock(OutboxProcessingHost) }
+      def groups = [
+        OutboxItemGroup.of(pendingItem),
+        new OutboxItemGroup([runningItem, failedItem])
+      ]
+
+    and:
+      def processingHosts = groups.collect { Mock(OutboxProcessingHost) }
 
     when:
       transactionalOutbox.monitor()
@@ -146,8 +155,18 @@ class OutboxMonitorSpec extends Specification {
         return item
       }
 
-    and: "A processor is created for each item and submitted for execution"
-      toBeProcessedItems.eachWithIndex { item, index ->
+    and: "The items marked for processing are grouped"
+      1 * groupingProvider.execute(_) >> {
+        // Spock gets confused by list parameters and even if we explicitly specify them (i.e. use named parameters)
+        // will still wrap it in an array.
+        // To avoid confusion we skip naming the parameters and instead access them by index.
+        def items = (it as List)[0] as List<OutboxItem>
+        assert items.collect { it.id } == toBeProcessedItems.collect { it.id }
+        return groups
+      }
+
+    and: "A processor is created for each group and submitted for execution"
+      groups.eachWithIndex { group, index ->
         1 * processingHostComposer.compose(_, _) >> { OutboxProcessingAction action, List<OutboxItemProcessorDecorator> decorators ->
           assert action instanceof OutboxGroupProcessor
           assert decorators == this.decorators
@@ -193,6 +212,7 @@ class OutboxMonitorSpec extends Specification {
         }
         return item
       }
+      1 * groupingProvider.execute(_) >> [OutboxItemGroup.of(pendingItem)]
       1 * processingHostComposer.compose(_, _) >> { OutboxProcessingAction action, List<OutboxItemProcessorDecorator> decorators ->
         assert action instanceof OutboxGroupProcessor
         assert decorators == this.decorators
@@ -215,6 +235,7 @@ class OutboxMonitorSpec extends Specification {
     then:
       1 * monitorLocksProvider.acquire()
       1 * store.fetch(_) >> items
+      1 * groupingProvider.execute(_) >> []
       1 * monitorLocksProvider.release()
       0 * _
   }
@@ -237,6 +258,7 @@ class OutboxMonitorSpec extends Specification {
     then:
       1 * monitorLocksProvider.acquire()
       1 * store.fetch(_) >> []
+      1 * groupingProvider.execute(_) >> []
       1 * monitorLocksProvider.release() >> { throw new RuntimeException() }
       0 * _
       noExceptionThrown()
@@ -275,6 +297,7 @@ class OutboxMonitorSpec extends Specification {
         }
         item
       }
+      1 * groupingProvider.execute(_) >> [OutboxItemGroup.of(instantOutbox)]
       1 * processingHostComposer.compose(_, _) >> {
         OutboxProcessingAction action, List<OutboxItemProcessorDecorator> decorators ->
           assert action instanceof OutboxGroupProcessor
@@ -300,7 +323,8 @@ class OutboxMonitorSpec extends Specification {
       decorators,
       threadPoolTimeOut,
       processingHostComposer,
-      instantProcessingEnabled
+      instantProcessingEnabled,
+      groupingProvider
     )
   }
 }

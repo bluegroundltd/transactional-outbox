@@ -2,6 +2,7 @@ package io.github.bluegroundltd.outbox.unit
 
 import io.github.bluegroundltd.outbox.OutboxHandler
 import io.github.bluegroundltd.outbox.OutboxLocksProvider
+import io.github.bluegroundltd.outbox.grouping.OutboxGroupingProvider
 import io.github.bluegroundltd.outbox.processing.OutboxProcessingHost
 import io.github.bluegroundltd.outbox.processing.OutboxProcessingHostComposer
 import io.github.bluegroundltd.outbox.TransactionalOutbox
@@ -49,7 +50,8 @@ class OutboxShutdownSpec extends Specification {
       [],
       threadPoolTimeOut,
       processingHostComposer,
-      false
+      false,
+      Mock(OutboxGroupingProvider)
     )
   }
 

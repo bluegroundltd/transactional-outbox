@@ -2,6 +2,7 @@ package io.github.bluegroundltd.outbox
 
 import io.github.bluegroundltd.outbox.event.InstantOutboxEvent
 import io.github.bluegroundltd.outbox.event.InstantOutboxPublisher
+import io.github.bluegroundltd.outbox.grouping.OutboxGroupingProvider
 import io.github.bluegroundltd.outbox.item.OutboxItem
 import io.github.bluegroundltd.outbox.item.OutboxItemGroup
 import io.github.bluegroundltd.outbox.item.OutboxPayload
@@ -10,7 +11,6 @@ import io.github.bluegroundltd.outbox.item.OutboxType
 import io.github.bluegroundltd.outbox.item.factory.OutboxItemFactory
 import io.github.bluegroundltd.outbox.processing.OutboxGroupProcessor
 import io.github.bluegroundltd.outbox.processing.OutboxItemProcessorDecorator
-import io.github.bluegroundltd.outbox.processing.OutboxProcessingAction
 import io.github.bluegroundltd.outbox.processing.OutboxProcessingHost
 import io.github.bluegroundltd.outbox.processing.OutboxProcessingHostComposer
 import io.github.bluegroundltd.outbox.store.OutboxFilter
@@ -40,7 +40,8 @@ internal class TransactionalOutboxImpl(
   private val decorators: List<OutboxItemProcessorDecorator> = emptyList(),
   private val threadPoolTimeOut: Duration,
   private val processingHostComposer: OutboxProcessingHostComposer,
-  private val instantOrderingEnabled: Boolean
+  private val instantOrderingEnabled: Boolean,
+  private val groupingProvider: OutboxGroupingProvider
 ) : TransactionalOutbox {
 
   private var inShutdownMode = AtomicBoolean(false)
@@ -76,7 +77,7 @@ internal class TransactionalOutboxImpl(
       monitor(outbox.id)
     } else {
       runCatching {
-        val processor = makeOutboxProcessor(outbox)
+        val processor = OutboxGroupProcessor(OutboxItemGroup.of(outbox), ::resolveOutboxHandler, outboxStore, clock)
         val processingHost = processingHostComposer.compose(processor, decorators)
         executor.execute(processingHost)
       }.onFailure {
@@ -103,7 +104,8 @@ internal class TransactionalOutboxImpl(
 
       markForProcessing(items)
         .map { outboxStore.update(it) }
-        .forEach { processItem(it) }
+        .group()
+        .forEach { it.process() }
     }.onFailure {
       logger.error("$LOGGER_PREFIX Failure in monitor", it)
     }
@@ -141,19 +143,19 @@ internal class TransactionalOutboxImpl(
       .onEach { it.prepareForProcessing(now, rerunAfter) }
   }
 
-  private fun processItem(item: OutboxItem) {
-    val processor = makeOutboxProcessor(item)
+  private fun List<OutboxItem>.group(): List<OutboxItemGroup> = groupingProvider.execute(this)
+
+  private fun OutboxItemGroup.process() {
+    val processor = OutboxGroupProcessor(this, ::resolveOutboxHandler, outboxStore, clock)
     val processingHost = processingHostComposer.compose(processor, decorators)
     try {
       executor.execute(processingHost)
     } catch (exception: RejectedExecutionException) {
-      logger.info("$LOGGER_PREFIX Executor rejected processing of outbox item with id ${item.id}")
+      val ids = items.joinToString(", ") { it.id.toString() }
+      logger.info("$LOGGER_PREFIX Executor rejected processing of outbox group with items: $ids")
       processingHost.reset()
     }
   }
-
-  private fun makeOutboxProcessor(item: OutboxItem): OutboxProcessingAction =
-    OutboxGroupProcessor(OutboxItemGroup.of(item), ::resolveOutboxHandler, outboxStore, clock)
 
   private fun resolveOutboxHandler(item: OutboxItem): OutboxHandler? = outboxHandlers[item.type]
 

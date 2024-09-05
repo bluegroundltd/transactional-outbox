@@ -1,6 +1,7 @@
 package io.github.bluegroundltd.outbox.unit
 
 import io.github.bluegroundltd.outbox.OutboxLocksProvider
+import io.github.bluegroundltd.outbox.grouping.OutboxGroupingProvider
 import io.github.bluegroundltd.outbox.processing.OutboxProcessingHostComposer
 import io.github.bluegroundltd.outbox.TransactionalOutbox
 import io.github.bluegroundltd.outbox.TransactionalOutboxImpl
@@ -38,7 +39,8 @@ class OutboxCleanupSpec extends Specification {
     [],
     Duration.ofMillis(5000),
     Mock(OutboxProcessingHostComposer),
-    false
+    false,
+    Mock(OutboxGroupingProvider)
   )
 
   def "Should acquire the clean up lock, delete all completed items and release it"() {

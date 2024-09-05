@@ -236,7 +236,8 @@ class TransactionalOutboxBuilder(
         decorators,
         threadPoolTimeOut,
         OutboxProcessingHostComposer(),
-        instantOrderingEnabled
+        instantOrderingEnabled,
+        groupingProvider
     )
   }
 }
