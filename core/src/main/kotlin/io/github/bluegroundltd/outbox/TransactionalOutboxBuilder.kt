@@ -2,14 +2,14 @@ package io.github.bluegroundltd.outbox
 
 import io.github.bluegroundltd.outbox.event.InstantOutboxPublisher
 import io.github.bluegroundltd.outbox.executor.FixedThreadPoolExecutorServiceFactory
-import io.github.bluegroundltd.outbox.item.OutboxType
-import io.github.bluegroundltd.outbox.item.factory.OutboxItemFactory
+import io.github.bluegroundltd.outbox.grouping.GroupIdGroupingProvider
 import io.github.bluegroundltd.outbox.grouping.OutboxGroupIdProvider
 import io.github.bluegroundltd.outbox.grouping.OutboxGroupingProvider
+import io.github.bluegroundltd.outbox.grouping.RandomGroupIdProvider
+import io.github.bluegroundltd.outbox.item.OutboxType
+import io.github.bluegroundltd.outbox.item.factory.OutboxItemFactory
 import io.github.bluegroundltd.outbox.processing.OutboxItemProcessorDecorator
 import io.github.bluegroundltd.outbox.processing.OutboxProcessingHostComposer
-import io.github.bluegroundltd.outbox.grouping.RandomGroupIdProvider
-import io.github.bluegroundltd.outbox.grouping.SingleItemGroupingProvider
 import io.github.bluegroundltd.outbox.store.OutboxStore
 import java.time.Clock
 import java.time.Duration
@@ -38,8 +38,8 @@ import java.time.Duration
  *   ```
  */
 class TransactionalOutboxBuilder(
-    private val clock: Clock,
-    private val rerunAfterDuration: Duration = DEFAULT_RERUN_AFTER_DURATION
+  private val clock: Clock,
+  private val rerunAfterDuration: Duration = DEFAULT_RERUN_AFTER_DURATION
 ) : OutboxHandlersStep,
   MonitorLocksProviderStep,
   CleanupLocksProviderStep,
@@ -57,7 +57,7 @@ class TransactionalOutboxBuilder(
   private lateinit var store: OutboxStore
   private lateinit var instantOutboxPublisher: InstantOutboxPublisher
   private var groupIdProvider: OutboxGroupIdProvider = RandomGroupIdProvider()
-  private var groupingProvider: OutboxGroupingProvider = SingleItemGroupingProvider()
+  private var groupingProvider: OutboxGroupingProvider = GroupIdGroupingProvider()
 
   companion object {
     private val DEFAULT_RERUN_AFTER_DURATION: Duration = Duration.ofHours(1)
@@ -83,8 +83,8 @@ class TransactionalOutboxBuilder(
 
   private fun validateNoDuplicateHandlerSupportedTypes(handlers: Set<OutboxHandler>) {
     val typesWithMoreThanOneHandlers = handlers
-        .groupBy { it.getSupportedType() }
-        .filter { it.value.size > 1 }
+      .groupBy { it.getSupportedType() }
+      .filter { it.value.size > 1 }
 
     if (typesWithMoreThanOneHandlers.isNotEmpty()) {
       val typesWithDuplicateHandlers = concatenateTypesWithDuplicateHandlers(typesWithMoreThanOneHandlers)
@@ -93,17 +93,17 @@ class TransactionalOutboxBuilder(
   }
 
   private fun concatenateTypesWithDuplicateHandlers(
-      typesWithMoreThanOneHandlers: Map<OutboxType, List<OutboxHandler>>
+    typesWithMoreThanOneHandlers: Map<OutboxType, List<OutboxHandler>>
   ): String {
     val typesWithMoreThanOneHandlersFlattened = typesWithMoreThanOneHandlers.entries.joinToString(
-        separator = ", ",
-        transform = {
-          // Transforms entries to "type1 -> [handlerA, handlerB]"
-          it.key.getType() +
-              " -> [" +
-              it.value.joinToString { handler -> handler.javaClass.simpleName } +
-              "]"
-        }
+      separator = ", ",
+      transform = {
+        // Transforms entries to "type1 -> [handlerA, handlerB]"
+        it.key.getType() +
+          " -> [" +
+          it.value.joinToString { handler -> handler.javaClass.simpleName } +
+          "]"
+      }
     )
     return typesWithMoreThanOneHandlersFlattened
   }
@@ -224,19 +224,19 @@ class TransactionalOutboxBuilder(
     val outboxItemFactory = OutboxItemFactory(clock, handlers.toMap(), rerunAfterDuration, groupIdProvider)
 
     return TransactionalOutboxImpl(
-        clock,
-        handlers.toMap(),
-        monitorLocksProvider,
-        cleanupLocksProvider,
-        store,
-        instantOutboxPublisher,
-        outboxItemFactory,
-        rerunAfterDuration,
-        executorServiceFactory.make(),
-        decorators,
-        threadPoolTimeOut,
-        OutboxProcessingHostComposer(),
-        instantOrderingEnabled,
+      clock,
+      handlers.toMap(),
+      monitorLocksProvider,
+      cleanupLocksProvider,
+      store,
+      instantOutboxPublisher,
+      outboxItemFactory,
+      rerunAfterDuration,
+      executorServiceFactory.make(),
+      decorators,
+      threadPoolTimeOut,
+      OutboxProcessingHostComposer(),
+      instantOrderingEnabled,
         groupingProvider
     )
   }

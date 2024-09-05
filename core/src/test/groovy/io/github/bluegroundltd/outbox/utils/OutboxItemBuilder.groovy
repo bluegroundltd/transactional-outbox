@@ -78,6 +78,10 @@ class OutboxItemBuilder implements SpecHelper {
     this
   }
 
+  OutboxItemBuilder withoutGroupId() {
+    withGroupId(null)
+  }
+
   static OutboxItemBuilder makePending(Instant now = Instant.now()) {
     make().withStatus(OutboxStatus.PENDING).withNextRun(now.minusSeconds(1))
   }

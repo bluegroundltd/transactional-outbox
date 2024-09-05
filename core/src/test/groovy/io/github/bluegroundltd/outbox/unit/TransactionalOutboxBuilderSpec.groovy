@@ -6,10 +6,10 @@ import io.github.bluegroundltd.outbox.TransactionalOutbox
 import io.github.bluegroundltd.outbox.TransactionalOutboxBuilder
 import io.github.bluegroundltd.outbox.TransactionalOutboxImpl
 import io.github.bluegroundltd.outbox.event.InstantOutboxPublisher
+import io.github.bluegroundltd.outbox.grouping.GroupIdGroupingProvider
 import io.github.bluegroundltd.outbox.grouping.OutboxGroupIdProvider
 import io.github.bluegroundltd.outbox.grouping.OutboxGroupingProvider
 import io.github.bluegroundltd.outbox.grouping.RandomGroupIdProvider
-import io.github.bluegroundltd.outbox.grouping.SingleItemGroupingProvider
 import io.github.bluegroundltd.outbox.item.OutboxType
 import io.github.bluegroundltd.outbox.item.factory.OutboxItemFactory
 import io.github.bluegroundltd.outbox.processing.OutboxItemProcessorDecorator
@@ -86,7 +86,7 @@ class TransactionalOutboxBuilderSpec extends UnitTestSpecification {
     and:
       def groupingProvider = transactionalOutbox.groupingProvider
       groupingProvider == builder.groupingProvider
-      groupingProvider instanceof SingleItemGroupingProvider
+      groupingProvider instanceof GroupIdGroupingProvider
 
     where:
       testCase                                                        | withCustomThreadPoolSize | withCustomThreadPoolTimeOut
