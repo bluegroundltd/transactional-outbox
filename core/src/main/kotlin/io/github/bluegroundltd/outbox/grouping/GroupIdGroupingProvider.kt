@@ -8,6 +8,11 @@ import io.github.bluegroundltd.outbox.item.OutboxItemGroup
  *
  * The provider assumes that all items have a group ID set. Otherwise, an exception will be thrown.
  */
-internal class GroupIdGroupingProvider : OutboxGroupingProvider {
-  override fun execute(items: Iterable<OutboxItem>) = items.groupBy { it.groupId!! }.map { OutboxItemGroup(it.value) }
+internal class GroupIdGroupingProvider(
+  private val orderingProvider: OutboxOrderingProvider = FifoOrderingProvider()
+) : OutboxGroupingProvider {
+  override fun execute(items: Iterable<OutboxItem>) = items
+    .groupBy { it.groupId!! } // group by group ID
+    .map { orderingProvider.execute(it.value) } // order items in each group
+    .map { OutboxItemGroup(it) } // create groups
 }
