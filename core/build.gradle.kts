@@ -107,7 +107,12 @@ tasks.dokkaHtml.configure {
 signing {
   // This is required to allow using the signing key via the CI in ASCII armored format.
   // https://docs.gradle.org/current/userguide/signing_plugin.html#sec:in-memory-keys
-  val signingKey: String? by project
-  val signingPassword: String? by project
-  useInMemoryPgpKeys(signingKey, signingPassword)
+  if (!project.gradle.startParameter.taskNames.any {
+    it.contains("publishToMavenLocal") ||
+    it.contains("publishMavenPublicationToMavenLocal")
+  }) {
+    val signingKey: String? by project
+    val signingPassword: String? by project
+    useInMemoryPgpKeys(signingKey, signingPassword)
+  }
 }

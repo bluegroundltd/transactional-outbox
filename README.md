@@ -27,7 +27,7 @@ Transactional Outbox is published on `mavenCentral`. In order to use it just add
 
 ```gradle
 
-implementation("io.github.bluegroundltd:transactional-outbox-core:2.1.1")
+implementation("io.github.bluegroundltd:transactional-outbox-core:2.2.0")
 
 ```
 
@@ -218,6 +218,26 @@ implementation("io.github.bluegroundltd:transactional-outbox-core:x.y.z")
 ```gradle
 implementation(files("../../../transactional-outbox/core/build/libs/core-x.y.z.jar"))
 ```
+
+* Alternative 3: You can publish a snapshot version of the library and make it available to maven snapshot repository.
+  1) Update the version in `gradle.properties` to a snapshot version, e.g. `2.2.0-SNAPSHOT`
+  2) Publish it using the instructions here: [Publish via your workstation](###Publish via your workstation) 
+  3) Snapshot will be published to the maven snapshot repository and you can use it in your project by adding the following to your `build.gradle` file:
+  ```gradle
+    repositories {
+      maven {
+        url = uri("https://s01.oss.sonatype.org/content/repositories/snapshots/")
+        credentials {
+          username = <your_username> or <your_gpr_user>
+          password = <your_password> or <your_gpr_token>
+        }
+      }
+    }
+    dependencies {
+        implementation("io.github.bluegroundltd:transactional-outbox-core:2.2.0-SNAPSHOT")
+    }
+  ```
+
 ## Publishing
 
 Firstly, bump version in `gradle.properties` of `core` module, commit and push a PR. Once it gets merged, follow one of the two options below.

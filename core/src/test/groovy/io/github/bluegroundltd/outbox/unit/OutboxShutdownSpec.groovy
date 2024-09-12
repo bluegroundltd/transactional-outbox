@@ -48,7 +48,8 @@ class OutboxShutdownSpec extends Specification {
       executor,
       [],
       threadPoolTimeOut,
-      processingHostComposer
+      processingHostComposer,
+      false
     )
   }
 
