@@ -39,7 +39,8 @@ $dokka.location:io.github.bluegroundltd.outbox.store////PointingToDeclaration/c
 $dokka.location:io.github.bluegroundltd.outbox.store/AbstractOutboxFilter///PointingToDeclaration/core/io.github.bluegroundltd.outbox.store/-abstract-outbox-filter/index.html
 $dokka.location:io.github.bluegroundltd.outbox.store/AbstractOutboxFilter/status/#/PointingToDeclaration/core/io.github.bluegroundltd.outbox.store/-abstract-outbox-filter/status.html
 $dokka.location:io.github.bluegroundltd.outbox.store/OutboxFilter///PointingToDeclaration/core/io.github.bluegroundltd.outbox.store/-outbox-filter/index.html
-$dokka.location:io.github.bluegroundltd.outbox.store/OutboxFilter/OutboxFilter/#java.time.Instant#java.time.Instant/PointingToDeclaration/core/io.github.bluegroundltd.outbox.store/-outbox-filter/-outbox-filter.html
+$dokka.location:io.github.bluegroundltd.outbox.store/OutboxFilter/OutboxFilter/#java.time.Instant#java.time.Instant#kotlin.Long?/PointingToDeclaration/core/io.github.bluegroundltd.outbox.store/-outbox-filter/-outbox-filter.html
+$dokka.location:io.github.bluegroundltd.outbox.store/OutboxFilter/id/#/PointingToDeclaration/core/io.github.bluegroundltd.outbox.store/-outbox-filter/id.html
 $dokka.location:io.github.bluegroundltd.outbox.store/OutboxFilter/outboxPendingFilter/#/PointingToDeclaration/core/io.github.bluegroundltd.outbox.store/-outbox-filter/outbox-pending-filter.html
 $dokka.location:io.github.bluegroundltd.outbox.store/OutboxFilter/outboxRunningFilter/#/PointingToDeclaration/core/io.github.bluegroundltd.outbox.store/-outbox-filter/outbox-running-filter.html
 $dokka.location:io.github.bluegroundltd.outbox.store/OutboxPendingFilter///PointingToDeclaration/core/io.github.bluegroundltd.outbox.store/-outbox-pending-filter/index.html
@@ -57,6 +58,7 @@ $dokka.location:io.github.bluegroundltd.outbox////PointingToDeclaration/core/io
 $dokka.location:io.github.bluegroundltd.outbox/BuildStep///PointingToDeclaration/core/io.github.bluegroundltd.outbox/-build-step/index.html
 $dokka.location:io.github.bluegroundltd.outbox/BuildStep/addProcessorDecorator/#io.github.bluegroundltd.outbox.processing.OutboxItemProcessorDecorator/PointingToDeclaration/core/io.github.bluegroundltd.outbox/-build-step/add-processor-decorator.html
 $dokka.location:io.github.bluegroundltd.outbox/BuildStep/build/#/PointingToDeclaration/core/io.github.bluegroundltd.outbox/-build-step/build.html
+$dokka.location:io.github.bluegroundltd.outbox/BuildStep/withInstantOrderingEnabled/#kotlin.Boolean/PointingToDeclaration/core/io.github.bluegroundltd.outbox/-build-step/with-instant-ordering-enabled.html
 $dokka.location:io.github.bluegroundltd.outbox/BuildStep/withThreadPoolSize/#kotlin.Int/PointingToDeclaration/core/io.github.bluegroundltd.outbox/-build-step/with-thread-pool-size.html
 $dokka.location:io.github.bluegroundltd.outbox/BuildStep/withThreadPoolTimeOut/#java.time.Duration/PointingToDeclaration/core/io.github.bluegroundltd.outbox/-build-step/with-thread-pool-time-out.html
 $dokka.location:io.github.bluegroundltd.outbox/BuildStep/withThreadPriority/#kotlin.Int/PointingToDeclaration/core/io.github.bluegroundltd.outbox/-build-step/with-thread-priority.html
@@ -95,6 +97,7 @@ $dokka.location:io.github.bluegroundltd.outbox/TransactionalOutbox///PointingToD
 $dokka.location:io.github.bluegroundltd.outbox/TransactionalOutbox/add/#io.github.bluegroundltd.outbox.item.OutboxType#io.github.bluegroundltd.outbox.item.OutboxPayload#kotlin.Boolean/PointingToDeclaration/core/io.github.bluegroundltd.outbox/-transactional-outbox/add.html
 $dokka.location:io.github.bluegroundltd.outbox/TransactionalOutbox/cleanup/#/PointingToDeclaration/core/io.github.bluegroundltd.outbox/-transactional-outbox/cleanup.html
 $dokka.location:io.github.bluegroundltd.outbox/TransactionalOutbox/monitor/#/PointingToDeclaration/core/io.github.bluegroundltd.outbox/-transactional-outbox/monitor.html
+$dokka.location:io.github.bluegroundltd.outbox/TransactionalOutbox/monitor/#kotlin.Long?/PointingToDeclaration/core/io.github.bluegroundltd.outbox/-transactional-outbox/monitor.html
 $dokka.location:io.github.bluegroundltd.outbox/TransactionalOutbox/processInstantOutbox/#io.github.bluegroundltd.outbox.item.OutboxItem/PointingToDeclaration/core/io.github.bluegroundltd.outbox/-transactional-outbox/process-instant-outbox.html
 $dokka.location:io.github.bluegroundltd.outbox/TransactionalOutbox/shutdown/#/PointingToDeclaration/core/io.github.bluegroundltd.outbox/-transactional-outbox/shutdown.html
 $dokka.location:io.github.bluegroundltd.outbox/TransactionalOutboxBuilder.Companion///PointingToDeclaration/core/io.github.bluegroundltd.outbox/-transactional-outbox-builder/-companion/index.html
@@ -105,6 +108,7 @@ $dokka.location:io.github.bluegroundltd.outbox/TransactionalOutboxBuilder/addPro
 $dokka.location:io.github.bluegroundltd.outbox/TransactionalOutboxBuilder/build/#/PointingToDeclaration/core/io.github.bluegroundltd.outbox/-transactional-outbox-builder/build.html
 $dokka.location:io.github.bluegroundltd.outbox/TransactionalOutboxBuilder/withCleanupLocksProvider/#io.github.bluegroundltd.outbox.OutboxLocksProvider/PointingToDeclaration/core/io.github.bluegroundltd.outbox/-transactional-outbox-builder/with-cleanup-locks-provider.html
 $dokka.location:io.github.bluegroundltd.outbox/TransactionalOutboxBuilder/withHandlers/#kotlin.collections.Set[io.github.bluegroundltd.outbox.OutboxHandler]/PointingToDeclaration/core/io.github.bluegroundltd.outbox/-transactional-outbox-builder/with-handlers.html
+$dokka.location:io.github.bluegroundltd.outbox/TransactionalOutboxBuilder/withInstantOrderingEnabled/#kotlin.Boolean/PointingToDeclaration/core/io.github.bluegroundltd.outbox/-transactional-outbox-builder/with-instant-ordering-enabled.html
 $dokka.location:io.github.bluegroundltd.outbox/TransactionalOutboxBuilder/withInstantOutboxPublisher/#io.github.bluegroundltd.outbox.event.InstantOutboxPublisher/PointingToDeclaration/core/io.github.bluegroundltd.outbox/-transactional-outbox-builder/with-instant-outbox-publisher.html
 $dokka.location:io.github.bluegroundltd.outbox/TransactionalOutboxBuilder/withMonitorLocksProvider/#io.github.bluegroundltd.outbox.OutboxLocksProvider/PointingToDeclaration/core/io.github.bluegroundltd.outbox/-transactional-outbox-builder/with-monitor-locks-provider.html
 $dokka.location:io.github.bluegroundltd.outbox/TransactionalOutboxBuilder/withStore/#io.github.bluegroundltd.outbox.store.OutboxStore/PointingToDeclaration/core/io.github.bluegroundltd.outbox/-transactional-outbox-builder/with-store.html
