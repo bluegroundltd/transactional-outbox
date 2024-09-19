@@ -15,6 +15,8 @@ import io.github.bluegroundltd.outbox.processing.OutboxProcessingHost
 import io.github.bluegroundltd.outbox.processing.OutboxProcessingHostComposer
 import io.github.bluegroundltd.outbox.store.OutboxFilter
 import io.github.bluegroundltd.outbox.store.OutboxStore
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import java.time.Clock
 import java.time.Duration
 import java.time.Instant
@@ -23,8 +25,6 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.RejectedExecutionException
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 
 @SuppressWarnings("LongParameterList", "TooGenericExceptionCaught")
 internal class TransactionalOutboxImpl(
@@ -95,7 +95,7 @@ internal class TransactionalOutboxImpl(
     runCatching {
       monitorLocksProvider.acquire()
 
-      val items = fetchEligibleItems(id).filterByIdIfExists(id) // ensures item filtering regardless of client's `fetch`
+      val items = fetchEligibleItems(id)
       if (items.isEmpty()) {
         logger.info("$LOGGER_PREFIX No outbox items to process")
       } else {
@@ -105,6 +105,7 @@ internal class TransactionalOutboxImpl(
       markForProcessing(items)
         .map { outboxStore.update(it) }
         .group()
+        .filterByIdIfExists(id) // ensures item filtering regardless of client's `fetch`
         .forEach { it.process() }
     }.onFailure {
       logger.error("$LOGGER_PREFIX Failure in monitor", it)
@@ -214,6 +215,9 @@ internal class TransactionalOutboxImpl(
     }
   }
 
-  private fun List<OutboxItem>.filterByIdIfExists(id: Long?): List<OutboxItem> =
-    id?.let { this.filter { it.id == id } } ?: this
+  private fun List<OutboxItemGroup>.filterByIdIfExists(id: Long?): List<OutboxItemGroup> =
+    id?.let { filter { it.contains(id) } } ?: this
+
+  private fun OutboxItemGroup.contains(id: Long): Boolean =
+    items.any { it.id == id }
 }

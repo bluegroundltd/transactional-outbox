@@ -288,16 +288,21 @@ class OutboxMonitorSpec extends Specification {
         }
         fetchedItems
       }
-      1 * store.update(_) >> { OutboxItem item ->
-        with(item) {
-          it.id == instantOutbox.id
-          it.status == OutboxStatus.RUNNING
-          it.lastExecution == now
-          it.rerunAfter == item.lastExecution + DURATION_ONE_HOUR
+      fetchedItems.each { OutboxItem fetchedItem ->
+        1 * store.update(_) >> { OutboxItem updatedItem ->
+          with(updatedItem) {
+            it.id == fetchedItem.id
+            it.status == OutboxStatus.RUNNING
+            it.lastExecution == now
+            it.rerunAfter == updatedItem.lastExecution + DURATION_ONE_HOUR
+          }
+          updatedItem
         }
-        item
       }
-      1 * groupingProvider.execute(_) >> [OutboxItemGroup.of(instantOutbox)]
+      1 * groupingProvider.execute(_) >> [
+        OutboxItemGroup.of(instantOutbox),
+        OutboxItemGroup.of(irrelevantOutbox),
+      ]
       1 * processingHostComposer.compose(_, _) >> {
         OutboxProcessingAction action, List<OutboxItemProcessorDecorator> decorators ->
           assert action instanceof OutboxGroupProcessor
