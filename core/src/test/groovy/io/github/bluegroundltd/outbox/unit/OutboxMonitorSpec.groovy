@@ -111,17 +111,15 @@ class OutboxMonitorSpec extends Specification {
 
     and:
       def fetchedItems = [pendingItem, runningItem, failedItem, completedItem]
-      def eligibleItems = [pendingItem, runningItem]
-      def toBeProcessedItems = [pendingItem, runningItem, failedItem]
-
-    and:
-      def groups = [
-        OutboxItemGroup.of(pendingItem),
-        new OutboxItemGroup([runningItem, failedItem])
+      def processableItems = [pendingItem, runningItem, failedItem]
+      def itemGroups = [
+        [pendingItem],
+        [runningItem, failedItem]
       ]
+      def eligibleItems = [pendingItem, runningItem]
 
     and:
-      def processingHosts = groups.collect { Mock(OutboxProcessingHost) }
+      def processingHosts = itemGroups.collect { Mock(OutboxProcessingHost) }
 
     when:
       transactionalOutbox.monitor()
@@ -134,6 +132,18 @@ class OutboxMonitorSpec extends Specification {
           outboxRunningFilter.rerunAfterLessThan == now
         }
         fetchedItems
+      }
+
+    and: "The items marked for processing are grouped"
+      1 * groupingProvider.execute(_) >> {
+        // Spock gets confused by list parameters and even if we explicitly specify them (i.e. use named parameters)
+        // will still wrap it in an array.
+        // To avoid confusion we skip naming the parameters and instead access them by index.
+        def items = (it as List)[0] as List<OutboxItem>
+        assert items == processableItems
+        return itemGroups.collect {
+          new OutboxItemGroup(findMatchingItems(items, it))
+        }
       }
 
     and: "The pending and running items are marked for processing while the failed item is stored as-is"
@@ -155,18 +165,8 @@ class OutboxMonitorSpec extends Specification {
         return item
       }
 
-    and: "The items marked for processing are grouped"
-      1 * groupingProvider.execute(_) >> {
-        // Spock gets confused by list parameters and even if we explicitly specify them (i.e. use named parameters)
-        // will still wrap it in an array.
-        // To avoid confusion we skip naming the parameters and instead access them by index.
-        def items = (it as List)[0] as List<OutboxItem>
-        assert items.collect { it.id } == toBeProcessedItems.collect { it.id }
-        return groups
-      }
-
     and: "A processor is created for each group and submitted for execution"
-      groups.eachWithIndex { group, index ->
+      itemGroups.eachWithIndex { group, index ->
         1 * processingHostComposer.compose(_, _) >> { OutboxProcessingAction action, List<OutboxItemProcessorDecorator> decorators ->
           assert action instanceof OutboxGroupProcessor
           assert decorators == this.decorators
@@ -203,6 +203,14 @@ class OutboxMonitorSpec extends Specification {
         }
         [pendingItem]
       }
+      1 * groupingProvider.execute(_) >> {
+        // Spock gets confused by list parameters and even if we explicitly specify them (i.e. use named parameters)
+        // will still wrap it in an array.
+        // To avoid confusion we skip naming the parameters and instead access them by index.
+        def items = (it as List)[0] as List<OutboxItem>
+        assert items == [pendingItem]
+        return [new OutboxItemGroup(items)]
+      }
       1 * store.update(_) >> { OutboxItem item ->
         assert item == originalItem.with {
           status = OutboxStatus.RUNNING
@@ -212,7 +220,6 @@ class OutboxMonitorSpec extends Specification {
         }
         return item
       }
-      1 * groupingProvider.execute(_) >> [OutboxItemGroup.of(pendingItem)]
       1 * processingHostComposer.compose(_, _) >> { OutboxProcessingAction action, List<OutboxItemProcessorDecorator> decorators ->
         assert action instanceof OutboxGroupProcessor
         assert decorators == this.decorators
@@ -235,7 +242,7 @@ class OutboxMonitorSpec extends Specification {
     then:
       1 * monitorLocksProvider.acquire()
       1 * store.fetch(_) >> items
-      1 * groupingProvider.execute(_) >> []
+      1 * groupingProvider.execute([]) >> []
       1 * monitorLocksProvider.release()
       0 * _
   }
@@ -258,7 +265,7 @@ class OutboxMonitorSpec extends Specification {
     then:
       1 * monitorLocksProvider.acquire()
       1 * store.fetch(_) >> []
-      1 * groupingProvider.execute(_) >> []
+      1 * groupingProvider.execute([]) >> []
       1 * monitorLocksProvider.release() >> { throw new RuntimeException() }
       0 * _
       noExceptionThrown()
@@ -288,21 +295,23 @@ class OutboxMonitorSpec extends Specification {
         }
         fetchedItems
       }
-      fetchedItems.each { OutboxItem fetchedItem ->
-        1 * store.update(_) >> { OutboxItem updatedItem ->
-          with(updatedItem) {
-            it.id == fetchedItem.id
-            it.status == OutboxStatus.RUNNING
-            it.lastExecution == now
-            it.rerunAfter == updatedItem.lastExecution + DURATION_ONE_HOUR
-          }
-          updatedItem
-        }
+      1 * groupingProvider.execute(_) >> {
+        // Spock gets confused by list parameters and even if we explicitly specify them (i.e. use named parameters)
+        // will still wrap it in an array.
+        // To avoid confusion we skip naming the parameters and instead access them by index.
+        def items = (it as List)[0] as List<OutboxItem>
+        assert items == fetchedItems
+        return items.collect { OutboxItemGroup.of(it) }
       }
-      1 * groupingProvider.execute(_) >> [
-        OutboxItemGroup.of(instantOutbox),
-        OutboxItemGroup.of(irrelevantOutbox),
-      ]
+      1 * store.update(_) >> { OutboxItem updatedItem ->
+        with(updatedItem) {
+          it.id == instantOutbox.id
+          it.status == OutboxStatus.RUNNING
+          it.lastExecution == now
+          it.rerunAfter == updatedItem.lastExecution + DURATION_ONE_HOUR
+        }
+        updatedItem
+      }
       1 * processingHostComposer.compose(_, _) >> {
         OutboxProcessingAction action, List<OutboxItemProcessorDecorator> decorators ->
           assert action instanceof OutboxGroupProcessor
@@ -331,5 +340,9 @@ class OutboxMonitorSpec extends Specification {
       instantProcessingEnabled,
       groupingProvider
     )
+  }
+
+  private static List<OutboxItem> findMatchingItems(List<OutboxItem> updatedItems, List<OutboxItem> originalItems) {
+    return updatedItems.findAll { item -> originalItems.contains(item) }
   }
 }

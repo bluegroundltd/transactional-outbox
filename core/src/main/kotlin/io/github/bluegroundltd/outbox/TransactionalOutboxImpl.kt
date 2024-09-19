@@ -95,17 +95,18 @@ internal class TransactionalOutboxImpl(
     runCatching {
       monitorLocksProvider.acquire()
 
-      val items = fetchEligibleItems(id)
-      if (items.isEmpty()) {
+      val fetchedItems = fetchEligibleItems(id)
+      if (fetchedItems.isEmpty()) {
         logger.info("$LOGGER_PREFIX No outbox items to process")
       } else {
-        logger.info("$LOGGER_PREFIX Will process ${items.size} outbox items")
+        logger.info("$LOGGER_PREFIX Will process ${fetchedItems.size} outbox items")
       }
 
-      markForProcessing(items)
-        .map { outboxStore.update(it) }
+      fetchedItems
+        .map { it.copy() } // Defensive copy to avoid external modifications.
         .group()
         .filterByIdIfExists(id) // ensures item filtering regardless of client's `fetch`
+        .apply { prepareForProcessing() } // mark groups (essentially contained items) for processing
         .forEach { it.process() }
     }.onFailure {
       logger.error("$LOGGER_PREFIX Failure in monitor", it)
@@ -136,12 +137,12 @@ internal class TransactionalOutboxImpl(
     return eligibleItems
   }
 
-  private fun markForProcessing(items: List<OutboxItem>): List<OutboxItem> {
+  private fun List<OutboxItemGroup>.prepareForProcessing() {
     val now = Instant.now(clock)
     val rerunAfter = now.plus(rerunAfterDuration)
-    return items
-      .map { it.copy() } // create a copy to ensure that no external code updates the item
+    flatMap { it.items }
       .onEach { it.prepareForProcessing(now, rerunAfter) }
+      .onEach { outboxStore.update(it) }
   }
 
   private fun List<OutboxItem>.group(): List<OutboxItemGroup> = groupingProvider.execute(this)
