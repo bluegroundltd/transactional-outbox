@@ -4,10 +4,10 @@ import io.github.bluegroundltd.outbox.item.OutboxPayload
 import io.github.bluegroundltd.outbox.item.OutboxType
 import spock.lang.Specification
 
-class RandomGroupIdProviderSpec extends Specification {
-  private RandomGroupIdProvider provider = new RandomGroupIdProvider()
+class NullGroupIdProviderSpec extends Specification {
+  private NullGroupIdProvider provider = new NullGroupIdProvider()
 
-  def "Should generate a random group id"() {
+  def "Should return null"() {
     given:
       def type = GroovyMock(OutboxType)
       def payload = Mock(OutboxPayload)
@@ -19,6 +19,6 @@ class RandomGroupIdProviderSpec extends Specification {
       0 * _
 
     and:
-      groupId
+      groupId == null
   }
 }

@@ -42,19 +42,25 @@ class GroupIdGroupingProviderSpec extends Specification {
         OutboxItemBuilder.make().withGroupId("group1").build(),
         OutboxItemBuilder.make().withGroupId("group2").build(),
         OutboxItemBuilder.make().withGroupId("group3").build(),
+        OutboxItemBuilder.make().withoutGroupId().build(),
         OutboxItemBuilder.make().withGroupId("group3").build(),
+        OutboxItemBuilder.make().withoutGroupId().build(),
         OutboxItemBuilder.make().withGroupId("group2").build()
       ]
 
     and:
       def group1 = [items[1]]
-      def group2 = [items[2], items[5]]
-      def group3 = [items[0], items[3], items[4]]
-      // The groups are created in the order of the first appearance of the group ID.
+      def group2 = [items[2], items[7]]
+      def group3 = [items[0], items[3], items[5]]
+      def group4 = [items[4]] // first null group
+      def group5 = [items[6]] // second null group
+      // The groups are created in the order of appearance of the group's first item.
       def groupedItems = [
         group3,
         group1,
-        group2
+        group2,
+        group4,
+        group5
       ]
       def expectedGroups = groupedItems.collect { new OutboxItemGroup(it) }
 
@@ -80,21 +86,5 @@ class GroupIdGroupingProviderSpec extends Specification {
 
     and:
       groups == []
-  }
-
-  def "Should throw an exception when the group ID is null"() {
-    given:
-      def items = (1..3).collect { OutboxItemBuilder.make().build() } +
-        OutboxItemBuilder.make().withoutGroupId().build()
-
-    when:
-      provider.execute(items)
-
-    then:
-      0 * _
-
-    and:
-      def ex = thrown(NullPointerException)
-      ex
   }
 }

@@ -5,7 +5,7 @@ import io.github.bluegroundltd.outbox.executor.FixedThreadPoolExecutorServiceFac
 import io.github.bluegroundltd.outbox.grouping.DefaultGroupingConfiguration
 import io.github.bluegroundltd.outbox.grouping.OutboxGroupingConfiguration
 import io.github.bluegroundltd.outbox.grouping.OutboxGroupIdProvider
-import io.github.bluegroundltd.outbox.grouping.RandomGroupIdProvider
+import io.github.bluegroundltd.outbox.grouping.NullGroupIdProvider
 import io.github.bluegroundltd.outbox.grouping.SingleItemGroupingConfiguration
 import io.github.bluegroundltd.outbox.item.OutboxType
 import io.github.bluegroundltd.outbox.item.factory.OutboxItemFactory
@@ -57,7 +57,7 @@ class TransactionalOutboxBuilder(
   private lateinit var cleanupLocksProvider: OutboxLocksProvider
   private lateinit var store: OutboxStore
   private lateinit var instantOutboxPublisher: InstantOutboxPublisher
-  private var groupIdProvider: OutboxGroupIdProvider = RandomGroupIdProvider()
+  private var groupIdProvider: OutboxGroupIdProvider = NullGroupIdProvider()
   private var groupingConfiguration: OutboxGroupingConfiguration = DefaultGroupingConfiguration
 
   companion object {
@@ -198,8 +198,8 @@ class TransactionalOutboxBuilder(
   /**
    * Sets the group id provider for the outbox that will be used to set corresponding field when an item is added.
    *
-   * If not set, a default [OutboxGroupIdProvider] is used that provides a random value, effectively ensuring that
-   * no groups will be formed.
+   * If not set, a default [OutboxGroupIdProvider] is used that always returns null, effectively indicating that
+   * there are no groups.
    */
   override fun withGroupIdProvider(groupIdProvider: OutboxGroupIdProvider): BuildStep {
     this.groupIdProvider = groupIdProvider

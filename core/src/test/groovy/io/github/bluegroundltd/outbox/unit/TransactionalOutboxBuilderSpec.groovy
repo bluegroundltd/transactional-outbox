@@ -11,7 +11,7 @@ import io.github.bluegroundltd.outbox.grouping.GroupIdGroupingProvider
 import io.github.bluegroundltd.outbox.grouping.OutboxGroupIdProvider
 import io.github.bluegroundltd.outbox.grouping.OutboxGroupingConfiguration
 import io.github.bluegroundltd.outbox.grouping.OutboxGroupingProvider
-import io.github.bluegroundltd.outbox.grouping.RandomGroupIdProvider
+import io.github.bluegroundltd.outbox.grouping.NullGroupIdProvider
 import io.github.bluegroundltd.outbox.grouping.SingleItemGroupingConfiguration
 import io.github.bluegroundltd.outbox.grouping.SingleItemGroupingProvider
 import io.github.bluegroundltd.outbox.item.OutboxType
@@ -85,7 +85,7 @@ class TransactionalOutboxBuilderSpec extends UnitTestSpecification {
     and:
       def groupIdProvider = itemFactory.groupIdProvider
       groupIdProvider == builder.groupIdProvider
-      groupIdProvider instanceof RandomGroupIdProvider
+      groupIdProvider instanceof NullGroupIdProvider
 
     and:
       def groupingProvider = transactionalOutbox.groupingProvider

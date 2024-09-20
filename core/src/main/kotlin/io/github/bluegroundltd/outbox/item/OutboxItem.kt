@@ -5,10 +5,8 @@ import java.time.Instant
 /**
  * Represents an outbox item.
  *
- * @param groupId an arbitrary value that can be used to group outbox items together. The value is defined as nullable
- * to allow for backward compatibility with existing outbox items. However, for all intents and purposes, the library
- * expects this value to be non-null. At a later stage, the value will be made non-nullable which would introduce a
- * breaking change.
+ * @param groupId an arbitrary value that can be used to group outbox items together. A null value indicates that the
+ * item is not part of a group.
  *
  * @property markedForProcessing is an internal flag that is used to determine if the item should be processed in the
  * current monitor cycle. It is set by [prepareForProcessing] based on the item status and current time.
