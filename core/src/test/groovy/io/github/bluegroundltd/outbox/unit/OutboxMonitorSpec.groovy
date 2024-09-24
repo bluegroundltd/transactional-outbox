@@ -4,7 +4,9 @@ import io.github.bluegroundltd.outbox.OutboxLocksProvider
 import io.github.bluegroundltd.outbox.TransactionalOutbox
 import io.github.bluegroundltd.outbox.TransactionalOutboxImpl
 import io.github.bluegroundltd.outbox.event.InstantOutboxPublisher
+import io.github.bluegroundltd.outbox.grouping.OutboxGroupingProvider
 import io.github.bluegroundltd.outbox.item.OutboxItem
+import io.github.bluegroundltd.outbox.item.OutboxItemGroup
 import io.github.bluegroundltd.outbox.item.OutboxStatus
 import io.github.bluegroundltd.outbox.item.factory.OutboxItemFactory
 import io.github.bluegroundltd.outbox.processing.OutboxGroupProcessor
@@ -35,6 +37,7 @@ class OutboxMonitorSpec extends Specification {
   private List<OutboxItemProcessorDecorator> decorators = (1..5).collect { Mock(OutboxItemProcessorDecorator) }
   private Duration threadPoolTimeOut = Duration.ofMillis(5000)
   private OutboxProcessingHostComposer processingHostComposer = Mock()
+  private final OutboxGroupingProvider groupingProvider = Mock()
 
   private TransactionalOutbox transactionalOutbox
 
@@ -44,7 +47,7 @@ class OutboxMonitorSpec extends Specification {
 
   def "Should delegate to the executor thread pool when an instant outbox is processed and `instantProcessingEnabled` is false"() {
     given:
-      def instantOutbox = OutboxItemBuilder.make().build()
+      def instantOutbox = OutboxItemBuilder.makePending().build()
       def processingHost = Mock(OutboxProcessingHost)
 
     when:
@@ -78,7 +81,7 @@ class OutboxMonitorSpec extends Specification {
 
   def "Should handle a failure while an instant outbox is being processed"() {
     given:
-      def instantOutbox = OutboxItemBuilder.make().build()
+      def instantOutbox = OutboxItemBuilder.makePending().build()
       def processingHost = Mock(OutboxProcessingHost)
 
     when:
@@ -98,19 +101,25 @@ class OutboxMonitorSpec extends Specification {
       noExceptionThrown()
   }
 
-  def "Should delegate to the executor thread pool when monitor is called"() {
+  def "Should group items and delegate to the executor thread pool when monitor is called"() {
     given:
-      def pendingItem = OutboxItemBuilder.makePending()
-      def runningItem = OutboxItemBuilder.make().withStatus(OutboxStatus.RUNNING).build()
-      def failedItem = OutboxItemBuilder.make().withStatus(OutboxStatus.FAILED).build()
-      def completedItem = OutboxItemBuilder.make().withStatus(OutboxStatus.COMPLETED).build()
-      def fetchedItems = [pendingItem, runningItem, failedItem, completedItem]
-      def toBeProcessedItems = [pendingItem, runningItem, failedItem]
-      def markedForProcessing = [pendingItem, runningItem]
+      def now = Instant.now(clock)
+      def pendingItem = OutboxItemBuilder.makePending(now).build()
+      def runningItem = OutboxItemBuilder.makeRunning(now).build()
+      def failedItem = OutboxItemBuilder.makeFailed().build()
+      def completedItem = OutboxItemBuilder.makeCompleted().build()
 
     and:
-      def now = Instant.now(clock)
-      def processingHosts = toBeProcessedItems.collect { Mock(OutboxProcessingHost) }
+      def fetchedItems = [pendingItem, runningItem, failedItem, completedItem]
+      def processableItems = [pendingItem, runningItem, failedItem]
+      def itemGroups = [
+        [pendingItem],
+        [runningItem, failedItem]
+      ]
+      def eligibleItems = [pendingItem, runningItem]
+
+    and:
+      def processingHosts = itemGroups.collect { Mock(OutboxProcessingHost) }
 
     when:
       transactionalOutbox.monitor()
@@ -125,8 +134,20 @@ class OutboxMonitorSpec extends Specification {
         fetchedItems
       }
 
+    and: "The items marked for processing are grouped"
+      1 * groupingProvider.execute(_) >> {
+        // Spock gets confused by list parameters and even if we explicitly specify them (i.e. use named parameters)
+        // will still wrap it in an array.
+        // To avoid confusion we skip naming the parameters and instead access them by index.
+        def items = (it as List)[0] as List<OutboxItem>
+        assert items == processableItems
+        return itemGroups.collect {
+          new OutboxItemGroup(findMatchingItems(items, it))
+        }
+      }
+
     and: "The pending and running items are marked for processing while the failed item is stored as-is"
-      markedForProcessing.size() * store.update(_) >> { OutboxItem item ->
+      eligibleItems.size() * store.update(_) >> { OutboxItem item ->
         with(item) {
           it.status == OutboxStatus.RUNNING
           it.lastExecution == now
@@ -144,8 +165,8 @@ class OutboxMonitorSpec extends Specification {
         return item
       }
 
-    and: "A processor is created for each item and submitted for execution"
-      toBeProcessedItems.eachWithIndex { item, index ->
+    and: "A processor is created for each group and submitted for execution"
+      itemGroups.eachWithIndex { group, index ->
         1 * processingHostComposer.compose(_, _) >> { OutboxProcessingAction action, List<OutboxItemProcessorDecorator> decorators ->
           assert action instanceof OutboxGroupProcessor
           assert decorators == this.decorators
@@ -164,7 +185,7 @@ class OutboxMonitorSpec extends Specification {
       def now = Instant.now(clock)
 
     and:
-      def itemBuilder = OutboxItemBuilder.make().withStatus(OutboxStatus.PENDING)
+      def itemBuilder = OutboxItemBuilder.makePending(now)
       def pendingItem = itemBuilder.build()
       def originalItem = itemBuilder.build() // Create a clone to use it for comparisons.
 
@@ -181,6 +202,14 @@ class OutboxMonitorSpec extends Specification {
           outboxPendingFilter.nextRunLessThan == now
         }
         [pendingItem]
+      }
+      1 * groupingProvider.execute(_) >> {
+        // Spock gets confused by list parameters and even if we explicitly specify them (i.e. use named parameters)
+        // will still wrap it in an array.
+        // To avoid confusion we skip naming the parameters and instead access them by index.
+        def items = (it as List)[0] as List<OutboxItem>
+        assert items == [pendingItem]
+        return [new OutboxItemGroup(items)]
       }
       1 * store.update(_) >> { OutboxItem item ->
         assert item == originalItem.with {
@@ -213,6 +242,7 @@ class OutboxMonitorSpec extends Specification {
     then:
       1 * monitorLocksProvider.acquire()
       1 * store.fetch(_) >> items
+      1 * groupingProvider.execute([]) >> []
       1 * monitorLocksProvider.release()
       0 * _
   }
@@ -235,6 +265,7 @@ class OutboxMonitorSpec extends Specification {
     then:
       1 * monitorLocksProvider.acquire()
       1 * store.fetch(_) >> []
+      1 * groupingProvider.execute([]) >> []
       1 * monitorLocksProvider.release() >> { throw new RuntimeException() }
       0 * _
       noExceptionThrown()
@@ -245,8 +276,8 @@ class OutboxMonitorSpec extends Specification {
       transactionalOutbox = makeTransactionalOutbox(true)
 
     and:
-      def instantOutbox = OutboxItemBuilder.make().build()
-      def irrelevantOutbox = OutboxItemBuilder.make().build()
+      def instantOutbox = OutboxItemBuilder.makePending().build()
+      def irrelevantOutbox = OutboxItemBuilder.makePending().build()
       def fetchedItems = [irrelevantOutbox, instantOutbox]
       def processingHost = Mock(OutboxProcessingHost)
       def now = Instant.now(clock)
@@ -264,14 +295,22 @@ class OutboxMonitorSpec extends Specification {
         }
         fetchedItems
       }
-      1 * store.update(_) >> { OutboxItem item ->
-        with(item) {
+      1 * groupingProvider.execute(_) >> {
+        // Spock gets confused by list parameters and even if we explicitly specify them (i.e. use named parameters)
+        // will still wrap it in an array.
+        // To avoid confusion we skip naming the parameters and instead access them by index.
+        def items = (it as List)[0] as List<OutboxItem>
+        assert items == fetchedItems
+        return items.collect { OutboxItemGroup.of(it) }
+      }
+      1 * store.update(_) >> { OutboxItem updatedItem ->
+        with(updatedItem) {
           it.id == instantOutbox.id
           it.status == OutboxStatus.RUNNING
           it.lastExecution == now
-          it.rerunAfter == item.lastExecution + DURATION_ONE_HOUR
+          it.rerunAfter == updatedItem.lastExecution + DURATION_ONE_HOUR
         }
-        item
+        updatedItem
       }
       1 * processingHostComposer.compose(_, _) >> {
         OutboxProcessingAction action, List<OutboxItemProcessorDecorator> decorators ->
@@ -298,7 +337,12 @@ class OutboxMonitorSpec extends Specification {
       decorators,
       threadPoolTimeOut,
       processingHostComposer,
-      instantProcessingEnabled
+      instantProcessingEnabled,
+      groupingProvider
     )
+  }
+
+  private static List<OutboxItem> findMatchingItems(List<OutboxItem> updatedItems, List<OutboxItem> originalItems) {
+    return updatedItems.findAll { item -> originalItems.contains(item) }
   }
 }

@@ -25,8 +25,8 @@ internal class OutboxItemProcessor(
   }
 
   override fun run() {
-    if (item.status != OutboxStatus.RUNNING) {
-      throw InvalidOutboxStatusException(item, setOf(OutboxStatus.RUNNING))
+    if (!item.markedForProcessing) {
+      throw InvalidOutboxStateException(item, "Outbox item with id: ${item.id} is not marked for processing.")
     }
 
     val handler = resolveHandler(item)

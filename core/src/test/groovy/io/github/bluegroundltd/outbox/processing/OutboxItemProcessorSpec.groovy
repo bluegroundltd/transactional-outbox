@@ -15,10 +15,11 @@ import java.time.ZoneId
 
 class OutboxItemProcessorSpec extends Specification {
   private Clock clock = Clock.fixed(Instant.now(), ZoneId.systemDefault())
+  private Instant now = Instant.now(clock)
 
-  private itemBuilder = OutboxItemBuilder.make().withStatus(OutboxStatus.RUNNING).withRerunAfter()
-  private processedItem = itemBuilder.build()
-  private originalItem = itemBuilder.build() // Create an identical second to use it for comparisons.
+  private itemBuilder = OutboxItemBuilder.makePending(now)
+  private processedItem = itemBuilder.buildAndPrepareForProcessing(now)
+  private originalItem = itemBuilder.buildAndPrepareForProcessing(now) // Create an identical second to use it for comparisons.
 
   private OutboxHandler handler = Mock()
   private def handlerResolver = { OutboxItem item -> handler }
@@ -35,9 +36,15 @@ class OutboxItemProcessorSpec extends Specification {
     )
   }
 
-  def "Should throw [InvalidOutboxStatusException] when a outbox status is #status"() {
-    given:
-      def outboxItem = itemBuilder.withStatus(status as OutboxStatus).build()
+  def "Should throw [InvalidOutboxStateException] when the outbox is not marked for processing"() {
+    given: "An outbox item that should not be processed due to a future next run"
+      def outboxItem = OutboxItemBuilder
+        .makePending(now.plusSeconds(1000))
+        .build()
+        .with {
+          prepareForProcessing(now, now.plusSeconds(1000))
+          it
+        }
       def itemProcessor = new OutboxItemProcessor(
         outboxItem,
         { null },
@@ -46,7 +53,10 @@ class OutboxItemProcessorSpec extends Specification {
       )
 
     and:
-      def expectedException = new InvalidOutboxStatusException(outboxItem, [OutboxStatus.RUNNING].toSet())
+      def expectedMessage = outboxItem.with {
+        "Outbox item with id: ${it.id} is not marked for processing."
+      }
+      def expectedException = new InvalidOutboxStateException(outboxItem, expectedMessage)
 
     when:
       itemProcessor.run()
@@ -55,11 +65,8 @@ class OutboxItemProcessorSpec extends Specification {
       0 * _
 
     and:
-      def ex = thrown(InvalidOutboxStatusException)
+      def ex = thrown(InvalidOutboxStateException)
       ex == expectedException
-
-    where:
-      status << OutboxStatus.values() - OutboxStatus.RUNNING
   }
 
   def "Should throw [InvalidOutboxHandlerException] when a handler cannot be resolved"() {
@@ -213,5 +220,10 @@ class OutboxItemProcessorSpec extends Specification {
 
     where:
       itemStatus << (OutboxStatus.values() - OutboxStatus.RUNNING).toList()
+  }
+
+  private static OutboxItem updateOutboxForProcessing(OutboxItem item, Instant monitorTimestamp) {
+    item.prepareForProcessing(monitorTimestamp, monitorTimestamp)
+    return item
   }
 }

@@ -6,6 +6,8 @@ import io.github.bluegroundltd.outbox.TransactionalOutbox
 import io.github.bluegroundltd.outbox.TransactionalOutboxImpl
 import io.github.bluegroundltd.outbox.event.InstantOutboxPublisher
 import io.github.bluegroundltd.outbox.executor.FixedThreadPoolExecutorServiceFactory
+import io.github.bluegroundltd.outbox.grouping.GroupIdGroupingProvider
+import io.github.bluegroundltd.outbox.grouping.OutboxGroupingProvider
 import io.github.bluegroundltd.outbox.item.OutboxItem
 import io.github.bluegroundltd.outbox.item.OutboxStatus
 import io.github.bluegroundltd.outbox.item.OutboxType
@@ -50,6 +52,7 @@ class TransactionalOutboxImplSpec extends Specification {
   private final InstantOutboxPublisher instantOutboxPublisher = Mock()
   private final OutboxItemFactory outboxItemFactory = Mock()
   private final OutboxProcessingHostComposer processingHostComposer = new OutboxProcessingHostComposer()
+  private final OutboxGroupingProvider groupingProvider = new GroupIdGroupingProvider()
 
   private final TransactionalOutbox transactionalOutbox = new TransactionalOutboxImpl(
     CLOCK,
@@ -64,15 +67,16 @@ class TransactionalOutboxImplSpec extends Specification {
     [],
     DURATION_ONE_NANO,
     processingHostComposer,
-    false
+    false,
+    groupingProvider
   )
 
   def "Should process all eligible items when [monitor] is invoked and set their statuses to 'COMPLETED'"() {
     given:
-      def pendingItems = (1..5).collect { OutboxItemBuilder.makePending() }
-      def runningItems = (1..2).collect { OutboxItemBuilder.makeRunning() }
-      def failedItems = (1..2).collect { OutboxItemBuilder.makeFailed() }
-      def completedItems = (1..2).collect { OutboxItemBuilder.makeCompleted() }
+      def pendingItems = (1..5).collect { OutboxItemBuilder.makePending(NOW).build() }
+      def runningItems = (1..2).collect { OutboxItemBuilder.makeRunning(NOW).build() }
+      def failedItems = (1..2).collect { OutboxItemBuilder.makeFailed().build() }
+      def completedItems = (1..2).collect { OutboxItemBuilder.makeCompleted().build() }
       def fetchedItems = pendingItems + runningItems + failedItems + completedItems
       fetchedItems.forEach { store.insert(it) }
 
@@ -140,7 +144,7 @@ class TransactionalOutboxImplSpec extends Specification {
   }
 
   private final static OutboxItem makePendingOutboxItem(OutboxType type) {
-    OutboxItemBuilder.make().withType(type).withStatus(OutboxStatus.PENDING).build()
+    OutboxItemBuilder.makePending(NOW).withType(type).build()
   }
 
   private final static void verifyMatchingOutboxItem(List<OutboxItem> originalItems, OutboxItem item) {

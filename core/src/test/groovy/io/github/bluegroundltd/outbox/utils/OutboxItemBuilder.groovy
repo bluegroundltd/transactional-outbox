@@ -16,6 +16,7 @@ class OutboxItemBuilder implements SpecHelper {
   Instant lastExecution
   Instant rerunAfter
   Instant deleteAfter
+  String groupId
 
   static OutboxItemBuilder make() {
     new OutboxItemBuilder().with {
@@ -28,6 +29,7 @@ class OutboxItemBuilder implements SpecHelper {
       lastExecution = null
       rerunAfter = null
       deleteAfter = null
+      groupId = generateString()
 
       it
     }
@@ -66,20 +68,38 @@ class OutboxItemBuilder implements SpecHelper {
     withRerunAfter(null)
   }
 
-  static OutboxItem makePending() {
-    make().withStatus(OutboxStatus.PENDING).build()
+  OutboxItemBuilder withLastExecution(Instant lastExecution) {
+    this.lastExecution = lastExecution
+    this
   }
 
-  static OutboxItem makeRunning() {
-    make().withStatus(OutboxStatus.RUNNING).build()
+  OutboxItemBuilder withGroupId(String groupId) {
+    this.groupId = groupId
+    this
   }
 
-  static OutboxItem makeCompleted() {
-    make().withStatus(OutboxStatus.COMPLETED).build()
+  OutboxItemBuilder withoutGroupId() {
+    withGroupId(null)
   }
 
-  static OutboxItem makeFailed() {
-    make().withStatus(OutboxStatus.FAILED).build()
+  static OutboxItemBuilder makePending(Instant now = Instant.now()) {
+    make().withStatus(OutboxStatus.PENDING).withNextRun(now.minusSeconds(1))
+  }
+
+  static OutboxItemBuilder makeRunning(Instant now = Instant.now()) {
+    make().withStatus(OutboxStatus.RUNNING).withRerunAfter(now.minusSeconds(1))
+  }
+
+  static OutboxItemBuilder makeCompleted() {
+    make().withStatus(OutboxStatus.COMPLETED)
+  }
+
+  static OutboxItemBuilder makeFailed() {
+    make().withStatus(OutboxStatus.FAILED)
+  }
+
+  static OutboxItem buildProcessable(Instant now = Instant.now()) {
+    makePending(now).buildAndPrepareForProcessing(now)
   }
 
   OutboxItem build() {
@@ -92,7 +112,15 @@ class OutboxItemBuilder implements SpecHelper {
       nextRun,
       lastExecution,
       rerunAfter,
-      deleteAfter
+      deleteAfter,
+      groupId
     )
+  }
+
+  OutboxItem buildAndPrepareForProcessing(Instant now = Instant.now()) {
+    build().with {
+      it.prepareForProcessing(now, now.plusSeconds(1000))
+      it
+    }
   }
 }

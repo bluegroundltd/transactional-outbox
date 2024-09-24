@@ -2,6 +2,7 @@ package io.github.bluegroundltd.outbox
 
 import io.github.bluegroundltd.outbox.event.InstantOutboxEvent
 import io.github.bluegroundltd.outbox.event.InstantOutboxPublisher
+import io.github.bluegroundltd.outbox.grouping.OutboxGroupingProvider
 import io.github.bluegroundltd.outbox.item.OutboxItem
 import io.github.bluegroundltd.outbox.item.OutboxItemGroup
 import io.github.bluegroundltd.outbox.item.OutboxPayload
@@ -10,11 +11,12 @@ import io.github.bluegroundltd.outbox.item.OutboxType
 import io.github.bluegroundltd.outbox.item.factory.OutboxItemFactory
 import io.github.bluegroundltd.outbox.processing.OutboxGroupProcessor
 import io.github.bluegroundltd.outbox.processing.OutboxItemProcessorDecorator
-import io.github.bluegroundltd.outbox.processing.OutboxProcessingAction
 import io.github.bluegroundltd.outbox.processing.OutboxProcessingHost
 import io.github.bluegroundltd.outbox.processing.OutboxProcessingHostComposer
 import io.github.bluegroundltd.outbox.store.OutboxFilter
 import io.github.bluegroundltd.outbox.store.OutboxStore
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import java.time.Clock
 import java.time.Duration
 import java.time.Instant
@@ -23,8 +25,6 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.RejectedExecutionException
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 
 @SuppressWarnings("LongParameterList", "TooGenericExceptionCaught")
 internal class TransactionalOutboxImpl(
@@ -40,7 +40,8 @@ internal class TransactionalOutboxImpl(
   private val decorators: List<OutboxItemProcessorDecorator> = emptyList(),
   private val threadPoolTimeOut: Duration,
   private val processingHostComposer: OutboxProcessingHostComposer,
-  private val instantOrderingEnabled: Boolean
+  private val instantOrderingEnabled: Boolean,
+  private val groupingProvider: OutboxGroupingProvider
 ) : TransactionalOutbox {
 
   private var inShutdownMode = AtomicBoolean(false)
@@ -53,7 +54,6 @@ internal class TransactionalOutboxImpl(
       OutboxStatus.RUNNING,
       OutboxStatus.FAILED // Required for in-order processing in groups (i.e. they might precede other items).
     )
-    private val STATUSES_TO_UPDATE_FOR_PROCESSING = EnumSet.of(OutboxStatus.PENDING, OutboxStatus.RUNNING)
   }
 
   override fun add(type: OutboxType, payload: OutboxPayload, shouldPublishAfterInsertion: Boolean) {
@@ -77,7 +77,7 @@ internal class TransactionalOutboxImpl(
       monitor(outbox.id)
     } else {
       runCatching {
-        val processor = makeOutboxProcessor(outbox)
+        val processor = OutboxGroupProcessor(OutboxItemGroup.of(outbox), ::resolveOutboxHandler, outboxStore, clock)
         val processingHost = processingHostComposer.compose(processor, decorators)
         executor.execute(processingHost)
       }.onFailure {
@@ -95,16 +95,19 @@ internal class TransactionalOutboxImpl(
     runCatching {
       monitorLocksProvider.acquire()
 
-      val items = fetchEligibleItems(id).filterByIdIfExists(id) // ensures item filtering regardless of client's `fetch`
-      if (items.isEmpty()) {
+      val fetchedItems = fetchEligibleItems(id)
+      if (fetchedItems.isEmpty()) {
         logger.info("$LOGGER_PREFIX No outbox items to process")
       } else {
-        logger.info("$LOGGER_PREFIX Will process ${items.size} outbox items")
+        logger.info("$LOGGER_PREFIX Will process ${fetchedItems.size} outbox items")
       }
 
-      markForProcessing(items)
-        .map { outboxStore.update(it) }
-        .forEach { processItem(it) }
+      fetchedItems
+        .map { it.copy() } // Defensive copy to avoid external modifications.
+        .group()
+        .filterByIdIfExists(id) // ensures item filtering regardless of client's `fetch`
+        .apply { prepareForProcessing() } // mark groups (essentially contained items) for processing
+        .forEach { it.process() }
     }.onFailure {
       logger.error("$LOGGER_PREFIX Failure in monitor", it)
     }
@@ -134,35 +137,27 @@ internal class TransactionalOutboxImpl(
     return eligibleItems
   }
 
-  private fun markForProcessing(items: List<OutboxItem>): List<OutboxItem> {
+  private fun List<OutboxItemGroup>.prepareForProcessing() {
     val now = Instant.now(clock)
-    return items.map { markForProcessing(it, now) }
+    val rerunAfter = now.plus(rerunAfterDuration)
+    flatMap { it.items }
+      .onEach { it.prepareForProcessing(now, rerunAfter) }
+      .onEach { outboxStore.update(it) }
   }
 
-  private fun markForProcessing(item: OutboxItem, now: Instant): OutboxItem =
-    if (item.status in STATUSES_TO_UPDATE_FOR_PROCESSING) {
-      item.copy(
-        status = OutboxStatus.RUNNING,
-        lastExecution = now,
-        rerunAfter = now.plus(rerunAfterDuration)
-      )
-    } else {
-      item.copy()
-    }
+  private fun List<OutboxItem>.group(): List<OutboxItemGroup> = groupingProvider.execute(this)
 
-  private fun processItem(item: OutboxItem) {
-    val processor = makeOutboxProcessor(item)
+  private fun OutboxItemGroup.process() {
+    val processor = OutboxGroupProcessor(this, ::resolveOutboxHandler, outboxStore, clock)
     val processingHost = processingHostComposer.compose(processor, decorators)
     try {
       executor.execute(processingHost)
     } catch (exception: RejectedExecutionException) {
-      logger.info("$LOGGER_PREFIX Executor rejected processing of outbox item with id ${item.id}")
+      val ids = items.joinToString(", ") { it.id.toString() }
+      logger.info("$LOGGER_PREFIX Executor rejected processing of outbox group with items: $ids")
       processingHost.reset()
     }
   }
-
-  private fun makeOutboxProcessor(item: OutboxItem): OutboxProcessingAction =
-    OutboxGroupProcessor(OutboxItemGroup(listOf(item)), ::resolveOutboxHandler, outboxStore, clock)
 
   private fun resolveOutboxHandler(item: OutboxItem): OutboxHandler? = outboxHandlers[item.type]
 
@@ -221,6 +216,9 @@ internal class TransactionalOutboxImpl(
     }
   }
 
-  private fun List<OutboxItem>.filterByIdIfExists(id: Long?): List<OutboxItem> =
-    id?.let { this.filter { it.id == id } } ?: this
+  private fun List<OutboxItemGroup>.filterByIdIfExists(id: Long?): List<OutboxItemGroup> =
+    id?.let { filter { it.contains(id) } } ?: this
+
+  private fun OutboxItemGroup.contains(id: Long): Boolean =
+    items.any { it.id == id }
 }

@@ -2,6 +2,11 @@ package io.github.bluegroundltd.outbox
 
 import io.github.bluegroundltd.outbox.event.InstantOutboxPublisher
 import io.github.bluegroundltd.outbox.executor.FixedThreadPoolExecutorServiceFactory
+import io.github.bluegroundltd.outbox.grouping.DefaultGroupingConfiguration
+import io.github.bluegroundltd.outbox.grouping.OutboxGroupingConfiguration
+import io.github.bluegroundltd.outbox.grouping.OutboxGroupIdProvider
+import io.github.bluegroundltd.outbox.grouping.NullGroupIdProvider
+import io.github.bluegroundltd.outbox.grouping.SingleItemGroupingConfiguration
 import io.github.bluegroundltd.outbox.item.OutboxType
 import io.github.bluegroundltd.outbox.item.factory.OutboxItemFactory
 import io.github.bluegroundltd.outbox.processing.OutboxItemProcessorDecorator
@@ -23,13 +28,19 @@ import java.time.Duration
  *       .withCleanupLocksProvider(cleanupLocksProvider)
  *       .withStore(outboxStore)
  *       .withInstantOutboxPublisher(instantOutboxPublisher)
+ *       .withThreadPoolSize(threadPoolSize)
+ *       .withThreadPriority(threadPriority)
+ *       .withThreadPoolTimeOut(threadPoolTimeOut)
+ *       .addProcessorDecorator(outboxItemProcessorDecorator)
+ *       .withGroupIdProvider(outboxGroupIdProvider)
+ *       .withGroupingConfiguration(outboxGroupingConfiguration)
  *       .build()
  *   }
  *   ```
  */
 class TransactionalOutboxBuilder(
-    private val clock: Clock,
-    private val rerunAfterDuration: Duration = DEFAULT_RERUN_AFTER_DURATION
+  private val clock: Clock,
+  private val rerunAfterDuration: Duration = DEFAULT_RERUN_AFTER_DURATION
 ) : OutboxHandlersStep,
   MonitorLocksProviderStep,
   CleanupLocksProviderStep,
@@ -46,6 +57,8 @@ class TransactionalOutboxBuilder(
   private lateinit var cleanupLocksProvider: OutboxLocksProvider
   private lateinit var store: OutboxStore
   private lateinit var instantOutboxPublisher: InstantOutboxPublisher
+  private var groupIdProvider: OutboxGroupIdProvider = NullGroupIdProvider()
+  private var groupingConfiguration: OutboxGroupingConfiguration = DefaultGroupingConfiguration
 
   companion object {
     private val DEFAULT_RERUN_AFTER_DURATION: Duration = Duration.ofHours(1)
@@ -71,8 +84,8 @@ class TransactionalOutboxBuilder(
 
   private fun validateNoDuplicateHandlerSupportedTypes(handlers: Set<OutboxHandler>) {
     val typesWithMoreThanOneHandlers = handlers
-        .groupBy { it.getSupportedType() }
-        .filter { it.value.size > 1 }
+      .groupBy { it.getSupportedType() }
+      .filter { it.value.size > 1 }
 
     if (typesWithMoreThanOneHandlers.isNotEmpty()) {
       val typesWithDuplicateHandlers = concatenateTypesWithDuplicateHandlers(typesWithMoreThanOneHandlers)
@@ -81,17 +94,17 @@ class TransactionalOutboxBuilder(
   }
 
   private fun concatenateTypesWithDuplicateHandlers(
-      typesWithMoreThanOneHandlers: Map<OutboxType, List<OutboxHandler>>
+    typesWithMoreThanOneHandlers: Map<OutboxType, List<OutboxHandler>>
   ): String {
     val typesWithMoreThanOneHandlersFlattened = typesWithMoreThanOneHandlers.entries.joinToString(
-        separator = ", ",
-        transform = {
-          // Transforms entries to "type1 -> [handlerA, handlerB]"
-          it.key.getType() +
-              " -> [" +
-              it.value.joinToString { handler -> handler.javaClass.simpleName } +
-              "]"
-        }
+      separator = ", ",
+      transform = {
+        // Transforms entries to "type1 -> [handlerA, handlerB]"
+        it.key.getType() +
+          " -> [" +
+          it.value.joinToString { handler -> handler.javaClass.simpleName } +
+          "]"
+      }
     )
     return typesWithMoreThanOneHandlersFlattened
   }
@@ -183,26 +196,49 @@ class TransactionalOutboxBuilder(
   }
 
   /**
+   * Sets the group id provider for the outbox that will be used to set corresponding field when an item is added.
+   *
+   * If not set, a default [OutboxGroupIdProvider] is used that always returns null, effectively indicating that
+   * there are no groups.
+   */
+  override fun withGroupIdProvider(groupIdProvider: OutboxGroupIdProvider): BuildStep {
+    this.groupIdProvider = groupIdProvider
+    return this
+  }
+
+  /**
+   * Sets the grouping configuration for the outbox.
+   *
+   * If not set, a default [OutboxGroupingConfiguration] is used which provides grouping based on the `groupId`
+   * field and FIFO ordering.
+   */
+  override fun withGroupingConfiguration(outboxGroupingConfiguration: OutboxGroupingConfiguration): BuildStep {
+    this.groupingConfiguration = outboxGroupingConfiguration
+    return this
+  }
+
+  /**
    * Builds the outbox.
    */
   override fun build(): TransactionalOutbox {
     val executorServiceFactory = FixedThreadPoolExecutorServiceFactory(threadPoolSize, threadPriority)
-    val outboxItemFactory = OutboxItemFactory(clock, handlers.toMap(), rerunAfterDuration)
+    val outboxItemFactory = OutboxItemFactory(clock, handlers.toMap(), rerunAfterDuration, groupIdProvider)
 
     return TransactionalOutboxImpl(
-        clock,
-        handlers.toMap(),
-        monitorLocksProvider,
-        cleanupLocksProvider,
-        store,
-        instantOutboxPublisher,
-        outboxItemFactory,
-        rerunAfterDuration,
-        executorServiceFactory.make(),
-        decorators,
-        threadPoolTimeOut,
-        OutboxProcessingHostComposer(),
-        instantOrderingEnabled
+      clock,
+      handlers.toMap(),
+      monitorLocksProvider,
+      cleanupLocksProvider,
+      store,
+      instantOutboxPublisher,
+      outboxItemFactory,
+      rerunAfterDuration,
+      executorServiceFactory.make(),
+      decorators,
+      threadPoolTimeOut,
+      OutboxProcessingHostComposer(),
+      instantOrderingEnabled,
+      groupingConfiguration.groupingProvider
     )
   }
 }
@@ -233,5 +269,11 @@ interface BuildStep {
   fun withThreadPoolTimeOut(threadPoolTimeOut: Duration): BuildStep
   fun withInstantOrderingEnabled(instantOrderingEnabled: Boolean): BuildStep
   fun addProcessorDecorator(decorator: OutboxItemProcessorDecorator): BuildStep
+
+  fun withGroupIdProvider(groupIdProvider: OutboxGroupIdProvider): BuildStep
+  fun withGroupingConfiguration(outboxGroupingConfiguration: OutboxGroupingConfiguration): BuildStep
+  fun withGrouping() = withGroupingConfiguration(DefaultGroupingConfiguration)
+  fun withoutGrouping() = withGroupingConfiguration(SingleItemGroupingConfiguration)
+
   fun build(): TransactionalOutbox
 }

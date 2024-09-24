@@ -6,6 +6,7 @@ import io.github.bluegroundltd.outbox.item.OutboxItem
 import io.github.bluegroundltd.outbox.item.OutboxPayload
 import io.github.bluegroundltd.outbox.item.OutboxStatus
 import io.github.bluegroundltd.outbox.item.OutboxType
+import io.github.bluegroundltd.outbox.grouping.OutboxGroupIdProvider
 import java.time.Clock
 import java.time.Duration
 import java.time.Instant
@@ -15,6 +16,7 @@ internal class OutboxItemFactory(
   private val clock: Clock,
   private val outboxHandlers: Map<OutboxType, OutboxHandler>,
   private val rerunAfterDuration: Duration,
+  private val groupIdProvider: OutboxGroupIdProvider
 ) {
 
   fun makeScheduledOutboxItem(type: OutboxType, payload: OutboxPayload): OutboxItem {
@@ -24,7 +26,8 @@ internal class OutboxItemFactory(
       status = OutboxStatus.PENDING,
       payload = handler.serialize(payload),
       // ensures that instant outbox items are picked up by monitor's fetching
-      nextRun = handler.getNextExecutionTime(0).minusMillis(1)
+      nextRun = handler.getNextExecutionTime(0).minusMillis(1),
+      groupId = groupIdProvider.execute(type, payload)
     )
   }
 
@@ -37,7 +40,8 @@ internal class OutboxItemFactory(
       payload = handler.serialize(payload),
       nextRun = handler.getNextExecutionTime(0),
       lastExecution = now,
-      rerunAfter = now.plus(rerunAfterDuration)
+      rerunAfter = now.plus(rerunAfterDuration),
+      groupId = groupIdProvider.execute(type, payload)
     )
   }
 

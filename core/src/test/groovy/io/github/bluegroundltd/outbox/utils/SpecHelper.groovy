@@ -7,6 +7,11 @@ import java.time.Instant
 trait SpecHelper {
   static SecureRandom srng = new SecureRandom()
 
+  // Preferably, these should have been static but there is a bug in Groovy that does not allow static initialization
+  // to access other static values: https://issues.apache.org/jira/browse/GROOVY-11267
+  private final String alphanumericCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+  private final int alphanumericCount = alphanumericCharacters.length()
+
   Long generateLong() {
     Math.abs(srng.nextLong())
   }
@@ -31,5 +36,13 @@ trait SpecHelper {
 
   int generateIntNonZero(Integer bound = null) {
     generateInt(bound) + 1
+  }
+
+  String generateString(int length = 10) {
+    StringBuilder sb = new StringBuilder(length)
+    for (int i = 0; i < length; i++) {
+      sb.append(alphanumericCharacters.charAt(generateInt(alphanumericCount)))
+    }
+    sb.toString()
   }
 }
