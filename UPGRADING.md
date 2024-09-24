@@ -2,6 +2,50 @@
 
 ## v.2.x.x
 
+### v.2.3.0 - Support for grouping and ordering outbox items
+
+Release 2.3.0 introduces support for grouping and ordering outbox items. Applications that want to take advantage of
+the new features would need to:
+- Implement the appropriate providers.
+- Configure them through `withGroupIdProvider` and `withGroupingConfiguration` in `TransactionalOutboxBuilder`.
+- Update implementations of `OutboxStore#fetch` and `OutboxStore#update`.
+
+The functionality is **optional** and applications that do not wish to use it, can continue to use the library as
+before.
+
+#### Persistence changes (i.e. `OutboxItem` and `OutboxStore`)
+
+A new field (`groupId`) has been added to the `OutboxItem` class. It allows for an arbitrary value which applications
+may use to group outbox items together. The field has a default value of `null` to maintain backward compatibility but
+implementors that would like to utilize it, should set/update it appropriately in `OutboxStore#fetch` and
+`OutboxStore#update`.
+
+In order to support the grouping and ordering functionality, the library needs to have access to **all the outbox items
+that potentially belong to the same group**. This includes items that may not be eligible for processing (e.g.
+scheduled for a later time, or failed). Accordingly, `OutboxStore#fetch` should be updated to return them. It is
+envisioned that most implementations will first fetch the relevant items and then use the `groupId` value to also
+retrieve items with the same value.
+
+Furthermore, the library will now perform a runtime filtering of the fetched items so that it will only process the
+ones that are actually eligible. Therefore, **it is no longer necessary** for the `OutboxStore#fetch` implementations
+to filter out non-eligible items. However, implementors could still do so, to limit the amount of items returned and
+improve performance (provided as described above that they also return all the same-group items).
+
+#### Grouping and ordering providers
+
+- `OutboxGroupIdProvider` should be implemented by all applications that want to use the `groupId` field for 
+  identifying groups. The provider is invoked after adding an outbox item to the store and should return the group id
+  value for the item or `null` if the item does not belong to a group. By default, the library utilizes a provider that
+  always returns null.
+- `OutboxGroupingProvider` allows for implementing a completely custom solution for grouping items. The provider is
+  invoked after the items are fetched and should return a list of `OutboxItemGroup`s. Most applications won't need
+  to implement this provider since by default the library utilizes a provider that automatically groups items based on
+  the `groupId` field which should be good enough for most use cases.
+- `OutboxOrderingProvider` is utilized by the default grouping provider to allow for custom ordering when using the
+  built-in (i.e. `groupId` based) grouping implementation. The provider is invoked after the items are grouped and
+  should return a list of `OutboxItem` in the desired order. By default, the library utilizes a provider that returns
+  the items in the order they were provider.
+
 ### v.2.2.0 - Common implementation for scheduled and instant processing
 
 Release 2.2.0 introduces the **option** to use the same implementation for handling both scheduled (i.e. `monitor`) and
