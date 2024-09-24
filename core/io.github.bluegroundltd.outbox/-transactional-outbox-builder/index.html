@@ -22,7 +22,7 @@
           </div>
           <div class="cover ">
             <h1 class="cover"><span>Transactional</span><wbr></wbr><span>Outbox</span><wbr></wbr><span><span>Builder</span></span></h1>
-            <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":core:dokkaHtml/main"><div class="symbol monospace">class <a href="index.html">TransactionalOutboxBuilder</a>(clock: <a href="https://docs.oracle.com/javase/8/docs/api/java/time/Clock.html">Clock</a>, rerunAfterDuration: <a href="https://docs.oracle.com/javase/8/docs/api/java/time/Duration.html">Duration</a>) : <a href="../-outbox-handlers-step/index.html">OutboxHandlersStep</a>, <a href="../-monitor-locks-provider-step/index.html">MonitorLocksProviderStep</a>, <a href="../-cleanup-locks-provider-step/index.html">CleanupLocksProviderStep</a>, <a href="../-store-step/index.html">StoreStep</a>, <a href="../-instant-outbox-publisher-step/index.html">InstantOutboxPublisherStep</a>, <a href="../-build-step/index.html">BuildStep</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><p class="paragraph">Builder for <a href="../-transactional-outbox/index.html">TransactionalOutbox</a>.</p><p class="paragraph">Example on Spring Boot:</p><div class="sample-container"><code class="" theme="idea"><pre>fun transactionalOutbox(): TransactionalOutbox {<br>  return TransactionalOutboxBuilder<br>    .make(clock)<br>    .withHandlers(outboxHandlers)<br>    .withMonitorLocksProvider(monitorLocksProvider)<br>    .withCleanupLocksProvider(cleanupLocksProvider)<br>    .withStore(outboxStore)<br>    .withInstantOutboxPublisher(instantOutboxPublisher)<br>    .build()<br>}</pre></code></div></div></div>
+            <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":core:dokkaHtml/main"><div class="symbol monospace">class <a href="index.html">TransactionalOutboxBuilder</a>(clock: <a href="https://docs.oracle.com/javase/8/docs/api/java/time/Clock.html">Clock</a>, rerunAfterDuration: <a href="https://docs.oracle.com/javase/8/docs/api/java/time/Duration.html">Duration</a>) : <a href="../-outbox-handlers-step/index.html">OutboxHandlersStep</a>, <a href="../-monitor-locks-provider-step/index.html">MonitorLocksProviderStep</a>, <a href="../-cleanup-locks-provider-step/index.html">CleanupLocksProviderStep</a>, <a href="../-store-step/index.html">StoreStep</a>, <a href="../-instant-outbox-publisher-step/index.html">InstantOutboxPublisherStep</a>, <a href="../-build-step/index.html">BuildStep</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><p class="paragraph">Builder for <a href="../-transactional-outbox/index.html">TransactionalOutbox</a>.</p><p class="paragraph">Example on Spring Boot:</p><div class="sample-container"><code class="" theme="idea"><pre>fun transactionalOutbox(): TransactionalOutbox {<br>  return TransactionalOutboxBuilder<br>    .make(clock)<br>    .withHandlers(outboxHandlers)<br>    .withMonitorLocksProvider(monitorLocksProvider)<br>    .withCleanupLocksProvider(cleanupLocksProvider)<br>    .withStore(outboxStore)<br>    .withInstantOutboxPublisher(instantOutboxPublisher)<br>    .withThreadPoolSize(threadPoolSize)<br>    .withThreadPriority(threadPriority)<br>    .withThreadPoolTimeOut(threadPoolTimeOut)<br>    .addProcessorDecorator(outboxItemProcessorDecorator)<br>    .withGroupIdProvider(outboxGroupIdProvider)<br>    .withGroupingConfiguration(outboxGroupingConfiguration)<br>    .build()<br>}</pre></code></div></div></div>
           </div>
           <div class="tabbedcontent">
             <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="Types">Types</button><button class="section-tab" data-togglable="Constructors">Constructors</button><button class="section-tab" data-togglable="Functions">Functions</button></div>
@@ -113,6 +113,57 @@
                     </div>
                   </div>
                 </div>
+<a data-name="-349410066%2FFunctions%2F-121426938" anchor-label="withGroupIdProvider" id="-349410066%2FFunctions%2F-121426938" data-filterable-set=":core:dokkaHtml/main"></a>
+                <div class="table-row" data-filterable-current=":core:dokkaHtml/main" data-filterable-set=":core:dokkaHtml/main">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="with-group-id-provider.html"><span>with</span><wbr></wbr><span>Group</span><wbr></wbr><span>Id</span><wbr></wbr><span><span>Provider</span></span></a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-349410066%2FFunctions%2F-121426938"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title"><div class="divergent-group" data-filterable-current=":core:dokkaHtml/main" data-filterable-set=":core:dokkaHtml/main"><div class="with-platform-tags"><span class="pull-right"></span></div>
+
+  <div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":core:dokkaHtml/main"><div class="symbol monospace">open override fun <a href="with-group-id-provider.html">withGroupIdProvider</a>(groupIdProvider: <a href="../../io.github.bluegroundltd.outbox.grouping/-outbox-group-id-provider/index.html">OutboxGroupIdProvider</a>): <a href="../-build-step/index.html">BuildStep</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+  </div>
+<div class="brief "><p class="paragraph">Sets the group id provider for the outbox that will be used to set corresponding field when an item is added.</p></div></div>
+</div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="1281842531%2FFunctions%2F-121426938" anchor-label="withGrouping" id="1281842531%2FFunctions%2F-121426938" data-filterable-set=":core:dokkaHtml/main"></a>
+                <div class="table-row" data-filterable-current=":core:dokkaHtml/main" data-filterable-set=":core:dokkaHtml/main">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="../-build-step/with-grouping.html"><span>with</span><wbr></wbr><span><span>Grouping</span></span></a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1281842531%2FFunctions%2F-121426938"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title"><div class="divergent-group" data-filterable-current=":core:dokkaHtml/main" data-filterable-set=":core:dokkaHtml/main"><div class="with-platform-tags"><span class="pull-right"></span></div>
+
+  <div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":core:dokkaHtml/main"><div class="symbol monospace">open fun <a href="../-build-step/with-grouping.html">withGrouping</a>(): <a href="../-build-step/index.html">BuildStep</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+  </div>
+</div>
+</div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="-686505746%2FFunctions%2F-121426938" anchor-label="withGroupingConfiguration" id="-686505746%2FFunctions%2F-121426938" data-filterable-set=":core:dokkaHtml/main"></a>
+                <div class="table-row" data-filterable-current=":core:dokkaHtml/main" data-filterable-set=":core:dokkaHtml/main">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="with-grouping-configuration.html"><span>with</span><wbr></wbr><span>Grouping</span><wbr></wbr><span><span>Configuration</span></span></a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-686505746%2FFunctions%2F-121426938"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title"><div class="divergent-group" data-filterable-current=":core:dokkaHtml/main" data-filterable-set=":core:dokkaHtml/main"><div class="with-platform-tags"><span class="pull-right"></span></div>
+
+  <div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":core:dokkaHtml/main"><div class="symbol monospace">open override fun <a href="with-grouping-configuration.html">withGroupingConfiguration</a>(outboxGroupingConfiguration: <a href="../../io.github.bluegroundltd.outbox.grouping/-outbox-grouping-configuration/index.html">OutboxGroupingConfiguration</a>): <a href="../-build-step/index.html">BuildStep</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+  </div>
+<div class="brief "><p class="paragraph">Sets the grouping configuration for the outbox.</p></div></div>
+</div>
+                    </div>
+                  </div>
+                </div>
 <a data-name="112176100%2FFunctions%2F-121426938" anchor-label="withHandlers" id="112176100%2FFunctions%2F-121426938" data-filterable-set=":core:dokkaHtml/main"></a>
                 <div class="table-row" data-filterable-current=":core:dokkaHtml/main" data-filterable-set=":core:dokkaHtml/main">
                   <div class="main-subrow keyValue ">
@@ -177,6 +228,23 @@
     <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":core:dokkaHtml/main"><div class="symbol monospace">open override fun <a href="with-monitor-locks-provider.html">withMonitorLocksProvider</a>(locksProvider: <a href="../-outbox-locks-provider/index.html">OutboxLocksProvider</a>): <a href="../-cleanup-locks-provider-step/index.html">CleanupLocksProviderStep</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
   </div>
 <div class="brief "><p class="paragraph">Sets the locks provider for the outbox monitor runs.</p></div></div>
+</div>
+                    </div>
+                  </div>
+                </div>
+<a data-name="-1410240413%2FFunctions%2F-121426938" anchor-label="withoutGrouping" id="-1410240413%2FFunctions%2F-121426938" data-filterable-set=":core:dokkaHtml/main"></a>
+                <div class="table-row" data-filterable-current=":core:dokkaHtml/main" data-filterable-set=":core:dokkaHtml/main">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex"><a href="../-build-step/without-grouping.html"><span>without</span><wbr></wbr><span><span>Grouping</span></span></a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1410240413%2FFunctions%2F-121426938"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div>
+                      <div class="title"><div class="divergent-group" data-filterable-current=":core:dokkaHtml/main" data-filterable-set=":core:dokkaHtml/main"><div class="with-platform-tags"><span class="pull-right"></span></div>
+
+  <div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":core:dokkaHtml/main"><div class="symbol monospace">open fun <a href="../-build-step/without-grouping.html">withoutGrouping</a>(): <a href="../-build-step/index.html">BuildStep</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+  </div>
+</div>
 </div>
                     </div>
                   </div>

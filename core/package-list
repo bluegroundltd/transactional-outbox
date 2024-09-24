@@ -9,18 +9,45 @@ $dokka.location:io.github.bluegroundltd.outbox.event/InstantOutboxEvent/InstantO
 $dokka.location:io.github.bluegroundltd.outbox.event/InstantOutboxEvent/outbox/#/PointingToDeclaration/core/io.github.bluegroundltd.outbox.event/-instant-outbox-event/outbox.html
 $dokka.location:io.github.bluegroundltd.outbox.event/InstantOutboxPublisher///PointingToDeclaration/core/io.github.bluegroundltd.outbox.event/-instant-outbox-publisher/index.html
 $dokka.location:io.github.bluegroundltd.outbox.event/InstantOutboxPublisher/publish/#io.github.bluegroundltd.outbox.event.InstantOutboxEvent/PointingToDeclaration/core/io.github.bluegroundltd.outbox.event/-instant-outbox-publisher/publish.html
+$dokka.location:io.github.bluegroundltd.outbox.grouping////PointingToDeclaration/core/io.github.bluegroundltd.outbox.grouping/index.html
+$dokka.location:io.github.bluegroundltd.outbox.grouping/CustomGroupingProviderConfiguration///PointingToDeclaration/core/io.github.bluegroundltd.outbox.grouping/-custom-grouping-provider-configuration/index.html
+$dokka.location:io.github.bluegroundltd.outbox.grouping/CustomGroupingProviderConfiguration/CustomGroupingProviderConfiguration/#io.github.bluegroundltd.outbox.grouping.OutboxGroupingProvider/PointingToDeclaration/core/io.github.bluegroundltd.outbox.grouping/-custom-grouping-provider-configuration/-custom-grouping-provider-configuration.html
+$dokka.location:io.github.bluegroundltd.outbox.grouping/CustomGroupingProviderConfiguration/groupingProvider/#/PointingToDeclaration/core/io.github.bluegroundltd.outbox.grouping/-custom-grouping-provider-configuration/grouping-provider.html
+$dokka.location:io.github.bluegroundltd.outbox.grouping/CustomOrderingProviderConfiguration///PointingToDeclaration/core/io.github.bluegroundltd.outbox.grouping/-custom-ordering-provider-configuration/index.html
+$dokka.location:io.github.bluegroundltd.outbox.grouping/CustomOrderingProviderConfiguration/CustomOrderingProviderConfiguration/#io.github.bluegroundltd.outbox.grouping.OutboxOrderingProvider/PointingToDeclaration/core/io.github.bluegroundltd.outbox.grouping/-custom-ordering-provider-configuration/-custom-ordering-provider-configuration.html
+$dokka.location:io.github.bluegroundltd.outbox.grouping/CustomOrderingProviderConfiguration/groupingProvider/#/PointingToDeclaration/core/io.github.bluegroundltd.outbox.grouping/-custom-ordering-provider-configuration/grouping-provider.html
+$dokka.location:io.github.bluegroundltd.outbox.grouping/DefaultGroupingConfiguration///PointingToDeclaration/core/io.github.bluegroundltd.outbox.grouping/-default-grouping-configuration/index.html
+$dokka.location:io.github.bluegroundltd.outbox.grouping/DefaultGroupingConfiguration/groupingProvider/#/PointingToDeclaration/core/io.github.bluegroundltd.outbox.grouping/-default-grouping-configuration/grouping-provider.html
+$dokka.location:io.github.bluegroundltd.outbox.grouping/FifoOrderingProvider///PointingToDeclaration/core/io.github.bluegroundltd.outbox.grouping/-fifo-ordering-provider/index.html
+$dokka.location:io.github.bluegroundltd.outbox.grouping/FifoOrderingProvider/FifoOrderingProvider/#/PointingToDeclaration/core/io.github.bluegroundltd.outbox.grouping/-fifo-ordering-provider/-fifo-ordering-provider.html
+$dokka.location:io.github.bluegroundltd.outbox.grouping/FifoOrderingProvider/execute/#kotlin.collections.Iterable[io.github.bluegroundltd.outbox.item.OutboxItem]/PointingToDeclaration/core/io.github.bluegroundltd.outbox.grouping/-fifo-ordering-provider/execute.html
+$dokka.location:io.github.bluegroundltd.outbox.grouping/OutboxGroupIdProvider///PointingToDeclaration/core/io.github.bluegroundltd.outbox.grouping/-outbox-group-id-provider/index.html
+$dokka.location:io.github.bluegroundltd.outbox.grouping/OutboxGroupIdProvider/execute/#io.github.bluegroundltd.outbox.item.OutboxType#io.github.bluegroundltd.outbox.item.OutboxPayload/PointingToDeclaration/core/io.github.bluegroundltd.outbox.grouping/-outbox-group-id-provider/execute.html
+$dokka.location:io.github.bluegroundltd.outbox.grouping/OutboxGroupingConfiguration///PointingToDeclaration/core/io.github.bluegroundltd.outbox.grouping/-outbox-grouping-configuration/index.html
+$dokka.location:io.github.bluegroundltd.outbox.grouping/OutboxGroupingConfiguration/groupingProvider/#/PointingToDeclaration/core/io.github.bluegroundltd.outbox.grouping/-outbox-grouping-configuration/grouping-provider.html
+$dokka.location:io.github.bluegroundltd.outbox.grouping/OutboxGroupingProvider///PointingToDeclaration/core/io.github.bluegroundltd.outbox.grouping/-outbox-grouping-provider/index.html
+$dokka.location:io.github.bluegroundltd.outbox.grouping/OutboxGroupingProvider/execute/#kotlin.collections.Iterable[io.github.bluegroundltd.outbox.item.OutboxItem]/PointingToDeclaration/core/io.github.bluegroundltd.outbox.grouping/-outbox-grouping-provider/execute.html
+$dokka.location:io.github.bluegroundltd.outbox.grouping/OutboxOrderingProvider///PointingToDeclaration/core/io.github.bluegroundltd.outbox.grouping/-outbox-ordering-provider/index.html
+$dokka.location:io.github.bluegroundltd.outbox.grouping/OutboxOrderingProvider/execute/#kotlin.collections.Iterable[io.github.bluegroundltd.outbox.item.OutboxItem]/PointingToDeclaration/core/io.github.bluegroundltd.outbox.grouping/-outbox-ordering-provider/execute.html
+$dokka.location:io.github.bluegroundltd.outbox.grouping/SingleItemGroupingConfiguration///PointingToDeclaration/core/io.github.bluegroundltd.outbox.grouping/-single-item-grouping-configuration/index.html
+$dokka.location:io.github.bluegroundltd.outbox.grouping/SingleItemGroupingConfiguration/groupingProvider/#/PointingToDeclaration/core/io.github.bluegroundltd.outbox.grouping/-single-item-grouping-configuration/grouping-provider.html
 $dokka.location:io.github.bluegroundltd.outbox.item////PointingToDeclaration/core/io.github.bluegroundltd.outbox.item/index.html
 $dokka.location:io.github.bluegroundltd.outbox.item/OutboxItem///PointingToDeclaration/core/io.github.bluegroundltd.outbox.item/-outbox-item/index.html
-$dokka.location:io.github.bluegroundltd.outbox.item/OutboxItem/OutboxItem/#kotlin.Long?#io.github.bluegroundltd.outbox.item.OutboxType#io.github.bluegroundltd.outbox.item.OutboxStatus#kotlin.String#kotlin.Long#java.time.Instant#java.time.Instant?#java.time.Instant?#java.time.Instant?/PointingToDeclaration/core/io.github.bluegroundltd.outbox.item/-outbox-item/-outbox-item.html
+$dokka.location:io.github.bluegroundltd.outbox.item/OutboxItem/OutboxItem/#kotlin.Long?#io.github.bluegroundltd.outbox.item.OutboxType#io.github.bluegroundltd.outbox.item.OutboxStatus#kotlin.String#kotlin.Long#java.time.Instant#java.time.Instant?#java.time.Instant?#java.time.Instant?#kotlin.String?/PointingToDeclaration/core/io.github.bluegroundltd.outbox.item/-outbox-item/-outbox-item.html
 $dokka.location:io.github.bluegroundltd.outbox.item/OutboxItem/deleteAfter/#/PointingToDeclaration/core/io.github.bluegroundltd.outbox.item/-outbox-item/delete-after.html
+$dokka.location:io.github.bluegroundltd.outbox.item/OutboxItem/groupId/#/PointingToDeclaration/core/io.github.bluegroundltd.outbox.item/-outbox-item/group-id.html
 $dokka.location:io.github.bluegroundltd.outbox.item/OutboxItem/id/#/PointingToDeclaration/core/io.github.bluegroundltd.outbox.item/-outbox-item/id.html
 $dokka.location:io.github.bluegroundltd.outbox.item/OutboxItem/lastExecution/#/PointingToDeclaration/core/io.github.bluegroundltd.outbox.item/-outbox-item/last-execution.html
+$dokka.location:io.github.bluegroundltd.outbox.item/OutboxItem/markedForProcessing/#/PointingToDeclaration/core/io.github.bluegroundltd.outbox.item/-outbox-item/marked-for-processing.html
 $dokka.location:io.github.bluegroundltd.outbox.item/OutboxItem/nextRun/#/PointingToDeclaration/core/io.github.bluegroundltd.outbox.item/-outbox-item/next-run.html
 $dokka.location:io.github.bluegroundltd.outbox.item/OutboxItem/payload/#/PointingToDeclaration/core/io.github.bluegroundltd.outbox.item/-outbox-item/payload.html
+$dokka.location:io.github.bluegroundltd.outbox.item/OutboxItem/prepareForProcessing/#java.time.Instant#java.time.Instant/PointingToDeclaration/core/io.github.bluegroundltd.outbox.item/-outbox-item/prepare-for-processing.html
 $dokka.location:io.github.bluegroundltd.outbox.item/OutboxItem/rerunAfter/#/PointingToDeclaration/core/io.github.bluegroundltd.outbox.item/-outbox-item/rerun-after.html
 $dokka.location:io.github.bluegroundltd.outbox.item/OutboxItem/retries/#/PointingToDeclaration/core/io.github.bluegroundltd.outbox.item/-outbox-item/retries.html
 $dokka.location:io.github.bluegroundltd.outbox.item/OutboxItem/status/#/PointingToDeclaration/core/io.github.bluegroundltd.outbox.item/-outbox-item/status.html
 $dokka.location:io.github.bluegroundltd.outbox.item/OutboxItem/type/#/PointingToDeclaration/core/io.github.bluegroundltd.outbox.item/-outbox-item/type.html
+$dokka.location:io.github.bluegroundltd.outbox.item/OutboxItemGroup.Companion///PointingToDeclaration/core/io.github.bluegroundltd.outbox.item/-outbox-item-group/-companion/index.html
+$dokka.location:io.github.bluegroundltd.outbox.item/OutboxItemGroup.Companion/of/#io.github.bluegroundltd.outbox.item.OutboxItem/PointingToDeclaration/core/io.github.bluegroundltd.outbox.item/-outbox-item-group/-companion/of.html
 $dokka.location:io.github.bluegroundltd.outbox.item/OutboxItemGroup///PointingToDeclaration/core/io.github.bluegroundltd.outbox.item/-outbox-item-group/index.html
 $dokka.location:io.github.bluegroundltd.outbox.item/OutboxItemGroup/OutboxItemGroup/#kotlin.collections.List[io.github.bluegroundltd.outbox.item.OutboxItem]/PointingToDeclaration/core/io.github.bluegroundltd.outbox.item/-outbox-item-group/-outbox-item-group.html
 $dokka.location:io.github.bluegroundltd.outbox.item/OutboxItemGroup/items/#/PointingToDeclaration/core/io.github.bluegroundltd.outbox.item/-outbox-item-group/items.html
@@ -58,10 +85,14 @@ $dokka.location:io.github.bluegroundltd.outbox////PointingToDeclaration/core/io
 $dokka.location:io.github.bluegroundltd.outbox/BuildStep///PointingToDeclaration/core/io.github.bluegroundltd.outbox/-build-step/index.html
 $dokka.location:io.github.bluegroundltd.outbox/BuildStep/addProcessorDecorator/#io.github.bluegroundltd.outbox.processing.OutboxItemProcessorDecorator/PointingToDeclaration/core/io.github.bluegroundltd.outbox/-build-step/add-processor-decorator.html
 $dokka.location:io.github.bluegroundltd.outbox/BuildStep/build/#/PointingToDeclaration/core/io.github.bluegroundltd.outbox/-build-step/build.html
+$dokka.location:io.github.bluegroundltd.outbox/BuildStep/withGroupIdProvider/#io.github.bluegroundltd.outbox.grouping.OutboxGroupIdProvider/PointingToDeclaration/core/io.github.bluegroundltd.outbox/-build-step/with-group-id-provider.html
+$dokka.location:io.github.bluegroundltd.outbox/BuildStep/withGrouping/#/PointingToDeclaration/core/io.github.bluegroundltd.outbox/-build-step/with-grouping.html
+$dokka.location:io.github.bluegroundltd.outbox/BuildStep/withGroupingConfiguration/#io.github.bluegroundltd.outbox.grouping.OutboxGroupingConfiguration/PointingToDeclaration/core/io.github.bluegroundltd.outbox/-build-step/with-grouping-configuration.html
 $dokka.location:io.github.bluegroundltd.outbox/BuildStep/withInstantOrderingEnabled/#kotlin.Boolean/PointingToDeclaration/core/io.github.bluegroundltd.outbox/-build-step/with-instant-ordering-enabled.html
 $dokka.location:io.github.bluegroundltd.outbox/BuildStep/withThreadPoolSize/#kotlin.Int/PointingToDeclaration/core/io.github.bluegroundltd.outbox/-build-step/with-thread-pool-size.html
 $dokka.location:io.github.bluegroundltd.outbox/BuildStep/withThreadPoolTimeOut/#java.time.Duration/PointingToDeclaration/core/io.github.bluegroundltd.outbox/-build-step/with-thread-pool-time-out.html
 $dokka.location:io.github.bluegroundltd.outbox/BuildStep/withThreadPriority/#kotlin.Int/PointingToDeclaration/core/io.github.bluegroundltd.outbox/-build-step/with-thread-priority.html
+$dokka.location:io.github.bluegroundltd.outbox/BuildStep/withoutGrouping/#/PointingToDeclaration/core/io.github.bluegroundltd.outbox/-build-step/without-grouping.html
 $dokka.location:io.github.bluegroundltd.outbox/CleanupLocksProviderStep///PointingToDeclaration/core/io.github.bluegroundltd.outbox/-cleanup-locks-provider-step/index.html
 $dokka.location:io.github.bluegroundltd.outbox/CleanupLocksProviderStep/withCleanupLocksProvider/#io.github.bluegroundltd.outbox.OutboxLocksProvider/PointingToDeclaration/core/io.github.bluegroundltd.outbox/-cleanup-locks-provider-step/with-cleanup-locks-provider.html
 $dokka.location:io.github.bluegroundltd.outbox/InstantOutboxPublisherStep///PointingToDeclaration/core/io.github.bluegroundltd.outbox/-instant-outbox-publisher-step/index.html
@@ -107,6 +138,8 @@ $dokka.location:io.github.bluegroundltd.outbox/TransactionalOutboxBuilder/Transa
 $dokka.location:io.github.bluegroundltd.outbox/TransactionalOutboxBuilder/addProcessorDecorator/#io.github.bluegroundltd.outbox.processing.OutboxItemProcessorDecorator/PointingToDeclaration/core/io.github.bluegroundltd.outbox/-transactional-outbox-builder/add-processor-decorator.html
 $dokka.location:io.github.bluegroundltd.outbox/TransactionalOutboxBuilder/build/#/PointingToDeclaration/core/io.github.bluegroundltd.outbox/-transactional-outbox-builder/build.html
 $dokka.location:io.github.bluegroundltd.outbox/TransactionalOutboxBuilder/withCleanupLocksProvider/#io.github.bluegroundltd.outbox.OutboxLocksProvider/PointingToDeclaration/core/io.github.bluegroundltd.outbox/-transactional-outbox-builder/with-cleanup-locks-provider.html
+$dokka.location:io.github.bluegroundltd.outbox/TransactionalOutboxBuilder/withGroupIdProvider/#io.github.bluegroundltd.outbox.grouping.OutboxGroupIdProvider/PointingToDeclaration/core/io.github.bluegroundltd.outbox/-transactional-outbox-builder/with-group-id-provider.html
+$dokka.location:io.github.bluegroundltd.outbox/TransactionalOutboxBuilder/withGroupingConfiguration/#io.github.bluegroundltd.outbox.grouping.OutboxGroupingConfiguration/PointingToDeclaration/core/io.github.bluegroundltd.outbox/-transactional-outbox-builder/with-grouping-configuration.html
 $dokka.location:io.github.bluegroundltd.outbox/TransactionalOutboxBuilder/withHandlers/#kotlin.collections.Set[io.github.bluegroundltd.outbox.OutboxHandler]/PointingToDeclaration/core/io.github.bluegroundltd.outbox/-transactional-outbox-builder/with-handlers.html
 $dokka.location:io.github.bluegroundltd.outbox/TransactionalOutboxBuilder/withInstantOrderingEnabled/#kotlin.Boolean/PointingToDeclaration/core/io.github.bluegroundltd.outbox/-transactional-outbox-builder/with-instant-ordering-enabled.html
 $dokka.location:io.github.bluegroundltd.outbox/TransactionalOutboxBuilder/withInstantOutboxPublisher/#io.github.bluegroundltd.outbox.event.InstantOutboxPublisher/PointingToDeclaration/core/io.github.bluegroundltd.outbox/-transactional-outbox-builder/with-instant-outbox-publisher.html
@@ -118,6 +151,7 @@ $dokka.location:io.github.bluegroundltd.outbox/TransactionalOutboxBuilder/withTh
 io.github.bluegroundltd.outbox
 io.github.bluegroundltd.outbox.annotation
 io.github.bluegroundltd.outbox.event
+io.github.bluegroundltd.outbox.grouping
 io.github.bluegroundltd.outbox.item
 io.github.bluegroundltd.outbox.processing
 io.github.bluegroundltd.outbox.store
