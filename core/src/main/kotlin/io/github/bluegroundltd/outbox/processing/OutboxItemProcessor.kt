@@ -44,7 +44,7 @@ internal class OutboxItemProcessor(
       } else {
         handleRetryableFailure(handler, exception)
       }
-      throw exception
+      throw OutboxHandlerException(item, exception)
     } finally {
       store.update(item)
     }
