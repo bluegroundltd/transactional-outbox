@@ -1,5 +1,6 @@
 package io.github.bluegroundltd.outbox.processing
 
+import io.github.bluegroundltd.outbox.utils.OutboxItemBuilder
 import spock.lang.Specification
 
 class OutboxProcessingHostSpec extends Specification {
@@ -45,7 +46,7 @@ class OutboxProcessingHostSpec extends Specification {
       noExceptionThrown()
   }
 
-  def "Should catch all exceptions and reset the processor when an exception occurs while processing"() {
+  def "Should catch #exceptionType that occurs while processing and reset the processor"() {
     when:
       processingHost.run()
 
@@ -56,6 +57,14 @@ class OutboxProcessingHostSpec extends Specification {
 
     and:
       noExceptionThrown()
+
+      // The only difference between the cases is the logging which is not really testable.
+      // However, they are all included for coverage.
+    where:
+      exceptionType               | exception
+      "a handler exception"       | makeHandlerException()
+      "an outbox state exception" | makeOutboxStateException()
+      "a non-handler exception"   | new Exception("Processing Exception")
   }
 
   def "Should delegate to the processor when [reset] is called"() {
@@ -68,5 +77,16 @@ class OutboxProcessingHostSpec extends Specification {
 
     and:
       noExceptionThrown()
+  }
+
+  private static OutboxHandlerException makeHandlerException() {
+    def outboxItem = OutboxItemBuilder.make().build()
+    def cause = new RuntimeException("Exception Message")
+    return new OutboxHandlerException(outboxItem, cause)
+  }
+
+  private static InvalidOutboxStateException makeOutboxStateException() {
+    def outboxItem = OutboxItemBuilder.make().build()
+    return new InvalidOutboxStateException(outboxItem)
   }
 }

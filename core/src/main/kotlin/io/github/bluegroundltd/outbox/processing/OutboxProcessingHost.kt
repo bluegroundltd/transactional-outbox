@@ -34,7 +34,7 @@ internal class OutboxProcessingHost(
     try {
       processingAction.run()
     } catch (e: Exception) {
-      logger.error("$LOGGER_PREFIX ${e.message}")
+      e.log()
       processingAction.reset()
     }
   }
@@ -47,5 +47,16 @@ internal class OutboxProcessingHost(
 
   fun reset() {
     processingAction.reset()
+  }
+
+  private fun Exception.log() {
+    when (this) {
+      // Outbox handler exceptions are logged by the item processor itself.
+      is OutboxHandlerException -> {}
+      // This is a semi-expected exception. The item will be retried at a later time.
+      is InvalidOutboxStateException -> logger.info("$LOGGER_PREFIX ${this.message}")
+      // This is a systemic/library exception that presumably won't be fixed by a retry.
+      else -> logger.error("$LOGGER_PREFIX ${this.message}")
+    }
   }
 }

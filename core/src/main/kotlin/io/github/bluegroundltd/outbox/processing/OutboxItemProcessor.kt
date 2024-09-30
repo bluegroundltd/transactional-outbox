@@ -44,7 +44,7 @@ internal class OutboxItemProcessor(
       } else {
         handleRetryableFailure(handler, exception)
       }
-      throw exception
+      throw OutboxHandlerException(item, exception)
     } finally {
       store.update(item)
     }
@@ -99,7 +99,7 @@ internal class OutboxItemProcessor(
   }
 
   private fun handleTerminalFailure(handler: OutboxHandler, exception: Exception) {
-    logger.info(
+    logger.error(
       "$LOGGER_PREFIX Failure handling outbox item with id: ${item.id} and type: ${item.type}. " +
         "Item reached max-retries (${item.retries}), delegating failure to handler.",
       exception

@@ -135,16 +135,16 @@ class OutboxItemProcessorSpec extends Specification {
       0 * _
   }
 
-  def "Should handle a processing failure when it has reached the max number of retries"() {
+  def "Should gracefully handle a processing failure when it has reached the max number of retries"() {
     given:
-      def exception = new RuntimeException()
+      def caughtException = new RuntimeException()
 
     when:
       processor.run()
 
     then:
       1 * handler.getSupportedType() >> processedItem.type
-      1 * handler.handle(processedItem.payload) >> { throw exception }
+      1 * handler.handle(processedItem.payload) >> { throw caughtException }
       1 * handler.hasReachedMaxRetries(processedItem.retries) >> true
       1 * handler.handleFailure(processedItem.payload)
       1 * store.update(_) >> { OutboxItem item ->
@@ -156,21 +156,21 @@ class OutboxItemProcessorSpec extends Specification {
       0 * _
 
     and:
-      def ex = thrown(Exception)
-      ex == exception
+      def ex = thrown(OutboxHandlerException)
+      ex.cause == caughtException
   }
 
   def "Should gracefully handle a processing failure when it hasn't reached the max number of retries"() {
     given:
       def expectedNextRun = Instant.now(clock)
-      def exception = new RuntimeException()
+      def caughtException = new RuntimeException()
 
     when:
       processor.run()
 
     then:
       1 * handler.getSupportedType() >> processedItem.type
-      1 * handler.handle(processedItem.payload) >> { throw exception }
+      1 * handler.handle(processedItem.payload) >> { throw caughtException }
       1 * handler.hasReachedMaxRetries(processedItem.retries) >> false
       1 * handler.getNextExecutionTime(processedItem.retries) >> expectedNextRun
       1 * store.update(_) >> { OutboxItem item ->
@@ -184,8 +184,8 @@ class OutboxItemProcessorSpec extends Specification {
       0 * _
 
     and:
-      def ex = thrown(Exception)
-      ex == exception
+      def ex = thrown(OutboxHandlerException)
+      ex.cause == caughtException
   }
 
   def "Should set item status to 'PENDING' when [reset] is invoked"() {
