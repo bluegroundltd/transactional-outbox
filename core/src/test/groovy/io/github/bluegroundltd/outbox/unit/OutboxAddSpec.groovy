@@ -67,19 +67,21 @@ class OutboxAddSpec extends UnitTestSpecification {
       def type = GroovyMock(OutboxType)
 
     and:
-      def outboxItem = OutboxItemBuilder.make().build()
-      def savedOutbox = OutboxItemBuilder.make().build()
+      def newOutbox = OutboxItemBuilder.makePending().build()
+      def insertedOutbox = OutboxItemBuilder.makePending().build()
+      def updatedOutbox = OutboxItemBuilder.make().build()
 
     when:
       transactionalOutbox.add(type, payload, true)
 
     then:
       1 * type.getType() >> "type"
-      (instantProcessingEnabled ? 1 : 0) * outboxItemFactory.makeScheduledOutboxItem(type, payload) >> outboxItem
-      (instantProcessingEnabled ? 0 : 1) * outboxItemFactory.makeInstantOutbox(type, payload) >> outboxItem
-      1 * store.insert(outboxItem) >> savedOutbox
+      1 * outboxItemFactory.makeScheduledOutboxItem(type, payload) >> newOutbox
+      1 * store.insert(newOutbox) >> insertedOutbox
+      (instantProcessingEnabled ? 0 : 1) * store.update(insertedOutbox) >> updatedOutbox
       1 * instantOutboxPublisher.publish({
-        assert it.outbox == savedOutbox
+        // Verify that it is actually the originally inserted outbox (and not the updated one) that it is published.
+        assert it.outbox == insertedOutbox
       })
       0 * _
 
