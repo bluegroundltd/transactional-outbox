@@ -4,6 +4,7 @@ import io.github.bluegroundltd.outbox.item.OutboxItem
 import io.github.bluegroundltd.outbox.item.OutboxStatus
 import io.github.bluegroundltd.outbox.store.OutboxFilter
 import io.github.bluegroundltd.outbox.store.OutboxStore
+import io.github.bluegroundltd.outbox.store.OutboxStoreInsertHints
 import org.jetbrains.annotations.NotNull
 
 import java.time.Instant
@@ -15,6 +16,11 @@ class InMemoryOutboxStore implements OutboxStore {
   OutboxItem insert(@NotNull OutboxItem outboxItem) {
     outboxItems[outboxItem.id] = outboxItem
     return outboxItem
+  }
+
+  @Override
+  OutboxItem insert(@NotNull OutboxItem outboxItem, @NotNull OutboxStoreInsertHints hints) {
+    insert(outboxItem)
   }
 
   @Override

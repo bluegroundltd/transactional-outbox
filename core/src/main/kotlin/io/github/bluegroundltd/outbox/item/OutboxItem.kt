@@ -38,7 +38,7 @@ data class OutboxItem(
    * eligible for processing and is marked as such.
    */
   fun prepareForProcessing(now: Instant, rerunAfter: Instant) {
-    markedForProcessing = isEligibleForProcessing(now)
+    markedForProcessing = markedForProcessing || isEligibleForProcessing(now)
     if (markedForProcessing) {
       status = OutboxStatus.RUNNING
       lastExecution = now

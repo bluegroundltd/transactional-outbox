@@ -15,6 +15,7 @@ import io.github.bluegroundltd.outbox.processing.OutboxProcessingHost
 import io.github.bluegroundltd.outbox.processing.OutboxProcessingHostComposer
 import io.github.bluegroundltd.outbox.store.OutboxFilter
 import io.github.bluegroundltd.outbox.store.OutboxStore
+import io.github.bluegroundltd.outbox.store.OutboxStoreInsertHints
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.time.Clock
@@ -59,12 +60,29 @@ internal class TransactionalOutboxImpl(
   override fun add(type: OutboxType, payload: OutboxPayload, shouldPublishAfterInsertion: Boolean) {
     logger.info("$LOGGER_PREFIX Adding item of type: ${type.getType()} and payload: $payload")
 
-    when {
-      shouldPublishAfterInsertion && !instantOrderingEnabled -> outboxItemFactory.makeInstantOutbox(type, payload)
-      else -> outboxItemFactory.makeScheduledOutboxItem(type, payload)
-    }.run { outboxStore.insert(this) }
-      .takeIf { shouldPublishAfterInsertion }
-      ?.let { instantOutboxPublisher.publish(InstantOutboxEvent(outbox = it)) }
+    // Build scheduled outbox item and insert it. Alternatively, for instant outboxes we could prepare for
+    // processing before inserting it. But then we would need to devise a method to allow us for updating
+    // `markedForProcessing` based on the originally built item.
+    val outboxItem = outboxItemFactory.makeScheduledOutboxItem(type, payload)
+      .run {
+        val hints = OutboxStoreInsertHints(
+          forInstantProcessing = shouldPublishAfterInsertion,
+          instantOrderingEnabled = instantOrderingEnabled
+        )
+        outboxStore.insert(this, hints)
+      }
+
+    if (shouldPublishAfterInsertion) {
+      if (!instantOrderingEnabled) {
+        // When instant ordering is not enabled (i.e. legacy instant processing), the item will be used from the
+        // processing method (i.e. `processInstantOutbox`) directly (i.e. will not be retrieved from the database).
+        // Therefore, we need to prepare/update it for processing so that any other possible concurrent operations
+        // do not pick it up. (This is essentially what `monitor` also does.)
+        val now = Instant.now(clock)
+        outboxItem.updateForProcessing(now, now + rerunAfterDuration)
+      }
+      instantOutboxPublisher.publish(InstantOutboxEvent(outbox = outboxItem))
+    }
   }
 
   @Deprecated(
@@ -106,7 +124,7 @@ internal class TransactionalOutboxImpl(
         .map { it.copy() } // Defensive copy to avoid external modifications.
         .group()
         .filterByIdIfExists(id) // ensures item filtering regardless of client's `fetch`
-        .apply { prepareForProcessing() } // mark groups (essentially contained items) for processing
+        .apply { updateForProcessing() } // mark groups (essentially contained items) for processing
         .forEach { it.process() }
     }.onFailure {
       logger.error("$LOGGER_PREFIX Failure in monitor", it)
@@ -137,12 +155,19 @@ internal class TransactionalOutboxImpl(
     return eligibleItems
   }
 
-  private fun List<OutboxItemGroup>.prepareForProcessing() {
+  private fun List<OutboxItemGroup>.updateForProcessing() {
     val now = Instant.now(clock)
     val rerunAfter = now.plus(rerunAfterDuration)
-    flatMap { it.items }
-      .onEach { it.prepareForProcessing(now, rerunAfter) }
-      .onEach { outboxStore.update(it) }
+    flatMap { it.items }.onEach { it.updateForProcessing(now, rerunAfter) }
+  }
+
+  private fun OutboxItem.updateForProcessing(now: Instant, rerunAfter: Instant) {
+    // It is important to NOT return the item returned from `update` since it may be a different instance
+    // where the `markedForProcessing` flag is not properly set.
+    // Rerunning `prepareForProcessing` on it, wouldn't work since **by design** (i.e. when retrieving items
+    // that have been updated for processing from another thread / instance) the function will not work on them.
+    prepareForProcessing(now, rerunAfter)
+    outboxStore.update(this)
   }
 
   private fun List<OutboxItem>.group(): List<OutboxItemGroup> = groupingProvider.execute(this)

@@ -3,9 +3,9 @@ package io.github.bluegroundltd.outbox
 import io.github.bluegroundltd.outbox.event.InstantOutboxPublisher
 import io.github.bluegroundltd.outbox.executor.FixedThreadPoolExecutorServiceFactory
 import io.github.bluegroundltd.outbox.grouping.DefaultGroupingConfiguration
-import io.github.bluegroundltd.outbox.grouping.OutboxGroupingConfiguration
-import io.github.bluegroundltd.outbox.grouping.OutboxGroupIdProvider
 import io.github.bluegroundltd.outbox.grouping.NullGroupIdProvider
+import io.github.bluegroundltd.outbox.grouping.OutboxGroupIdProvider
+import io.github.bluegroundltd.outbox.grouping.OutboxGroupingConfiguration
 import io.github.bluegroundltd.outbox.grouping.SingleItemGroupingConfiguration
 import io.github.bluegroundltd.outbox.item.OutboxType
 import io.github.bluegroundltd.outbox.item.factory.OutboxItemFactory
@@ -222,7 +222,7 @@ class TransactionalOutboxBuilder(
    */
   override fun build(): TransactionalOutbox {
     val executorServiceFactory = FixedThreadPoolExecutorServiceFactory(threadPoolSize, threadPriority)
-    val outboxItemFactory = OutboxItemFactory(clock, handlers.toMap(), rerunAfterDuration, groupIdProvider)
+    val outboxItemFactory = OutboxItemFactory(handlers.toMap(), groupIdProvider)
 
     return TransactionalOutboxImpl(
       clock,

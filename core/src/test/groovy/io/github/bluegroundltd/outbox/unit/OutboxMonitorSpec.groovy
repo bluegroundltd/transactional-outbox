@@ -47,7 +47,10 @@ class OutboxMonitorSpec extends Specification {
 
   def "Should delegate to the executor thread pool when an instant outbox is processed and `instantProcessingEnabled` is false"() {
     given:
-      def instantOutbox = OutboxItemBuilder.makePending().build()
+      def instantOutbox = OutboxItemBuilder.makePending().build().with {
+        it.prepareForProcessing(Instant.now(clock), Instant.now(clock) + DURATION_ONE_HOUR)
+        it
+      }
       def processingHost = Mock(OutboxProcessingHost)
 
     when:
