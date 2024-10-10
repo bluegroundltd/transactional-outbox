@@ -11,6 +11,7 @@ import io.github.bluegroundltd.outbox.item.OutboxType
 import io.github.bluegroundltd.outbox.item.factory.OutboxItemFactory
 import io.github.bluegroundltd.outbox.processing.OutboxProcessingHostComposer
 import io.github.bluegroundltd.outbox.store.OutboxStore
+import io.github.bluegroundltd.outbox.store.OutboxStoreInsertHints
 import io.github.bluegroundltd.outbox.utils.OutboxItemBuilder
 import io.github.bluegroundltd.outbox.utils.UnitTestSpecification
 
@@ -47,6 +48,7 @@ class OutboxAddSpec extends UnitTestSpecification {
 
     and:
       def outboxItem = OutboxItemBuilder.make().build()
+      def hints = new OutboxStoreInsertHints(false, false)
 
     when:
       transactionalOutbox.add(type, payload, false)
@@ -54,7 +56,7 @@ class OutboxAddSpec extends UnitTestSpecification {
     then:
       1 * type.getType() >> "type"
       1 * outboxItemFactory.makeScheduledOutboxItem(type, payload) >> outboxItem
-      1 * store.insert(outboxItem)
+      1 * store.insert(outboxItem, hints)
       0 * _
   }
 
@@ -70,6 +72,7 @@ class OutboxAddSpec extends UnitTestSpecification {
       def newOutbox = OutboxItemBuilder.makePending().build()
       def insertedOutbox = OutboxItemBuilder.makePending().build()
       def updatedOutbox = OutboxItemBuilder.make().build()
+      def hints = new OutboxStoreInsertHints(true, instantProcessingEnabled)
 
     when:
       transactionalOutbox.add(type, payload, true)
@@ -77,7 +80,7 @@ class OutboxAddSpec extends UnitTestSpecification {
     then:
       1 * type.getType() >> "type"
       1 * outboxItemFactory.makeScheduledOutboxItem(type, payload) >> newOutbox
-      1 * store.insert(newOutbox) >> insertedOutbox
+      1 * store.insert(newOutbox, hints) >> insertedOutbox
       (instantProcessingEnabled ? 0 : 1) * store.update(insertedOutbox) >> updatedOutbox
       1 * instantOutboxPublisher.publish({
         // Verify that it is actually the originally inserted outbox (and not the updated one) that it is published.

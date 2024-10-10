@@ -15,6 +15,7 @@ import io.github.bluegroundltd.outbox.processing.OutboxProcessingHost
 import io.github.bluegroundltd.outbox.processing.OutboxProcessingHostComposer
 import io.github.bluegroundltd.outbox.store.OutboxFilter
 import io.github.bluegroundltd.outbox.store.OutboxStore
+import io.github.bluegroundltd.outbox.store.OutboxStoreInsertHints
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.time.Clock
@@ -63,7 +64,13 @@ internal class TransactionalOutboxImpl(
     // processing before inserting it. But then we would need to devise a method to allow us for updating
     // `markedForProcessing` based on the originally built item.
     val outboxItem = outboxItemFactory.makeScheduledOutboxItem(type, payload)
-      .run { outboxStore.insert(this) }
+      .run {
+        val hints = OutboxStoreInsertHints(
+          forInstantProcessing = shouldPublishAfterInsertion,
+          instantOrderingEnabled = instantOrderingEnabled
+        )
+        outboxStore.insert(this, hints)
+      }
 
     if (shouldPublishAfterInsertion) {
       if (!instantOrderingEnabled) {
