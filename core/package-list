@@ -79,8 +79,13 @@ $dokka.location:io.github.bluegroundltd.outbox.store/OutboxRunningFilter/rerunAf
 $dokka.location:io.github.bluegroundltd.outbox.store/OutboxStore///PointingToDeclaration/core/io.github.bluegroundltd.outbox.store/-outbox-store/index.html
 $dokka.location:io.github.bluegroundltd.outbox.store/OutboxStore/deleteCompletedItems/#java.time.Instant/PointingToDeclaration/core/io.github.bluegroundltd.outbox.store/-outbox-store/delete-completed-items.html
 $dokka.location:io.github.bluegroundltd.outbox.store/OutboxStore/fetch/#io.github.bluegroundltd.outbox.store.OutboxFilter/PointingToDeclaration/core/io.github.bluegroundltd.outbox.store/-outbox-store/fetch.html
+$dokka.location:io.github.bluegroundltd.outbox.store/OutboxStore/insert/#io.github.bluegroundltd.outbox.item.OutboxItem#io.github.bluegroundltd.outbox.store.OutboxStoreInsertHints/PointingToDeclaration/core/io.github.bluegroundltd.outbox.store/-outbox-store/insert.html
 $dokka.location:io.github.bluegroundltd.outbox.store/OutboxStore/insert/#io.github.bluegroundltd.outbox.item.OutboxItem/PointingToDeclaration/core/io.github.bluegroundltd.outbox.store/-outbox-store/insert.html
 $dokka.location:io.github.bluegroundltd.outbox.store/OutboxStore/update/#io.github.bluegroundltd.outbox.item.OutboxItem/PointingToDeclaration/core/io.github.bluegroundltd.outbox.store/-outbox-store/update.html
+$dokka.location:io.github.bluegroundltd.outbox.store/OutboxStoreInsertHints///PointingToDeclaration/core/io.github.bluegroundltd.outbox.store/-outbox-store-insert-hints/index.html
+$dokka.location:io.github.bluegroundltd.outbox.store/OutboxStoreInsertHints/OutboxStoreInsertHints/#kotlin.Boolean#kotlin.Boolean/PointingToDeclaration/core/io.github.bluegroundltd.outbox.store/-outbox-store-insert-hints/-outbox-store-insert-hints.html
+$dokka.location:io.github.bluegroundltd.outbox.store/OutboxStoreInsertHints/forInstantProcessing/#/PointingToDeclaration/core/io.github.bluegroundltd.outbox.store/-outbox-store-insert-hints/for-instant-processing.html
+$dokka.location:io.github.bluegroundltd.outbox.store/OutboxStoreInsertHints/instantOrderingEnabled/#/PointingToDeclaration/core/io.github.bluegroundltd.outbox.store/-outbox-store-insert-hints/instant-ordering-enabled.html
 $dokka.location:io.github.bluegroundltd.outbox////PointingToDeclaration/core/io.github.bluegroundltd.outbox/index.html
 $dokka.location:io.github.bluegroundltd.outbox/BuildStep///PointingToDeclaration/core/io.github.bluegroundltd.outbox/-build-step/index.html
 $dokka.location:io.github.bluegroundltd.outbox/BuildStep/addProcessorDecorator/#io.github.bluegroundltd.outbox.processing.OutboxItemProcessorDecorator/PointingToDeclaration/core/io.github.bluegroundltd.outbox/-build-step/add-processor-decorator.html
