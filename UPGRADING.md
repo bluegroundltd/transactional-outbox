@@ -2,6 +2,20 @@
 
 ## v.2.x.x
 
+### v.2.3.2 - Fix for legacy instant processing and insertion hints
+
+Release 2.3.2 fixes the legacy instant processing (i.e. when `instantOrderingEnabled` is set to `false`) which was
+broken since 2.3. The fix
+introduces a flow where the outbox item is first inserted and then immediately updated for processing.
+
+#### Persistence changes
+
+The updated insertion implementation for instant processing introduces a flow where both `OutboxStore#insert` and
+`OutboxStore#update` are called. In turn, this means that the corresponding implementations may need to be updated to
+support it. Since this might have performance implications (e.g. requiring flushing the date to the underlying
+database), the library now provides a set of hints (`OutboxInsertionHint`) to allow for implementors to appropriately
+optimize. 
+
 ### v.2.3.0 - Support for grouping and ordering outbox items
 
 Release 2.3.0 introduces support for grouping and ordering outbox items. Applications that want to take advantage of

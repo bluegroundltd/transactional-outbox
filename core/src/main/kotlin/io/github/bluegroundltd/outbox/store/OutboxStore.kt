@@ -15,6 +15,8 @@ interface OutboxStore {
    */
   fun insert(outboxItem: OutboxItem): OutboxItem
 
+  fun insert(outboxItem: OutboxItem, hints: OutboxStoreInsertHints): OutboxItem = insert(outboxItem)
+
   /**
    * Updates an outbox item in the store.
    *
