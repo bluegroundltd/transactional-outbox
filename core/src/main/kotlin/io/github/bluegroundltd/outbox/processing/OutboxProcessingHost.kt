@@ -31,10 +31,10 @@ internal class OutboxProcessingHost(
   }
 
   private val processorRunnable = Runnable {
-    try {
+    runCatching {
       processingAction.run()
-    } catch (e: Exception) {
-      e.log()
+    }.onFailure {
+      it.log()
       processingAction.reset()
     }
   }
@@ -49,7 +49,7 @@ internal class OutboxProcessingHost(
     processingAction.reset()
   }
 
-  private fun Exception.log() {
+  private fun Throwable.log() {
     when (this) {
       // Outbox handler exceptions are logged by the item processor itself.
       is OutboxHandlerException -> {}
