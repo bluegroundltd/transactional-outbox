@@ -15,3 +15,4 @@ pluginManagement {
 
 rootProject.name = "transactional-outbox"
 include("core")
+include("spring")
