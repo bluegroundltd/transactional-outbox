@@ -5,6 +5,7 @@ import io.github.bluegroundltd.outbox.item.OutboxStatus
 import io.github.bluegroundltd.outbox.store.OutboxFilter
 import io.github.bluegroundltd.outbox.store.OutboxStore
 import io.github.bluegroundltd.outbox.store.OutboxStoreInsertHints
+import io.github.bluegroundltd.springoutbox.database.OutboxDao
 import java.time.Instant
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory

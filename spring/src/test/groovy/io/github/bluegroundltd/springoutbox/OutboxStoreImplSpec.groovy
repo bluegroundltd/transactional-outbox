@@ -4,6 +4,7 @@ import io.github.bluegroundltd.outbox.item.OutboxItem
 import io.github.bluegroundltd.outbox.item.OutboxStatus
 import io.github.bluegroundltd.outbox.store.OutboxFilter
 import io.github.bluegroundltd.outbox.store.OutboxStoreInsertHints
+import io.github.bluegroundltd.springoutbox.database.OutboxDao
 import io.github.bluegroundltd.springoutbox.utils.OutboxItemBuilder
 import io.github.bluegroundltd.springoutbox.utils.UnitTestSpecification
 

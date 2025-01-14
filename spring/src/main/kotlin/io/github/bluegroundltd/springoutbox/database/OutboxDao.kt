@@ -1,4 +1,4 @@
-package io.github.bluegroundltd.springoutbox
+package io.github.bluegroundltd.springoutbox.database
 
 import io.github.bluegroundltd.outbox.item.OutboxItem
 import io.github.bluegroundltd.outbox.item.OutboxStatus

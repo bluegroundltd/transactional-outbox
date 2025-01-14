@@ -1,100 +1,105 @@
 package io.github.bluegroundltd.springoutbox.utils
 
-import io.github.bluegroundltd.outbox.item.OutboxItem
 import io.github.bluegroundltd.outbox.item.OutboxStatus
 import io.github.bluegroundltd.outbox.item.OutboxType
 import io.github.bluegroundltd.springoutbox.TestOutboxType
+import io.github.bluegroundltd.springoutbox.database.OutboxItemEntity
 
 import java.time.Instant
 
-class OutboxItemBuilder implements SpecHelper {
+class OutboxItemEntityBuilder implements SpecHelper {
   private Long id
-  private OutboxType type
+  private String type
   private OutboxStatus status
   private String payload
+  private String groupId
   private Long retries
   private Instant nextRun
   private Instant lastExecution
   private Instant rerunAfter
   private Instant deleteAfter
-  private String groupId
 
-  static OutboxItemBuilder make() {
-    new OutboxItemBuilder().with {
+  static OutboxItemEntityBuilder make() {
+    new OutboxItemEntityBuilder().with {
       id = generateLong()
-      type = randomEnum(TestOutboxType)
+      type = randomEnum(TestOutboxType).type
       status = randomEnum(OutboxStatus)
       payload = generateString()
+      groupId = generateString()
       retries = generateIntNonZero(5)
       nextRun = generateInstant()
       lastExecution = generateInstant()
       rerunAfter = generateInstant()
       deleteAfter = generateInstant()
-      groupId = generateString()
       it
     }
   }
 
-  OutboxItemBuilder withId(Long id) {
+  OutboxItemEntityBuilder withId(Long id) {
     this.id = id
     this
   }
 
-  OutboxItemBuilder withStatus(OutboxStatus status) {
+  OutboxItemEntityBuilder withType(OutboxType type) {
+    this.type = type.type
+    this
+  }
+
+  OutboxItemEntityBuilder withStatus(OutboxStatus status) {
     this.status = status
     this
   }
 
-  OutboxItemBuilder withGroupId(String groupId) {
+  OutboxItemEntityBuilder withGroupId(String groupId) {
     this.groupId = groupId
     this
   }
 
-  OutboxItemBuilder withGroupId() {
+  OutboxItemEntityBuilder withGroupId() {
     withGroupId(generateString())
   }
 
-  OutboxItemBuilder withoutGroupId() {
+  OutboxItemEntityBuilder withoutGroupId() {
     withGroupId(null)
   }
 
-  OutboxItemBuilder withRetries(Long retries) {
+  OutboxItemEntityBuilder withRetries(Long retries) {
     this.retries = retries
     this
   }
 
-  OutboxItemBuilder withNextRun(Instant nextRun) {
+  OutboxItemEntityBuilder withNextRun(Instant nextRun) {
     this.nextRun = nextRun
     this
   }
 
-  OutboxItemBuilder withLastExecution(Instant lastExecution) {
+  OutboxItemEntityBuilder withLastExecution(Instant lastExecution) {
     this.lastExecution = lastExecution
     this
   }
 
-  OutboxItemBuilder withRerunAfter(Instant rerunAfter) {
+  OutboxItemEntityBuilder withRerunAfter(Instant rerunAfter) {
     this.rerunAfter = rerunAfter
     this
   }
 
-  OutboxItemBuilder withDeleteAfter(Instant deleteAfter) {
+  OutboxItemEntityBuilder withDeleteAfter(Instant deleteAfter) {
     this.deleteAfter = deleteAfter
     this
   }
 
-  OutboxItem build() {
-    new OutboxItem(
+  OutboxItemEntity build() {
+    new OutboxItemEntity(
       id,
       type,
       status,
       payload,
+      groupId,
       retries,
       nextRun,
       lastExecution,
       rerunAfter,
-      deleteAfter,
-      groupId
+      deleteAfter
     )
   }
 }

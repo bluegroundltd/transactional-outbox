@@ -83,7 +83,6 @@ tasks.withType<JacocoReport> {
   }
 }
 
-
 tasks.detekt {
   reports {
     xml.required.set(true)
