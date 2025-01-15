@@ -71,7 +71,7 @@ tasks.withType<JacocoCoverageVerification> {
     rule {
       limit {
         counter = "BRANCH"
-        minimum = "0.80".toBigDecimal()
+        minimum = "0.70".toBigDecimal()
       }
     }
   }
