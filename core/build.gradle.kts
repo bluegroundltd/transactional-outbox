@@ -8,7 +8,7 @@ plugins {
   codenarc
   jacoco
   id("io.gitlab.arturbosch.detekt")
-  id("org.jetbrains.dokka") version "1.5.31"
+  id("org.jetbrains.dokka") version "1.9.0"
   id("com.vanniktech.maven.publish") version "0.25.2"
   id("org.jetbrains.kotlin.plugin.allopen") version "1.8.0"
 }
@@ -100,8 +100,8 @@ tasks.check.configure {
 
 apply(plugin = "com.vanniktech.maven.publish")
 
-tasks.dokkaHtml.configure {
-  outputDirectory.set(buildDir.resolve("dokka-html"))
+tasks.dokkaHtmlPartial.configure {
+  failOnWarning.set(true)
 }
 
 signing {
