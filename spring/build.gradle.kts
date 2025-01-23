@@ -11,7 +11,6 @@ plugins {
   id("org.jetbrains.dokka") version "1.9.0"
   id("org.jetbrains.kotlin.plugin.allopen") version "2.1.0"
   id("org.jetbrains.kotlin.plugin.jpa") version "2.1.0"
-  id("com.vanniktech.maven.publish") version "0.25.3"
 }
 
 repositories {
@@ -71,7 +70,7 @@ tasks.withType<JacocoCoverageVerification> {
     rule {
       limit {
         counter = "BRANCH"
-        minimum = "0.70".toBigDecimal()
+        minimum = "0.75".toBigDecimal()
       }
     }
   }
@@ -113,21 +112,6 @@ tasks.check.configure {
   dependsOn(tasks.jacocoTestCoverageVerification)
 }
 
-apply(plugin = "com.vanniktech.maven.publish")
-
 tasks.dokkaHtmlPartial.configure {
   failOnWarning.set(true)
-}
-
-signing {
-  // This is required to allow using the signing key via the CI in ASCII armored format.
-  // https://docs.gradle.org/current/userguide/signing_plugin.html#sec:in-memory-keys
-  if (!project.gradle.startParameter.taskNames.any {
-      it.contains("publishToMavenLocal") ||
-          it.contains("publishMavenPublicationToMavenLocal")
-    }) {
-    val signingKey: String? by project
-    val signingPassword: String? by project
-    useInMemoryPgpKeys(signingKey, signingPassword)
-  }
 }

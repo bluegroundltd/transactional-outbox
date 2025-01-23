@@ -3,6 +3,24 @@ description = "Transactional Outbox"
 plugins {
   kotlin("jvm")
   id("org.jetbrains.dokka") version "1.9.0"
+  id("com.vanniktech.maven.publish") version "0.25.3"
+}
+
+subprojects {
+  apply(plugin = "com.vanniktech.maven.publish")
+
+  signing {
+    // This is required to allow using the signing key via the CI in ASCII armored format.
+    // https://docs.gradle.org/current/userguide/signing_plugin.html#sec:in-memory-keys
+    if (!project.gradle.startParameter.taskNames.any {
+        it.contains("publishToMavenLocal") ||
+            it.contains("publishMavenPublicationToMavenLocal")
+      }) {
+      val signingKey: String? by project
+      val signingPassword: String? by project
+      useInMemoryPgpKeys(signingKey, signingPassword)
+    }
+  }
 }
 
 repositories {
