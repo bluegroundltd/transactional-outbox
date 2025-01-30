@@ -1,1 +1,1 @@
-sourceset_dependencies='{":core:dokkaHtml/main":[]}'
+sourceset_dependencies = '{":spring:dokkaHtmlPartial/main":[],":core:dokkaHtmlPartial/main":[]}'

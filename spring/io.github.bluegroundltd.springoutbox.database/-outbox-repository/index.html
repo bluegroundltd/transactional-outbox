@@ -1,0 +1,480 @@
+<!doctype html>
+<html class="no-js">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>OutboxRepository</title>
+<link href="../../../images/logo-icon.svg" rel="icon" type="image/svg">    <script>var pathToRoot = "../../../";</script>
+    <script>document.documentElement.classList.replace("no-js","js");</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+    if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    } else {
+        const savedDarkMode = JSON.parse(storage)
+        if(savedDarkMode === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    }
+    </script>
+<script type="text/javascript" src="https://unpkg.com/kotlin-playground@1/dist/playground.min.js" async></script>
+<script type="text/javascript" src="../../../scripts/sourceset_dependencies.js" async></script>
+<link href="../../../styles/style.css" rel="Stylesheet">
+<link href="../../../styles/main.css" rel="Stylesheet">
+<link href="../../../styles/prism.css" rel="Stylesheet">
+<link href="../../../styles/logo-styles.css" rel="Stylesheet">
+<link href="../../../styles/font-jb-sans-auto.css" rel="Stylesheet">
+<script type="text/javascript" src="../../../scripts/clipboard.js" async></script>
+<script type="text/javascript" src="../../../scripts/navigation-loader.js" async></script>
+<script type="text/javascript" src="../../../scripts/platform-content-handler.js" async></script>
+<script type="text/javascript" src="../../../scripts/main.js" defer></script>
+<script type="text/javascript" src="../../../scripts/prism.js" async></script>
+<script type="text/javascript" src="../../../scripts/symbol-parameters-wrapper_deferred.js" defer></script></head>
+<body>
+    <div class="root">
+<nav class="navigation" id="navigation-wrapper">
+    <div class="navigation--inner">
+        <div class="navigation-title">
+            <button class="menu-toggle" id="menu-toggle" type="button">toggle menu</button>
+            <div class="library-name">
+<a class="library-name--link" href="../../../index.html">
+                            Transactional Outbox
+                    </a>            </div>
+            <div class="library-version">
+            </div>
+        </div>
+        <div class="filter-section" id="filter-section">
+                <button class="platform-tag platform-selector jvm-like" data-active="" data-filter=":spring:dokkaHtmlPartial/main">jvm</button>
+        </div>
+    </div>
+    <div class="navigation-controls">
+        <button class="navigation-controls--btn navigation-controls--theme" id="theme-toggle-button" type="button">switch theme</button>
+        <div class="navigation-controls--btn navigation-controls--search" id="searchBar" role="button">search in API</div>
+    </div>
+</nav>
+        <div id="container">
+            <div class="sidebar" id="leftColumn">
+                <div class="sidebar--inner" id="sideMenu"></div>
+            </div>
+            <div id="main">
+<div class="main-content" data-page-type="classlike" id="content" pageids="spring::io.github.bluegroundltd.springoutbox.database/OutboxRepository///PointingToDeclaration//-135221541">
+  <div class="breadcrumbs"><a href="../../index.html">spring</a><span class="delimiter">/</span><a href="../index.html">io.github.bluegroundltd.springoutbox.database</a><span class="delimiter">/</span><span class="current">OutboxRepository</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span>Outbox</span><wbr><span><span>Repository</span></span></h1>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":spring:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">interface </span><a href="index.html">OutboxRepository</a> : <span data-unresolved-link="org.springframework.data.jpa.repository/JpaRepository///PointingToDeclaration/">JpaRepository</span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../-outbox-item-entity/index.html">OutboxItemEntity</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token operator">&gt; </span></div></div></div>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button></div>
+    <div class="tabs-section-body">
+      <div data-togglable="FUNCTION">
+        <h2 class="">Functions</h2>
+        <div class="table"><a data-name="-683872837%2FFunctions%2F-135221541" anchor-label="count" id="-683872837%2FFunctions%2F-135221541" data-filterable-set=":spring:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-filterable-current=":spring:dokkaHtmlPartial/main" data-filterable-set=":spring:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#-1347258675%2FFunctions%2F-135221541"><span><span>count</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-683872837%2FFunctions%2F-135221541"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":spring:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="index.html#-1347258675%2FFunctions%2F-135221541"><span class="token function">count</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-long/index.html">Long</a></div><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword"></span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="index.html#189219166%2FFunctions%2F-135221541">S</a><span class="token operator"> : </span><a href="../-outbox-item-entity/index.html">OutboxItemEntity</a><span class="token operator">&gt; </span><a href="index.html#189219166%2FFunctions%2F-135221541"><span class="token function">count</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">example<span class="token operator">: </span><span data-unresolved-link="org.springframework.data.domain/Example///PointingToDeclaration/">Example</span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="index.html#189219166%2FFunctions%2F-135221541">S</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-long/index.html">Long</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1832016645%2FFunctions%2F-135221541" anchor-label="delete" id="-1832016645%2FFunctions%2F-135221541" data-filterable-set=":spring:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-filterable-current=":spring:dokkaHtmlPartial/main" data-filterable-set=":spring:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#-1832016645%2FFunctions%2F-135221541"><span><span>delete</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1832016645%2FFunctions%2F-135221541"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":spring:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="index.html#-1832016645%2FFunctions%2F-135221541"><span class="token function">delete</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">entity<span class="token operator">: </span><a href="../-outbox-item-entity/index.html">OutboxItemEntity</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="640241200%2FFunctions%2F-135221541" anchor-label="deleteAll" id="640241200%2FFunctions%2F-135221541" data-filterable-set=":spring:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-filterable-current=":spring:dokkaHtmlPartial/main" data-filterable-set=":spring:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#87931462%2FFunctions%2F-135221541"><span>delete</span><wbr><span><span>All</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="640241200%2FFunctions%2F-135221541"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":spring:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="index.html#87931462%2FFunctions%2F-135221541"><span class="token function">deleteAll</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="index.html#653782442%2FFunctions%2F-135221541"><span class="token function">deleteAll</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">entities<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin.collections/-mutable-iterable/index.html">MutableIterable</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../-outbox-item-entity/index.html">OutboxItemEntity</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="522801037%2FFunctions%2F-135221541" anchor-label="deleteAllByDeleteAfterLessThanEqual" id="522801037%2FFunctions%2F-135221541" data-filterable-set=":spring:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-filterable-current=":spring:dokkaHtmlPartial/main" data-filterable-set=":spring:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="delete-all-by-delete-after-less-than-equal.html"><span>delete</span><wbr><span>All</span><wbr><span>By</span><wbr><span>Delete</span><wbr><span>After</span><wbr><span>Less</span><wbr><span>Than</span><wbr><span><span>Equal</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="522801037%2FFunctions%2F-135221541"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":spring:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="delete-all-by-delete-after-less-than-equal.html"><span class="token function">deleteAllByDeleteAfterLessThanEqual</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">referenceTimestamp<span class="token operator">: </span><a href="https://docs.oracle.com/javase/8/docs/api/java/time/Instant.html">Instant</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="897308593%2FFunctions%2F-135221541" anchor-label="deleteAllById" id="897308593%2FFunctions%2F-135221541" data-filterable-set=":spring:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-filterable-current=":spring:dokkaHtmlPartial/main" data-filterable-set=":spring:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#897308593%2FFunctions%2F-135221541"><span>delete</span><wbr><span>All</span><wbr><span>By</span><wbr><span><span>Id</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="897308593%2FFunctions%2F-135221541"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":spring:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="index.html#897308593%2FFunctions%2F-135221541"><span class="token function">deleteAllById</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">ids<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin.collections/-mutable-iterable/index.html">MutableIterable</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1220015476%2FFunctions%2F-135221541" anchor-label="deleteAllByIdInBatch" id="1220015476%2FFunctions%2F-135221541" data-filterable-set=":spring:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-filterable-current=":spring:dokkaHtmlPartial/main" data-filterable-set=":spring:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#1220015476%2FFunctions%2F-135221541"><span>delete</span><wbr><span>All</span><wbr><span>By</span><wbr><span>Id</span><wbr><span>In</span><wbr><span><span>Batch</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1220015476%2FFunctions%2F-135221541"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":spring:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="index.html#1220015476%2FFunctions%2F-135221541"><span class="token function">deleteAllByIdInBatch</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">ids<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin.collections/-mutable-iterable/index.html">MutableIterable</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="869499344%2FFunctions%2F-135221541" anchor-label="deleteAllInBatch" id="869499344%2FFunctions%2F-135221541" data-filterable-set=":spring:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-filterable-current=":spring:dokkaHtmlPartial/main" data-filterable-set=":spring:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#615142975%2FFunctions%2F-135221541"><span>delete</span><wbr><span>All</span><wbr><span>In</span><wbr><span><span>Batch</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="869499344%2FFunctions%2F-135221541"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":spring:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="index.html#615142975%2FFunctions%2F-135221541"><span class="token function">deleteAllInBatch</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="index.html#-1371143325%2FFunctions%2F-135221541"><span class="token function">deleteAllInBatch</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">entities<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin.collections/-mutable-iterable/index.html">MutableIterable</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../-outbox-item-entity/index.html">OutboxItemEntity</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1865927624%2FFunctions%2F-135221541" anchor-label="deleteById" id="-1865927624%2FFunctions%2F-135221541" data-filterable-set=":spring:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-filterable-current=":spring:dokkaHtmlPartial/main" data-filterable-set=":spring:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#-1865927624%2FFunctions%2F-135221541"><span>delete</span><wbr><span>By</span><wbr><span><span>Id</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1865927624%2FFunctions%2F-135221541"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":spring:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="index.html#-1865927624%2FFunctions%2F-135221541"><span class="token function">deleteById</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">id<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-long/index.html">Long</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1319024586%2FFunctions%2F-135221541" anchor-label="deleteInBatch" id="-1319024586%2FFunctions%2F-135221541" data-filterable-set=":spring:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-filterable-current=":spring:dokkaHtmlPartial/main" data-filterable-set=":spring:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#-1319024586%2FFunctions%2F-135221541"><span>delete</span><wbr><span>In</span><wbr><span><span>Batch</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1319024586%2FFunctions%2F-135221541"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":spring:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="index.html#-1319024586%2FFunctions%2F-135221541"><span class="token function"><strike>deleteInBatch</strike></span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">entities<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin.collections/-mutable-iterable/index.html">MutableIterable</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../-outbox-item-entity/index.html">OutboxItemEntity</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="169996753%2FFunctions%2F-135221541" anchor-label="exists" id="169996753%2FFunctions%2F-135221541" data-filterable-set=":spring:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-filterable-current=":spring:dokkaHtmlPartial/main" data-filterable-set=":spring:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#169996753%2FFunctions%2F-135221541"><span><span>exists</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="169996753%2FFunctions%2F-135221541"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":spring:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword"></span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="index.html#169996753%2FFunctions%2F-135221541">S</a><span class="token operator"> : </span><a href="../-outbox-item-entity/index.html">OutboxItemEntity</a><span class="token operator">&gt; </span><a href="index.html#169996753%2FFunctions%2F-135221541"><span class="token function">exists</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">example<span class="token operator">: </span><span data-unresolved-link="org.springframework.data.domain/Example///PointingToDeclaration/">Example</span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="index.html#169996753%2FFunctions%2F-135221541">S</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1245749783%2FFunctions%2F-135221541" anchor-label="existsById" id="-1245749783%2FFunctions%2F-135221541" data-filterable-set=":spring:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-filterable-current=":spring:dokkaHtmlPartial/main" data-filterable-set=":spring:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#-1245749783%2FFunctions%2F-135221541"><span>exists</span><wbr><span>By</span><wbr><span><span>Id</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1245749783%2FFunctions%2F-135221541"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":spring:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="index.html#-1245749783%2FFunctions%2F-135221541"><span class="token function">existsById</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">id<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-long/index.html">Long</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="116807685%2FFunctions%2F-135221541" anchor-label="findAll" id="116807685%2FFunctions%2F-135221541" data-filterable-set=":spring:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-filterable-current=":spring:dokkaHtmlPartial/main" data-filterable-set=":spring:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#-809306725%2FFunctions%2F-135221541"><span>find</span><wbr><span><span>All</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="116807685%2FFunctions%2F-135221541"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":spring:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">override </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="index.html#-809306725%2FFunctions%2F-135221541">S</a><span class="token operator"> : </span><a href="../-outbox-item-entity/index.html">OutboxItemEntity</a><span class="token operator">&gt; </span><a href="index.html#-809306725%2FFunctions%2F-135221541"><span class="token function">findAll</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">example<span class="token operator">: </span><span data-unresolved-link="org.springframework.data.domain/Example///PointingToDeclaration/">Example</span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="index.html#-809306725%2FFunctions%2F-135221541">S</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin.collections/-mutable-list/index.html">MutableList</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="index.html#-809306725%2FFunctions%2F-135221541">S</a><span class="token operator">&gt;</span></div><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">override </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="index.html#716811897%2FFunctions%2F-135221541">S</a><span class="token operator"> : </span><a href="../-outbox-item-entity/index.html">OutboxItemEntity</a><span class="token operator">&gt; </span><a href="index.html#716811897%2FFunctions%2F-135221541"><span class="token function">findAll</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">example<span class="token operator">: </span><span data-unresolved-link="org.springframework.data.domain/Example///PointingToDeclaration/">Example</span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="index.html#716811897%2FFunctions%2F-135221541">S</a><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter ">sort<span class="token operator">: </span><span data-unresolved-link="org.springframework.data.domain/Sort///PointingToDeclaration/">Sort</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin.collections/-mutable-list/index.html">MutableList</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="index.html#716811897%2FFunctions%2F-135221541">S</a><span class="token operator">&gt;</span></div><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="index.html#-1853947754%2FFunctions%2F-135221541"><span class="token function">findAll</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin.collections/-mutable-list/index.html">MutableList</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../-outbox-item-entity/index.html">OutboxItemEntity</a><span class="token operator">&gt;</span></div><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="index.html#-1438780336%2FFunctions%2F-135221541"><span class="token function">findAll</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">sort<span class="token operator">: </span><span data-unresolved-link="org.springframework.data.domain/Sort///PointingToDeclaration/">Sort</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin.collections/-mutable-list/index.html">MutableList</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../-outbox-item-entity/index.html">OutboxItemEntity</a><span class="token operator">&gt;</span></div><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="index.html#-504942557%2FFunctions%2F-135221541"><span class="token function">findAll</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">pageable<span class="token operator">: </span><span data-unresolved-link="org.springframework.data.domain/Pageable///PointingToDeclaration/">Pageable</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="org.springframework.data.domain/Page///PointingToDeclaration/">Page</span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../-outbox-item-entity/index.html">OutboxItemEntity</a><span class="token operator">&gt;</span></div><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword"></span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="index.html#1886565810%2FFunctions%2F-135221541">S</a><span class="token operator"> : </span><a href="../-outbox-item-entity/index.html">OutboxItemEntity</a><span class="token operator">&gt; </span><a href="index.html#1886565810%2FFunctions%2F-135221541"><span class="token function">findAll</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">example<span class="token operator">: </span><span data-unresolved-link="org.springframework.data.domain/Example///PointingToDeclaration/">Example</span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="index.html#1886565810%2FFunctions%2F-135221541">S</a><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter ">pageable<span class="token operator">: </span><span data-unresolved-link="org.springframework.data.domain/Pageable///PointingToDeclaration/">Pageable</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="org.springframework.data.domain/Page///PointingToDeclaration/">Page</span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="index.html#1886565810%2FFunctions%2F-135221541">S</a><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="491701789%2FFunctions%2F-135221541" anchor-label="findAllByGroupIdInAndStatusNot" id="491701789%2FFunctions%2F-135221541" data-filterable-set=":spring:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-filterable-current=":spring:dokkaHtmlPartial/main" data-filterable-set=":spring:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="find-all-by-group-id-in-and-status-not.html"><span>find</span><wbr><span>All</span><wbr><span>By</span><wbr><span>Group</span><wbr><span>Id</span><wbr><span>In</span><wbr><span>And</span><wbr><span>Status</span><wbr><span><span>Not</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="491701789%2FFunctions%2F-135221541"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":spring:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="find-all-by-group-id-in-and-status-not.html"><span class="token function">findAllByGroupIdInAndStatusNot</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">groupIds<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin.collections/-set/index.html">Set</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter ">status<span class="token operator">: </span><a href="../../../core/io.github.bluegroundltd.outbox.item/-outbox-status/index.html">OutboxStatus</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../-outbox-item-entity/index.html">OutboxItemEntity</a><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-377417887%2FFunctions%2F-135221541" anchor-label="findAllById" id="-377417887%2FFunctions%2F-135221541" data-filterable-set=":spring:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-filterable-current=":spring:dokkaHtmlPartial/main" data-filterable-set=":spring:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#-377417887%2FFunctions%2F-135221541"><span>find</span><wbr><span>All</span><wbr><span>By</span><wbr><span><span>Id</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-377417887%2FFunctions%2F-135221541"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":spring:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="index.html#-377417887%2FFunctions%2F-135221541"><span class="token function">findAllById</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">ids<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin.collections/-mutable-iterable/index.html">MutableIterable</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin.collections/-mutable-list/index.html">MutableList</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../-outbox-item-entity/index.html">OutboxItemEntity</a><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-308302%2FFunctions%2F-135221541" anchor-label="findBy" id="-308302%2FFunctions%2F-135221541" data-filterable-set=":spring:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-filterable-current=":spring:dokkaHtmlPartial/main" data-filterable-set=":spring:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#-308302%2FFunctions%2F-135221541"><span>find</span><wbr><span><span>By</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-308302%2FFunctions%2F-135221541"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":spring:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword"></span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="index.html#-308302%2FFunctions%2F-135221541">S</a><span class="token operator"> : </span><a href="../-outbox-item-entity/index.html">OutboxItemEntity</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="index.html#-308302%2FFunctions%2F-135221541">R</a><span class="token operator"> : </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-any/index.html">Any</a><span class="token operator">&gt; </span><a href="index.html#-308302%2FFunctions%2F-135221541"><span class="token function">findBy</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">example<span class="token operator">: </span><span data-unresolved-link="org.springframework.data.domain/Example///PointingToDeclaration/">Example</span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="index.html#-308302%2FFunctions%2F-135221541">S</a><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter ">queryFunction<span class="token operator">: </span><a href="https://docs.oracle.com/javase/8/docs/api/java/util/function/Function.html">Function</a><span class="token operator">&lt;</span><span class="token keyword"></span><span data-unresolved-link="org.springframework.data.repository.query/FluentQuery.FetchableFluentQuery///PointingToDeclaration/">FluentQuery.FetchableFluentQuery</span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="index.html#-308302%2FFunctions%2F-135221541">S</a><span class="token operator">&gt;</span><span class="token punctuation">, </span><span class="token keyword"></span><a href="index.html#-308302%2FFunctions%2F-135221541">R</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html#-308302%2FFunctions%2F-135221541">R</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1559454340%2FFunctions%2F-135221541" anchor-label="findByFilter" id="1559454340%2FFunctions%2F-135221541" data-filterable-set=":spring:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-filterable-current=":spring:dokkaHtmlPartial/main" data-filterable-set=":spring:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="find-by-filter.html"><span>find</span><wbr><span>By</span><wbr><span><span>Filter</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1559454340%2FFunctions%2F-135221541"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":spring:dokkaHtmlPartial/main"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="org.springframework.data.jpa.repository/Query///PointingToDeclaration/"><span class="token annotation builtin">Query</span></span><span class="token punctuation">(</span><span>value<span class="token operator"> = </span><span class="breakable-word"><span class="token string">"
+      select * from outbox_item where
+      (status = :pendingStatus and next_run &lt; :nextRunLessThan)
+      or
+      (status = :runningStatus and rerun_after &lt; :rerunAfterLessThan)
+    "</span></span><span class="token punctuation">, </span></span><wbr><span>nativeQuery<span class="token operator"> = </span><span class="breakable-word"><span class="token boolean">true</span></span></span><wbr><span class="token punctuation">)</span></div></div><span class="token keyword">abstract </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="find-by-filter.html"><span class="token function">findByFilter</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">pendingStatus<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">nextRunLessThan<span class="token operator">: </span><a href="https://docs.oracle.com/javase/8/docs/api/java/time/Instant.html">Instant</a><span class="token punctuation">, </span></span><span class="parameter ">runningStatus<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">rerunAfterLessThan<span class="token operator">: </span><a href="https://docs.oracle.com/javase/8/docs/api/java/time/Instant.html">Instant</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../-outbox-item-entity/index.html">OutboxItemEntity</a><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1293284809%2FFunctions%2F-135221541" anchor-label="findById" id="1293284809%2FFunctions%2F-135221541" data-filterable-set=":spring:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-filterable-current=":spring:dokkaHtmlPartial/main" data-filterable-set=":spring:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="find-by-id.html"><span>find</span><wbr><span>By</span><wbr><span><span>Id</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1293284809%2FFunctions%2F-135221541"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":spring:dokkaHtmlPartial/main"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="org.springframework.data.jpa.repository/Lock///PointingToDeclaration/"><span class="token annotation builtin">Lock</span></span><span class="token punctuation">(</span><span>value<span class="token operator"> = </span><span data-unresolved-link="jakarta.persistence/LockModeType.PESSIMISTIC_WRITE///PointingToDeclaration/">LockModeType.PESSIMISTIC_WRITE</span></span><wbr><span class="token punctuation">)</span></div><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="org.springframework.data.jpa.repository/QueryHints///PointingToDeclaration/"><span class="token annotation builtin">QueryHints</span></span><span class="token punctuation">(</span><span>value<span class="token operator"> = </span><span class="token punctuation">[</span><span><span data-unresolved-link="jakarta.persistence/QueryHint///PointingToDeclaration/">QueryHint</span><span class="token punctuation">(</span><span>value<span class="token operator"> = </span><span class="breakable-word"><span class="token string">"100"</span></span><span class="token punctuation">, </span></span><wbr><span>name<span class="token operator"> = </span><span class="breakable-word"><span class="token string">"jakarta.persistence.lock.timeout"</span></span></span><wbr><span class="token punctuation">)</span></span><wbr><span class="token punctuation">]</span></span><wbr><span class="token punctuation">)</span></div></div><span class="token keyword">abstract </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="find-by-id.html"><span class="token function">findById</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">id<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-long/index.html">Long</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://docs.oracle.com/javase/8/docs/api/java/util/Optional.html">Optional</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../-outbox-item-entity/index.html">OutboxItemEntity</a><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1000006652%2FFunctions%2F-135221541" anchor-label="findOne" id="1000006652%2FFunctions%2F-135221541" data-filterable-set=":spring:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-filterable-current=":spring:dokkaHtmlPartial/main" data-filterable-set=":spring:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#1000006652%2FFunctions%2F-135221541"><span>find</span><wbr><span><span>One</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1000006652%2FFunctions%2F-135221541"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":spring:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword"></span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="index.html#1000006652%2FFunctions%2F-135221541">S</a><span class="token operator"> : </span><a href="../-outbox-item-entity/index.html">OutboxItemEntity</a><span class="token operator">&gt; </span><a href="index.html#1000006652%2FFunctions%2F-135221541"><span class="token function">findOne</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">example<span class="token operator">: </span><span data-unresolved-link="org.springframework.data.domain/Example///PointingToDeclaration/">Example</span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="index.html#1000006652%2FFunctions%2F-135221541">S</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://docs.oracle.com/javase/8/docs/api/java/util/Optional.html">Optional</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="index.html#1000006652%2FFunctions%2F-135221541">S</a><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="2029040120%2FFunctions%2F-135221541" anchor-label="flush" id="2029040120%2FFunctions%2F-135221541" data-filterable-set=":spring:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-filterable-current=":spring:dokkaHtmlPartial/main" data-filterable-set=":spring:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#2029040120%2FFunctions%2F-135221541"><span><span>flush</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="2029040120%2FFunctions%2F-135221541"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":spring:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="index.html#2029040120%2FFunctions%2F-135221541"><span class="token function">flush</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1816232261%2FFunctions%2F-135221541" anchor-label="getById" id="1816232261%2FFunctions%2F-135221541" data-filterable-set=":spring:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-filterable-current=":spring:dokkaHtmlPartial/main" data-filterable-set=":spring:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#1816232261%2FFunctions%2F-135221541"><span>get</span><wbr><span>By</span><wbr><span><span>Id</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1816232261%2FFunctions%2F-135221541"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":spring:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="index.html#1816232261%2FFunctions%2F-135221541"><span class="token function"><strike>getById</strike></span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">id<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-long/index.html">Long</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../-outbox-item-entity/index.html">OutboxItemEntity</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-44634933%2FFunctions%2F-135221541" anchor-label="getOne" id="-44634933%2FFunctions%2F-135221541" data-filterable-set=":spring:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-filterable-current=":spring:dokkaHtmlPartial/main" data-filterable-set=":spring:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#-44634933%2FFunctions%2F-135221541"><span>get</span><wbr><span><span>One</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-44634933%2FFunctions%2F-135221541"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":spring:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="index.html#-44634933%2FFunctions%2F-135221541"><span class="token function"><strike>getOne</strike></span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">id<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-long/index.html">Long</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../-outbox-item-entity/index.html">OutboxItemEntity</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-467478174%2FFunctions%2F-135221541" anchor-label="getReferenceById" id="-467478174%2FFunctions%2F-135221541" data-filterable-set=":spring:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-filterable-current=":spring:dokkaHtmlPartial/main" data-filterable-set=":spring:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#-467478174%2FFunctions%2F-135221541"><span>get</span><wbr><span>Reference</span><wbr><span>By</span><wbr><span><span>Id</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-467478174%2FFunctions%2F-135221541"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":spring:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="index.html#-467478174%2FFunctions%2F-135221541"><span class="token function">getReferenceById</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">id<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-long/index.html">Long</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../-outbox-item-entity/index.html">OutboxItemEntity</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-795375659%2FFunctions%2F-135221541" anchor-label="save" id="-795375659%2FFunctions%2F-135221541" data-filterable-set=":spring:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-filterable-current=":spring:dokkaHtmlPartial/main" data-filterable-set=":spring:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#-795375659%2FFunctions%2F-135221541"><span><span>save</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-795375659%2FFunctions%2F-135221541"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":spring:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword"></span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="index.html#-795375659%2FFunctions%2F-135221541">S</a><span class="token operator"> : </span><a href="../-outbox-item-entity/index.html">OutboxItemEntity</a><span class="token operator">&gt; </span><a href="index.html#-795375659%2FFunctions%2F-135221541"><span class="token function">save</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">entity<span class="token operator">: </span><a href="index.html#-795375659%2FFunctions%2F-135221541">S</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html#-795375659%2FFunctions%2F-135221541">S</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1113962130%2FFunctions%2F-135221541" anchor-label="saveAll" id="1113962130%2FFunctions%2F-135221541" data-filterable-set=":spring:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-filterable-current=":spring:dokkaHtmlPartial/main" data-filterable-set=":spring:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#1113962130%2FFunctions%2F-135221541"><span>save</span><wbr><span><span>All</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1113962130%2FFunctions%2F-135221541"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":spring:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">override </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="index.html#1113962130%2FFunctions%2F-135221541">S</a><span class="token operator"> : </span><a href="../-outbox-item-entity/index.html">OutboxItemEntity</a><span class="token operator">&gt; </span><a href="index.html#1113962130%2FFunctions%2F-135221541"><span class="token function">saveAll</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">entities<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin.collections/-mutable-iterable/index.html">MutableIterable</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="index.html#1113962130%2FFunctions%2F-135221541">S</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin.collections/-mutable-list/index.html">MutableList</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="index.html#1113962130%2FFunctions%2F-135221541">S</a><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1727731171%2FFunctions%2F-135221541" anchor-label="saveAllAndFlush" id="1727731171%2FFunctions%2F-135221541" data-filterable-set=":spring:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-filterable-current=":spring:dokkaHtmlPartial/main" data-filterable-set=":spring:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#1727731171%2FFunctions%2F-135221541"><span>save</span><wbr><span>All</span><wbr><span>And</span><wbr><span><span>Flush</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1727731171%2FFunctions%2F-135221541"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":spring:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword"></span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="index.html#1727731171%2FFunctions%2F-135221541">S</a><span class="token operator"> : </span><a href="../-outbox-item-entity/index.html">OutboxItemEntity</a><span class="token operator">&gt; </span><a href="index.html#1727731171%2FFunctions%2F-135221541"><span class="token function">saveAllAndFlush</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">entities<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin.collections/-mutable-iterable/index.html">MutableIterable</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="index.html#1727731171%2FFunctions%2F-135221541">S</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin.collections/-mutable-list/index.html">MutableList</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="index.html#1727731171%2FFunctions%2F-135221541">S</a><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-10515800%2FFunctions%2F-135221541" anchor-label="saveAndFlush" id="-10515800%2FFunctions%2F-135221541" data-filterable-set=":spring:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-filterable-current=":spring:dokkaHtmlPartial/main" data-filterable-set=":spring:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#-10515800%2FFunctions%2F-135221541"><span>save</span><wbr><span>And</span><wbr><span><span>Flush</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-10515800%2FFunctions%2F-135221541"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":spring:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword"></span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="index.html#-10515800%2FFunctions%2F-135221541">S</a><span class="token operator"> : </span><a href="../-outbox-item-entity/index.html">OutboxItemEntity</a><span class="token operator">&gt; </span><a href="index.html#-10515800%2FFunctions%2F-135221541"><span class="token function">saveAndFlush</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">entity<span class="token operator">: </span><a href="index.html#-10515800%2FFunctions%2F-135221541">S</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html#-10515800%2FFunctions%2F-135221541">S</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      <div class="footer">
+        <span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>© 2025 Copyright</span><span class="pull-right"><span>Generated by </span><a href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span>
+      </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+

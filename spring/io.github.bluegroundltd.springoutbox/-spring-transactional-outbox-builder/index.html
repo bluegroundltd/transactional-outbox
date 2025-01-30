@@ -1,0 +1,164 @@
+<!doctype html>
+<html class="no-js">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>SpringTransactionalOutboxBuilder</title>
+<link href="../../../images/logo-icon.svg" rel="icon" type="image/svg">    <script>var pathToRoot = "../../../";</script>
+    <script>document.documentElement.classList.replace("no-js","js");</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+    if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    } else {
+        const savedDarkMode = JSON.parse(storage)
+        if(savedDarkMode === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    }
+    </script>
+<script type="text/javascript" src="https://unpkg.com/kotlin-playground@1/dist/playground.min.js" async></script>
+<script type="text/javascript" src="../../../scripts/sourceset_dependencies.js" async></script>
+<link href="../../../styles/style.css" rel="Stylesheet">
+<link href="../../../styles/main.css" rel="Stylesheet">
+<link href="../../../styles/prism.css" rel="Stylesheet">
+<link href="../../../styles/logo-styles.css" rel="Stylesheet">
+<link href="../../../styles/font-jb-sans-auto.css" rel="Stylesheet">
+<script type="text/javascript" src="../../../scripts/clipboard.js" async></script>
+<script type="text/javascript" src="../../../scripts/navigation-loader.js" async></script>
+<script type="text/javascript" src="../../../scripts/platform-content-handler.js" async></script>
+<script type="text/javascript" src="../../../scripts/main.js" defer></script>
+<script type="text/javascript" src="../../../scripts/prism.js" async></script>
+<script type="text/javascript" src="../../../scripts/symbol-parameters-wrapper_deferred.js" defer></script></head>
+<body>
+    <div class="root">
+<nav class="navigation" id="navigation-wrapper">
+    <div class="navigation--inner">
+        <div class="navigation-title">
+            <button class="menu-toggle" id="menu-toggle" type="button">toggle menu</button>
+            <div class="library-name">
+<a class="library-name--link" href="../../../index.html">
+                            Transactional Outbox
+                    </a>            </div>
+            <div class="library-version">
+            </div>
+        </div>
+        <div class="filter-section" id="filter-section">
+                <button class="platform-tag platform-selector jvm-like" data-active="" data-filter=":spring:dokkaHtmlPartial/main">jvm</button>
+        </div>
+    </div>
+    <div class="navigation-controls">
+        <button class="navigation-controls--btn navigation-controls--theme" id="theme-toggle-button" type="button">switch theme</button>
+        <div class="navigation-controls--btn navigation-controls--search" id="searchBar" role="button">search in API</div>
+    </div>
+</nav>
+        <div id="container">
+            <div class="sidebar" id="leftColumn">
+                <div class="sidebar--inner" id="sideMenu"></div>
+            </div>
+            <div id="main">
+<div class="main-content" data-page-type="classlike" id="content" pageids="spring::io.github.bluegroundltd.springoutbox/SpringTransactionalOutboxBuilder///PointingToDeclaration//-135221541">
+  <div class="breadcrumbs"><a href="../../index.html">spring</a><span class="delimiter">/</span><a href="../index.html">io.github.bluegroundltd.springoutbox</a><span class="delimiter">/</span><span class="current">SpringTransactionalOutboxBuilder</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span>Spring</span><wbr><span>Transactional</span><wbr><span>Outbox</span><wbr><span><span>Builder</span></span></h1>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":spring:dokkaHtmlPartial/main"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="org.springframework.stereotype/Component///PointingToDeclaration/"><span class="token annotation builtin">Component</span></span></div></div><span class="token keyword">class </span><a href="index.html">SpringTransactionalOutboxBuilder</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">postgresLockDao<span class="token operator">: </span><a href="../../io.github.bluegroundltd.springoutbox.postgreslock/-postgres-lock-dao/index.html">PostgresLockDao</a><span class="token punctuation">, </span></span><span class="parameter ">outboxStore<span class="token operator">: </span><a href="../../../core/io.github.bluegroundltd.outbox.store/-outbox-store/index.html">OutboxStore</a><span class="token punctuation">, </span></span><span class="parameter ">instantOutboxPublisher<span class="token operator">: </span><a href="../../../core/io.github.bluegroundltd.outbox.event/-instant-outbox-publisher/index.html">InstantOutboxPublisher</a></span></span><span class="token punctuation">)</span> : <a href="../-spring-outbox-clock-step/index.html">SpringOutboxClockStep</a>, <a href="../-spring-outbox-handlers-step/index.html">SpringOutboxHandlersStep</a>, <a href="../-spring-monitor-locks-identifier-step/index.html">SpringMonitorLocksIdentifierStep</a>, <a href="../-spring-cleanup-locks-identifier-step/index.html">SpringCleanupLocksIdentifierStep</a></div><p class="paragraph">Builder for <a href="../../../core/io.github.bluegroundltd.outbox/-transactional-outbox/index.html">TransactionalOutbox</a>.</p><p class="paragraph">Example on Spring Boot:</p><div class="sample-container"><pre><code class="block lang- kotlin" theme="idea">fun transactionalOutbox(<br>  private val springOutboxBuilder: SpringTransactionalOutboxBuilder,<br>): TransactionalOutbox {<br>  return springOutboxBuilder<br>    .withClock(clock)<br>    .withHandlers(outboxHandlers)<br>    .withMonitorLocksIdentifier(monitorLocksIdentifier)<br>    .withCleanupLocksIdentifier(cleanupLocksIdentifier)<br>    .withThreadPoolSize(threadPoolSize)<br>    .withThreadPriority(threadPriority)<br>    .withThreadPoolTimeOut(threadPoolTimeOut)<br>    .addProcessorDecorator(outboxItemProcessorDecorator)<br>    .withGroupIdProvider(outboxGroupIdProvider)<br>    .withGroupingConfiguration(outboxGroupingConfiguration)<br>    .build()<br>}</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button></div>
+    <div class="tabs-section-body">
+      <div data-togglable="CONSTRUCTOR">
+        <h2 class="">Constructors</h2>
+        <div class="table"><a data-name="-1710221274%2FConstructors%2F-135221541" anchor-label="SpringTransactionalOutboxBuilder" id="-1710221274%2FConstructors%2F-135221541" data-filterable-set=":spring:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-togglable="CONSTRUCTOR" data-filterable-current=":spring:dokkaHtmlPartial/main" data-filterable-set=":spring:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-spring-transactional-outbox-builder.html"><span>Spring</span><wbr><span>Transactional</span><wbr><span>Outbox</span><wbr><span><span>Builder</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1710221274%2FConstructors%2F-135221541"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":spring:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">constructor</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">postgresLockDao<span class="token operator">: </span><a href="../../io.github.bluegroundltd.springoutbox.postgreslock/-postgres-lock-dao/index.html">PostgresLockDao</a><span class="token punctuation">, </span></span><span class="parameter ">outboxStore<span class="token operator">: </span><a href="../../../core/io.github.bluegroundltd.outbox.store/-outbox-store/index.html">OutboxStore</a><span class="token punctuation">, </span></span><span class="parameter ">instantOutboxPublisher<span class="token operator">: </span><a href="../../../core/io.github.bluegroundltd.outbox.event/-instant-outbox-publisher/index.html">InstantOutboxPublisher</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="FUNCTION">
+        <h2 class="">Functions</h2>
+        <div class="table"><a data-name="1402055501%2FFunctions%2F-135221541" anchor-label="withCleanupLocksIdentifier" id="1402055501%2FFunctions%2F-135221541" data-filterable-set=":spring:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-filterable-current=":spring:dokkaHtmlPartial/main" data-filterable-set=":spring:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="with-cleanup-locks-identifier.html"><span>with</span><wbr><span>Cleanup</span><wbr><span>Locks</span><wbr><span><span>Identifier</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1402055501%2FFunctions%2F-135221541"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":spring:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="with-cleanup-locks-identifier.html"><span class="token function">withCleanupLocksIdentifier</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">locksIdentifier<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-long/index.html">Long</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../../core/io.github.bluegroundltd.outbox/-build-step/index.html">BuildStep</a></div><div class="brief "><p class="paragraph">Sets the locks identifier for the outbox cleanup runs.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1889441590%2FFunctions%2F-135221541" anchor-label="withClock" id="1889441590%2FFunctions%2F-135221541" data-filterable-set=":spring:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-filterable-current=":spring:dokkaHtmlPartial/main" data-filterable-set=":spring:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="with-clock.html"><span>with</span><wbr><span><span>Clock</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1889441590%2FFunctions%2F-135221541"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":spring:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="with-clock.html"><span class="token function">withClock</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">clock<span class="token operator">: </span><a href="https://docs.oracle.com/javase/8/docs/api/java/time/Clock.html">Clock</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../-spring-outbox-handlers-step/index.html">SpringOutboxHandlersStep</a></div><div class="brief "><p class="paragraph">Sets the clock for the outbox.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-607465308%2FFunctions%2F-135221541" anchor-label="withHandlers" id="-607465308%2FFunctions%2F-135221541" data-filterable-set=":spring:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-filterable-current=":spring:dokkaHtmlPartial/main" data-filterable-set=":spring:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="with-handlers.html"><span>with</span><wbr><span><span>Handlers</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-607465308%2FFunctions%2F-135221541"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":spring:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="with-handlers.html"><span class="token function">withHandlers</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">handlers<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin.collections/-set/index.html">Set</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../../../core/io.github.bluegroundltd.outbox/-outbox-handler/index.html">OutboxHandler</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../-spring-monitor-locks-identifier-step/index.html">SpringMonitorLocksIdentifierStep</a></div><div class="brief "><p class="paragraph">Sets the handlers for the outbox.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1142047959%2FFunctions%2F-135221541" anchor-label="withMonitorLocksIdentifier" id="1142047959%2FFunctions%2F-135221541" data-filterable-set=":spring:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-filterable-current=":spring:dokkaHtmlPartial/main" data-filterable-set=":spring:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="with-monitor-locks-identifier.html"><span>with</span><wbr><span>Monitor</span><wbr><span>Locks</span><wbr><span><span>Identifier</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1142047959%2FFunctions%2F-135221541"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":spring:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="with-monitor-locks-identifier.html"><span class="token function">withMonitorLocksIdentifier</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">locksIdentifier<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-long/index.html">Long</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../-spring-cleanup-locks-identifier-step/index.html">SpringCleanupLocksIdentifierStep</a></div><div class="brief "><p class="paragraph">Sets the locks identifier for the outbox monitor runs.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      <div class="footer">
+        <span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>© 2025 Copyright</span><span class="pull-right"><span>Generated by </span><a href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span>
+      </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+

@@ -1,0 +1,17 @@
+$dokka.format:html-v1
+$dokka.linkExtension:html
+
+module:core
+io.github.bluegroundltd.outbox
+io.github.bluegroundltd.outbox.annotation
+io.github.bluegroundltd.outbox.event
+io.github.bluegroundltd.outbox.grouping
+io.github.bluegroundltd.outbox.item
+io.github.bluegroundltd.outbox.processing
+io.github.bluegroundltd.outbox.store
+module:spring
+io.github.bluegroundltd.springoutbox
+io.github.bluegroundltd.springoutbox.converter
+io.github.bluegroundltd.springoutbox.database
+io.github.bluegroundltd.springoutbox.event
+io.github.bluegroundltd.springoutbox.postgreslock
