@@ -10,11 +10,17 @@ API Docs: https://bluegroundltd.github.io/transactional-outbox/spring/index.html
 - [Installation](#installation)
 - [Usage](#usage)
   - [Creating an Outbox library instance](#creating-an-outbox-library-instance)
-  - [Creating a new outbox handler](#creating-a-new-outbox-handler)
-  - [Creating a new outbox entry](#creating-a-new-outbox-entry)
-  - [Monitoring the outbox entries](#monitoring-the-outbox-entries)
-  - [Shutting down](#shutting-down)
+  - [Creating your OutboxType](#creating-your-outboxtype)
+  - [Creating your OutboxTypeConverter](#creating-your-outboxtypeconverter)
+  - [Underlying Components](#underlying-components)
+    - [Database Table](#database-table)
+    - [Outbox Scheduler and Cleaner](#outbox-scheduler-and-cleaner)
+    - [Postgres Locks](#postgres-locks)
+- [Local Development](#local-development)
 - [Publishing](#publishing)
+  - [Publish via GitHub](#publish-via-github)
+    - [Tag formatting](#tag-formatting)
+  - [Publish via your workstation](#publish-via-your-workstation)
 
 ## Installation
 
@@ -164,7 +170,7 @@ implementation(files("../transactional-outbox/spring/build/libs/transactional-ou
 
 * Alternative 3: You can publish a snapshot version of the library and make it available to maven snapshot repository.
   1) Update the version in `gradle.properties` to a snapshot version, e.g. `0.0.1-SNAPSHOT`
-  2) Publish it using the instructions here: [Publish via your workstation](###Publish via your workstation) 
+  2) Publish it using the instructions here: [Publish via your workstation](#publish-via-your-workstation)
   3) Snapshot will be published to the maven snapshot repository and then you can use it in your project by adding the following to your `build.gradle` file:
   ```gradle
     repositories {
@@ -193,7 +199,7 @@ Now, you can either:
 ### Publish via GitHub
 Using this method has the benefit of not having to provide any secrets whatsoever.  
 Simply, push a git tag **after** a PR is merged, which will trigger the 
-[release.yml](.github/workflows/release-spring.yml) pipeline.  
+[release-spring.yml](../.github/workflows/release-spring.yml) pipeline.  
 Said pipeline, will publish the artifact.
 
 Please note that this will be automated in future work.
