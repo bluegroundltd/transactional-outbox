@@ -1,0 +1,62 @@
+name: Release
+on:
+  push:
+    tags:
+      - 'spring-v*'
+
+jobs:
+  release-spring:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          # https://github.com/actions/checkout?tab=readme-ov-file#Fetch-all-history-for-all-tags-and-branches
+          fetch-depth: 0
+          ref: ${{ github.ref }}
+
+      - name: Check tag name pattern follows `spring-vX.Y.Z`
+        run: |
+          if [[ ! "$GITHUB_REF" =~ ^refs/tags/spring-v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Tag name ($GITHUB_REF) does not match the pattern 'spring-vX.Y.Z'. Exiting."
+            exit 1
+          fi
+
+      - name: Issue a release only if a tag is based on a merged commit in `main` branch
+        run: |
+          tag_commit=$(git rev-parse ${{ github.ref }})
+          merged_commit=$(git rev-parse origin/main)
+
+          if git merge-base --is-ancestor $tag_commit $merged_commit; then
+            echo "Tag is based on a merged commit in the main branch"
+          else
+            echo "Tag is not based on a merged commit in the main branch. Exiting."
+            exit 1
+          fi
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          java-version: 17.0.1
+          distribution: 'zulu'
+
+      - name: Build and test
+        run: ./gradlew spring:build
+
+      - name: Publish package
+        uses: gradle/gradle-build-action@v2.4.2
+        env:
+          # https://docs.gradle.org/current/userguide/signing_plugin.html#sec:in-memory-keys
+          ORG_GRADLE_PROJECT_signingKey: ${{ secrets.SIGNING_KEY }}
+          ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.SIGNING_PASSWORD }}
+          ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.SONATYPE_USERNAME }}
+          ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.SONATYPE_PASSWORD }}
+        with:
+          arguments: spring:publishAllPublicationsToMavenCentral --no-configuration-cache
+
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+        with:
+          generate_release_notes: true

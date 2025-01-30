@@ -14,21 +14,52 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+
       - name: Setup Java JDK
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           java-version: 17.0.1
           distribution: 'zulu'
+
       - name: Build and test
         run: ./gradlew core:build
+
       - name: Upload Coverage
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: coverage-report
+          name: coverage-report-core
           path: ./core/build/reports/jacoco
+
       - name: Upload Test Results
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: test-results
+          name: test-results-core
           path: ./core/build/reports/tests
+
+  build-and-test-spring:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Java JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: 17.0.1
+          distribution: 'zulu'
+
+      - name: Build and test
+        run: ./gradlew spring:build
+
+      - name: Upload Coverage
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report-spring
+          path: ./spring/build/reports/jacoco
+
+      - name: Upload Test Results
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-spring
+          path: ./spring/build/reports/tests
