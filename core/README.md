@@ -14,7 +14,12 @@ API Docs: https://bluegroundltd.github.io/transactional-outbox/core/index.html
   - [Creating a new outbox entry](#creating-a-new-outbox-entry)
   - [Monitoring the outbox entries](#monitoring-the-outbox-entries)
   - [Shutting down](#shutting-down)
+- [Local Development](#local-development)
 - [Publishing](#publishing)
+  - [Publish via GitHub](#publish-via-github)
+    - [Tag formatting](#tag-formatting)
+  - [Publish via your workstation](#publish-via-your-workstation)
+
 
 ## Installation
 
@@ -216,7 +221,7 @@ implementation(files("../../../transactional-outbox/core/build/libs/core-x.y.z.j
 
 * Alternative 3: You can publish a snapshot version of the library and make it available to maven snapshot repository.
   1) Update the version in `gradle.properties` to a snapshot version, e.g. `2.2.0-SNAPSHOT`
-  2) Publish it using the instructions here: [Publish via your workstation](###Publish via your workstation) 
+  2) Publish it using the instructions here: [Publish via your workstation](#publish-via-your-workstation)
   3) Snapshot will be published to the maven snapshot repository and you can use it in your project by adding the following to your `build.gradle` file:
   ```gradle
     repositories {
@@ -244,8 +249,8 @@ Now, you can either:
 
 ### Publish via GitHub
 Using this method has the benefit of not having to provide any secrets whatsoever.  
-Simply, push a git tag **after** a PR is merged, which will trigger the 
-[release.yml](.github/workflows/release-core.yml) pipeline.  
+Simply, push a git tag **after** a PR is merged, which will trigger the
+[release-core.yml](../.github/workflows/release-core.yml) pipeline.  
 Said pipeline, will publish the artifact.
 
 Please note that this will be automated in future work.
