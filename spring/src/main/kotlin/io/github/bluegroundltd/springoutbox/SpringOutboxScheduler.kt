@@ -2,11 +2,9 @@ package io.github.bluegroundltd.springoutbox
 
 import org.slf4j.LoggerFactory
 import org.springframework.scheduling.annotation.Scheduled
-import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 
-@Component
-internal class SpringOutboxScheduler(
+open class SpringOutboxScheduler(
   private val transactionalOutbox: TransactionalOutbox,
 ) : OutboxScheduler {
   companion object {
