@@ -2,6 +2,11 @@
 
 ## v.2.x.x
 
+### v.2.3.3 - Error logging fix
+
+Release 2.3.3 updates the main outbox processor to handle all Throwables and log them. Previously, only exceptions
+were handled and logged.
+
 ### v.2.3.2 - Fix for legacy instant processing and insertion hints
 
 Release 2.3.2 fixes the legacy instant processing (i.e. when `instantOrderingEnabled` is set to `false`) which was
