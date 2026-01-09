@@ -3,7 +3,7 @@ description = "Transactional Outbox"
 plugins {
   kotlin("jvm")
   id("org.jetbrains.dokka") version "1.9.0"
-  id("com.vanniktech.maven.publish") version "0.25.3"
+  id("com.vanniktech.maven.publish") version "0.35.0"
 }
 
 subprojects {
@@ -18,7 +18,10 @@ subprojects {
       }) {
       val signingKey: String? by project
       val signingPassword: String? by project
-      useInMemoryPgpKeys(signingKey, signingPassword)
+      // Use in-memory keys if provided (for CI), otherwise fall back to default signing config (keyring file)
+      if (signingKey != null && signingPassword != null) {
+        useInMemoryPgpKeys(signingKey, signingPassword)
+      }
     }
   }
 }
