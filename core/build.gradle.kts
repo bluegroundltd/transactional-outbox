@@ -9,7 +9,7 @@ plugins {
   jacoco
   id("io.gitlab.arturbosch.detekt")
   id("org.jetbrains.dokka") version "1.9.0"
-  id("org.jetbrains.kotlin.plugin.allopen") version "1.8.0"
+  id("org.jetbrains.kotlin.plugin.allopen") version "1.9.25"
 }
 
 repositories {
@@ -77,8 +77,8 @@ tasks.detekt {
 }
 
 java {
-  sourceCompatibility = JavaVersion.VERSION_11
-  targetCompatibility = JavaVersion.VERSION_11
+  sourceCompatibility = JavaVersion.VERSION_17
+  targetCompatibility = JavaVersion.VERSION_17
 }
 
 detekt {
