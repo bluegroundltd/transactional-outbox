@@ -1,5 +1,11 @@
 # Upgrade Guide
 
+## v.3.x.x
+
+### v.3.0.0 - Java & Kotlin upgrade
+
+Java was upgraded to version 17 and Kotlin to 1.9
+
 ## v.2.x.x
 
 ### v.2.3.3 - Error logging fix
